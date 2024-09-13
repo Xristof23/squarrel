@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import { initialState } from "@/initialData";
+import LilSquare from "@/components/LilSquare";
 
 
 const ProgressBar = styled.div`
@@ -53,7 +54,7 @@ const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
   padding: 0.5rem;
-  margin: auto; 
+  margin: 1rem auto 1rem; 
   min-height: 40px;
   width: 50%;
   align-content: center;
@@ -84,56 +85,12 @@ height: 600px;
   border-radius: 2px;
   justify-content: center;
 `;
-const LilSquareContainer = styled.div`
-  text-align: center;  
-  padding: 0.1rem;
-  min-height: 100px;
-  height: 100%;
-  width: 100%;
-  border: 2px solid orange;
-  border-radius: 5px;
 
-`;
-
-const LilSquareBack = styled.p`
-color: orange;  
-text-align: left;  
-  padding: 0;
-  line-height: 0.77rem;
-  font-size: 0.77rem;
-`;
-
-const LilSquareFront = styled.div`
-  text-align: center;  
-  padding: 2.7rem;
-  min-height: 100px;
-  height: 100%;
-  width: 100%;
-  line-height: 3rem;
-  font-size: 3rem;
-`;
-
-const LilTest = styled.div`
-  text-align: center;  
-  
-  min-height: 50px;
-  height: 100%;
-  width: 100%;
-  border: 2px solid orange;
-  border-radius: 2px;
-  line-height: 2rem;
-  font-size: 2rem;
-`;
-
-
-
-
-// console.log(generateSquareArray("memory", 4));
 
 export default function HomePage() {
   const [squareState, setSquareState] = useState(initialState);
-  const [gameState, setGameState] = useState({ gameMode: "memory", progress: "noGame" });
-  const { gameMode, progress } = gameState;
+  const [gameState, setGameState] = useState({ gameMode: "memory", progress: "no game started yet", openCards: 0 });
+  const {gameMode, progress, openCards } = gameState;
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L");
 
   function generateSquareArray(mode, root) {
@@ -142,9 +99,8 @@ export default function HomePage() {
     const cardNumbers = [...Array(numberOfSquares + 1).keys()].slice(1);
 
     const backLetters = "s Q U A R R E L "
-
-   const backSideArray = cardNumbers.map((number) => backLetters);
-      console.log(backSideArray);
+    const backSideArray = cardNumbers.map((number) => backLetters);
+     
 
     const squareArray = cardNumbers.map((number) => {
         // const timeStamp = Date.now();
@@ -156,49 +112,56 @@ export default function HomePage() {
     return squareArray;
   }
   
-
-
   function handleStart() {
-   
     setSquareState(generateSquareArray("memory", 4));
-    setGameState({...gameState, progress: "generated"})
+    setGameState({ ...gameState, progress: "generated" })
+
     setMessage(`Started a ${gameMode} game!`);
   }
 
+  function handleReset() {
+    setSquareState(initialState);
+    setGameState({ ...gameState, progress: "no game started yet" });
+    setMessage("no game started yet");
+    }
 
 
+  function turnAroundCard(id) {
+    const filteredSquareState =  squareState.filter((card) => card.show === true);
+    const openCardsCountBeforeClick = filteredSquareState.length;
+    console.log("openCardsCountBeforeClick: ",openCardsCountBeforeClick)
+    const newSquareState = squareState.map((card) => {
+      if (card.id === id) {
+        return {
+          ...card, show: !card.show
+        }
+      
+     } else {
+      return card
+     } 
+    });
+    
+    setSquareState(newSquareState);
+    const filteredSquareStatePostClick = newSquareState.filter((card) => card.show === true);
+    const openCardsCount = filteredSquareStatePostClick.length;
+    setGameState({ ...gameState, openCards: openCardsCount });
+    setMessage(`You turned card no. ${id}. Open CardCount (post click): ${openCardsCount}`);
+  }
  
   return (
     <>
       <SquarrelTitle>🟧 S Q U A R R E L 🟧</SquarrelTitle>
-      <ButtonContainer><button onClick={handleStart}>START</button><MessageSlot>{message}</MessageSlot></ButtonContainer>
+      <ButtonContainer><button onClick={handleStart}>START</button><MessageSlot>{message}</MessageSlot><button onClick={handleReset}>RESET</button></ButtonContainer>
      <SquareSection>
-        {progress === "generated" ? (squareState.map((square) => <LilSquareContainer key={square.id}><LilSquareBack>{square.back}</LilSquareBack></LilSquareContainer>)) : null}
+        {progress === "generated" ? (squareState.map((square) => <LilSquare onTurn={turnAroundCard} key={square.id} id={square.id} front={square.front} back={square.back} show={square.show} />)) : null}
 
     
 
       </SquareSection>
-      {/* <SquareSection>
-       <LilSquare>1</LilSquare>
-       <LilSquare>2</LilSquare>
-       <LilSquare>3</LilSquare>
-       <LilSquare>4</LilSquare>
-       <LilSquare>5</LilSquare>
-       <LilSquare>6</LilSquare>
-       <LilSquare>7</LilSquare>
-       <LilSquare>8</LilSquare>
-       <LilSquare>9</LilSquare>
-       <LilSquare>10</LilSquare>
-       <LilSquare>11</LilSquare>
-       <LilSquare>12</LilSquare>
-       <LilSquare>13</LilSquare>
-       <LilSquare>14</LilSquare>
-       <LilSquare>15</LilSquare>
-     <LilSquare>16</LilSquare> 
-     </SquareSection> */}
+     
       
 
-      <TestFlexContainer> </TestFlexContainer>
+      
     </>
   );
 }
