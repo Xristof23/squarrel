@@ -1,32 +1,8 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
-import { initialState } from "@/initialData";
+import { initialState, memoryCardsets } from "@/initialData";
 import LilSquare from "@/components/LilSquare";
-
-
-const ProgressBar = styled.div`
-  width: 42%;
-  max-width: 200px;
-  height: 0.8rem;
-  border: 1px solid var(--text-on-bright);
-  position: relative;
-  display: inline-block;
-  margin: 0 0.5rem 0 0;
-  border-radius: 6px;
-
-  &::after {
-    content: "";
-    position: absolute;
-    height: 100%;
-    width: ${({ $progress, $showDetails }) =>
-      $showDetails ? `${$progress}%` : "0"};
-    background: var(--text-on-bright);
-    border-radius: 6px;
-    transition: width 400ms;
-    transition-delay: ${({ $showDetails }) => ($showDetails ? "500ms" : "0ms")};
-  }
-`;
-
+import Image from "next/image";
 
 
 const SquarrelTitle = styled.h1`
@@ -38,29 +14,27 @@ const SquarrelTitle = styled.h1`
   margin:  2rem auto 2rem;
 `;
 
-const CardCount = styled.div`
-text-align: left; 
-color: darkorange;
-padding: 0.1rem;
-margin: 0.5rem;`
-  ;
 
-const TestFlexContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 0.5rem;
-  min-height: 400px;
-  height: 90%;
-  width: 90%;
-  align-content: center;
-  align-items: center;
-  border: 2px solid black;
- 
-`;
+
+
 const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
   padding: 0.5rem;
+  margin: .5rem auto .5rem; 
+  min-height: 40px;
+  width: 50%;
+  align-content: center;
+  align-items: center;
+  background-color: lightgray;
+  border: 1px solid black;
+  border-radius: 5px;
+`;
+
+const FlexSection = styled.section`
+  display: flex;
+  flex-direction: row;
+  padding: 0;
   margin: 1rem auto 1rem; 
   min-height: 40px;
   width: 50%;
@@ -70,6 +44,37 @@ const ButtonContainer = styled.div`
   border: 1px solid black;
   border-radius: 5px;
 `;
+
+const OptionsContainer = styled.div`
+padding: 0.5rem;
+margin: .5rem; 
+  width: 75%;
+ background-color: white;
+  border: 1px solid black;
+  border-radius: 5px;
+`;
+
+
+const ImageContainer = styled.div`
+padding: .5rem;
+margin: .5rem; 
+  width: 75%;
+ background-color: white;
+  border: 1px solid black;
+  border-radius: 5px;
+`;
+
+const Stats = styled.div`
+text-align: left; 
+color: orange;
+background-color: black;
+padding: 0.5rem;
+margin: .5rem; 
+width: 25%;
+border: 1px solid black;
+border-radius: 5px;
+`;
+
 
 const ConfirmMessage = styled.div`
   display: flex;
@@ -109,13 +114,14 @@ height: 600px;
 
 export default function HomePage() {
   const [squareState, setSquareState] = useState(initialState);
-  const [gameState, setGameState] = useState({ gameMode: "memory", progress: "no game started yet", cardsShown: 0, score: 0, match: false });
-  const { gameMode, progress, cardsShown, score, match } = gameState;
-  const [openedCards, setOpenedCards] = useState([]);
-  const { card0, card1 } = openedCards;
+  const [gameState, setGameState] = useState({ gameMode: "memory", progress: "no game started yet", cardsShown: 0, cardsOpened: 0, score: 0, match: false });
+  const { gameMode, progress, cardsShown, score, cardsOpened, match } = gameState;
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L");
+  const { htmlSet, ABC } = memoryCardsets;
 
-  function generateSquareArray(mode, root, shuffle) {
+
+  // root: even numbers >= 4
+  function generateSquareArray(mode, root, shuffle, set) {
     const numberOfSquares = root ** 2;
     const cardSets = numberOfSquares / 2;
     const cardNumbers = [...Array(numberOfSquares + 1).keys()].slice(1);
@@ -126,8 +132,8 @@ export default function HomePage() {
     const squareArray = cardNumbers.map((number) => {
         // const timeStamp = Date.now();
       
-      const front = Math.ceil(number / 2);
-      const squareObject = { id: number, mode, front, back: backSideArray, show: false, won: false };
+      const front = set === "numbers" ? Math.ceil(number / 2) : memoryCardsets.ABC[number-1];
+      const squareObject = { id: number, mode, front, back: backSideArray, isShown: false, won: false };
       return squareObject;
     });
     function shuffleArray(array) {
@@ -144,7 +150,7 @@ export default function HomePage() {
   }
   
   function handleStart() {
-    setSquareState(generateSquareArray("memory", 4, false));
+    setSquareState(generateSquareArray("memory", 4, false, "ABC"));
     setGameState({ ...gameState, progress: "generated" })
 
     setMessage(`Started a ${gameMode} game!`);
@@ -160,17 +166,19 @@ export default function HomePage() {
 
   // restart
   function handleRestart() {
+    //needs added confirm dialog
     setSquareState(squareState.map((card) => {
-      const newCard = { ...card, show: false, won: false }
+      const newCard = { ...card, isShown: false, won: false }
       return newCard;
     }));
-    setGameState({ ...gameState, progress: "generated", cardsShown: 0, score: 0, match: false });
-    setOpenedCards([]);
-      setMessage("Click on a card to start!");
+
+    setGameState({ ...gameState, progress: "generated", cardsShown: 0, cardsOpened: 0, score: 0, match: false });
+  
+   setMessage("Click on a card to start!");
       }
   
   
-  function handleMatch(card0, card1) {
+  function handleMatch(card0) {
   
       const postMatchSquareState = squareState.map((card) => {
         if (card.front === card0.front) {
@@ -183,8 +191,20 @@ export default function HomePage() {
         }
       });
       setSquareState(postMatchSquareState);
-      setGameState({ ...gameState, score: gameState.score + 2 });
+      setGameState({ ...gameState, score: gameState.score + 2, match: false, });
     setMessage("You scored!");
+  postMatchSquareState.map((card) => {
+      if (card.front === card0.front) {
+        return {
+          ...card, isShown: false
+        }
+      
+      } else {
+        return card
+      }
+    });
+   setTimeout(setSquareState, 2000, postMatchSquareState);
+    
     }
   
   
@@ -193,7 +213,7 @@ export default function HomePage() {
        const noMatchSquareState = squareState.map((card) => {
         if (card.id === card0.id) {
           return {
-            ...card, show: !card.show
+            ...card, isShown: !card.isShown
           }
         
        } else {
@@ -203,7 +223,7 @@ export default function HomePage() {
         .map((card) => {
           if (card.id === card1.id) {
             return {
-              ...card, show: !card.show
+              ...card, isShown: !card.isShown
             }
           
          } else {
@@ -216,12 +236,12 @@ export default function HomePage() {
   
   function turnAroundCard(id) {
     //following 2 lines obsolete now?
-    const filteredSquareStatePreClick =  squareState.filter((card) => card.show === true);
+    const filteredSquareStatePreClick =  squareState.filter((card) => card.isShown === true);
     const openCardsCountBeforeClick = filteredSquareStatePreClick.length;
     const newSquareState = squareState.map((card) => {
       if (card.id === id) {
         return {
-          ...card, show: !card.show
+          ...card, isShown: !card.isShown
         }
       
      } else {
@@ -230,10 +250,12 @@ export default function HomePage() {
     });
     
     setSquareState(newSquareState);
-    const filteredSquareState = newSquareState.filter((card) => card.show === true);
+    const filteredSquareState = newSquareState.filter((card) => card.isShown === true);
     const openCardsCount = filteredSquareState.length;
-    setGameState({ ...gameState, cardsShown: openCardsCount });
-    setMessage(`You turned card no. ${id}. Open CardCount: ${openCardsCount}`);
+    console.log("l. 245 openCardsCount: ", openCardsCount);
+    setGameState({ ...gameState, cardsShown: openCardsCount, cardsOpened: gameState.cardsOpened + 1 });
+    console.log("l. 247 cardsopenedState: ", cardsOpened);
+    setMessage(`You turned card no. ${id}.`);
     //check for too many cards not needed, instead check for match and autoclose
     
     if (openCardsCount <= 1) {
@@ -244,9 +266,8 @@ export default function HomePage() {
       if (card0.front === card1.front) {
         setMessage("The cards match, yeah!");
         setGameState({ ...gameState, match: true });
-        setOpenedCards([card0, card1]);
-        console.log(card0);
-        console.log(card1);
+        setTimeout(handleMatch, 2000, card0);
+        
       } else {
         setMessage("The cards do not match!");
        
@@ -255,23 +276,46 @@ export default function HomePage() {
       // card0.front === card1.front ? setMessage("The cards match, yeah!") : setMessage("The cards do not match!");
       // make cards disappear and count points
     }
-  
-
   }
  
   return (
     <>
       <SquarrelTitle>🟧 S Q U A R R E L 🟧</SquarrelTitle>
-      <ButtonContainer><button onClick={handleStart}>START</button><MessageSlot>{message}</MessageSlot><CardCount>Open: {cardsShown}  Score: {score} </CardCount>  <button onClick={handleRestart}>RESTART</button></ButtonContainer>
-     {match && <ConfirmMessage><button onClick={()=>handleMatch(openedCards[0], openedCards[1])}>Ok</button></ConfirmMessage>}
-      <SquareSection>
-        {progress === "generated" ? (squareState.map((square) => <LilSquare onTurn={turnAroundCard} key={square.id} id={square.id} front={square.front} back={square.back} show={square.show} won={square.won} />)) : null}
+      <FlexSection><OptionsContainer>Options</OptionsContainer>
+        <Stats>Open Cards: {cardsShown} <br/>Won Cards: {score} <br/>Cards opened: {cardsOpened}</Stats>
+      </FlexSection>
 
-    
-
-      </SquareSection>
+      <ButtonContainer><button onClick={handleStart}>START</button><MessageSlot>{message}</MessageSlot> <button onClick={handleRestart}>RESTART</button></ButtonContainer>
      
+  
+      <SquareSection>
+        {progress === "generated" ? (squareState.map((square) => <LilSquare onTurn={turnAroundCard} key={square.id} id={square.id} front={square.front} back={square.back} isShown={square.isShown} won={square.won} />)) : null}
+
+  
+      </SquareSection>
+     <p> Image 384:  <img src="eu-a-bear.jpeg"
+        alt="A bear in black & white" width="200px" height="200px" />
+      </p>
+      <p> Image Next component <Image src="/eu-a-bear.jpeg"
+        height={200} width={200}
+        alt="A bear in black & white" />
+    
       
+      </p>
+      {/* <FlexContainer>  Image 1024:  <img src="..\public\images\bear.jpeg"
+        alt="A bear in black & white" />
+      </FlexContainer>
+
+      <p>  Flyer Test:  <img src="ressources\images\MOA2024FlyerHochKantA62024V2web.jpg"
+        alt="Flyer" />
+      </p>
+
+
+      <FlexContainer>  Image 384 normal:  <img src="..\ressources\images\eu-a-wolf.jpg"
+        alt="A bear in black & white" />
+      </FlexContainer>
+  
+       */}
 
       
     </>

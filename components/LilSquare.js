@@ -45,7 +45,7 @@ padding: 2.7rem;
 
 
 
-export default function LilSquare({ id, front, back, show, onTurn, won }) {
+export default function LilSquare({ id, front, back, isShown, onTurn, won, set }) {
   
   function handleCardClick(id) {
     onTurn(id);
@@ -55,7 +55,7 @@ export default function LilSquare({ id, front, back, show, onTurn, won }) {
    
   } else {
     return (
-      <LilSquareContainer onClick={() => handleCardClick(id)}>{show ? <LilSquareFront>{front}</LilSquareFront> : <LilSquareBack>{back}</LilSquareBack>}</LilSquareContainer>)
+      <LilSquareContainer onClick={() => handleCardClick(id)}>{isShown ? <LilSquareFront>{front}</LilSquareFront> : <LilSquareBack>{back}</LilSquareBack>}</LilSquareContainer>)
   
   }
 }
