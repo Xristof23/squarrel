@@ -2,7 +2,8 @@ import styled from "styled-components";
 
 
 const LilSquareContainer = styled.div`
-  text-align: center;  
+position: relative;  
+text-align: center;  
   padding: 0.1rem;
   min-height: 100px;
   height: 100%;
@@ -43,9 +44,18 @@ padding: 2.7rem;
   font-size: 3rem;
 `;
 
+const CardImage = styled.img`
+  display: block;
+  position: absolute;
+ 
+  height: 142px;
+ width: 142px;
+ 
+`;
 
 
-export default function LilSquare({ id, front, back, isShown, onTurn, won, set }) {
+
+export default function Card({ id, front, back, isShown, onTurn, won, set, typeOfSet }) {
   
   function handleCardClick(id) {
     onTurn(id);
@@ -55,8 +65,11 @@ export default function LilSquare({ id, front, back, isShown, onTurn, won, set }
    
   } else {
     return (
-      <LilSquareContainer onClick={() => handleCardClick(id)}>{isShown ? <LilSquareFront>{front}</LilSquareFront> : <LilSquareBack>{back}</LilSquareBack>}</LilSquareContainer>)
-  
+      // <LilSquareContainer onClick={() => handleCardClick(id)}>{isShown ? (typeOfSet === "img" ? <CardImage src={"public/images/eu-a-bear.jpeg"} alt={"an animal" } /> : <LilSquareFront>{front}</LilSquareFront>) : <LilSquareBack>{back}</LilSquareBack>}</LilSquareContainer>)
+      <>
+        <LilSquareContainer onClick={() => handleCardClick(id)}>{isShown ? (typeOfSet === "img" ? <CardImage src={`/images/${front}`}  alt="A bear in black & white" /> : <LilSquareFront>{front}</LilSquareFront>) : <LilSquareBack>{back}</LilSquareBack>}</LilSquareContainer>
+        
+      </>)
   }
 }
   
