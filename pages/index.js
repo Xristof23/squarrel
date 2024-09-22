@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useState } from "react";
-import { initialCardState, ABCSet, htmlSet, euAnimals } from "@/memoryData";
+import { initialCardState, initialGameState, ABCSet, htmlSet, euAnimals } from "@/memoryData";
 import Card from "@/components/Card";
 
 const SquarrelTitle = styled.h1`
@@ -102,8 +102,8 @@ export default function HomePage() {
   const [options, setOptions] = useState({ gameMode: "memory", root: 4, shuffle: false, set: euAnimals, typeOfSet: "img" });
   const { gameMode, root, shuffle, set, typeOfSet } = options;
   const [squareState, setSquareState] = useState(initialCardState);
-  const [gameState, setGameState] = useState({progress: "no game started yet", cardsShown: 0, cardClicks: 0, score: 0, match: false, card0: {id: "a"}, card1: {id: "b"} });
-  const { progress, cardsShown, score, cardClicks, match, card0, card1 } = gameState;
+  const [gameState, setGameState] = useState(initialGameState);
+  const { progress, openCardsBeforeClick, cardsShown, score, cardClicks, match, card0, card1 } = gameState;
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L");
 
   
@@ -141,6 +141,7 @@ export default function HomePage() {
   
   function handleStart() {
     setSquareState(generateSquareArray(root, shuffle, euAnimals));
+   //not needed right now
     setGameState({ ...gameState, progress: "generated" })
 
     setMessage(`Started a ${gameMode} game!`);
@@ -162,39 +163,12 @@ export default function HomePage() {
       return newCard;
     }));
 
-    setGameState({ ...gameState, progress: "generated", cardsShown: 0, cardsOpened: 0, score: 0, match: false, card0: {id: "a"}, card1 : {id: "b"}  });
-  
+    setGameState(initialGameState);
    setMessage("Click on a card to start!");
       }
   
   
-  function handleMatch(card0) {
-      const postMatchSquareState = squareState.map((card) => {
-        if (card.front === card0.front) {
-          return {
-            ...card, won: true
-          }
-        
-        } else {
-          return card
-        }
-      });
-      setSquareState(postMatchSquareState);
-      setGameState({ ...gameState, score: gameState.score + 2, match: false, });
-    setMessage("You scored!");
-  postMatchSquareState.map((card) => {
-      if (card.front === card0.front) {
-        return {
-          ...card, isShown: false
-        }
-      
-      } else {
-        return card
-      }
-    });
-   setTimeout(setSquareState, 1000, postMatchSquareState);
-   setTimeout(setGameState, 1000, { ...gameState, cardsShown: 0 })
-    }
+
   
   
     function handleNoMatch(card0, card1) {
@@ -220,12 +194,12 @@ export default function HomePage() {
          } 
         });
       setSquareState(noMatchSquareState);
-
     }
   
   function turnAroundCard(id) {
-    const filteredSquareStatePreClick =  squareState.filter((card) => card.isShown === true);
-    const openCardsBeforeClick = filteredSquareStatePreClick.length;
+    const filteredSquareStatePreClick = squareState.filter((card) => card.isShown === true);
+    setGameState({...gameState, openCardsBeforeClick: filteredSquareStatePreClick.length })
+    // const openCardsBeforeClick = filteredSquareStatePreClick.length;
       
     if (openCardsBeforeClick <= 1) {
       const newSquareState = squareState.map((card) => {
@@ -238,6 +212,7 @@ export default function HomePage() {
         return card
        } 
       });
+
       setSquareState(newSquareState);
       const filteredSquareState = newSquareState.filter((card) => card.isShown === true);
       const openCardsCount = filteredSquareState.length;
@@ -247,12 +222,10 @@ export default function HomePage() {
       if (openCardsCount === 2) {
         setGameState({ ...gameState, card1: filteredSquareState[1] });
         if (card0.front === filteredSquareState[1].front) {
-          setMessage("The cards match, yeah! Score: " +{score});
+          setMessage("The cards match, yeah!");
           setGameState({ ...gameState, match: true });
-          //test
-          setMessage("(l 253 Score: " +{score})
           setTimeout(handleMatch, 1500, card0, card1);
-          setMessage("(l 255 Score: " + { score })
+        
           
         } else {
           setMessage("The cards do not match!");
@@ -268,19 +241,52 @@ export default function HomePage() {
       }
 
     
-    //check for too many cards not needed, instead check for match and autoclose
-
+    //check for too many cards not needed, instead check for match and autoclos
          // card0.front === card1.front ? setMessage("The cards match, yeah!") : setMessage("The cards do not match!");
       // make cards disappear and count points
     
   }
  
+  function handleMatch(card0) {
+    const postMatchSquareState = squareState.map((card) => {
+      if (card.front === card0.front) {
+        return {
+          ...card, won: true
+        }
+      } else {
+        return card
+      }
+    });
+    setSquareState(postMatchSquareState);
+    const postWinGameState = { ...gameState, score: gameState.score + 2, match: false, }
+    setGameState(postWinGameState);
+    setMessage("You scored!");
+    postMatchSquareState.map((card) => {
+     if (card.front === card0.front) {
+      return {
+        ...card, isShown: false
+      }
+      } else {
+      return card
+      }
+  });
+ setTimeout(setSquareState, 1000, postMatchSquareState);
+ setTimeout(setGameState, 1000, { ...postWinGameState, cardsShown: 0, card0: {id: "a"}, card1: {id: "b"} })
+  }
+
+
+
+
+
   return (
     <>
       <SquarrelTitle>🟧 S Q U A R R E L 🟧</SquarrelTitle>
       <FlexSection><OptionsContainer>Options</OptionsContainer>
         <Stats>
           Stats(some only for dev)  
+          <br />
+          <br />
+          Open cards before Click: {openCardsBeforeClick}
           <br />
           Open Cards: {cardsShown}
           <br />
