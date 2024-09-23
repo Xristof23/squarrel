@@ -1,7 +1,7 @@
 // initial states
 
 const initialCardState = [];
-const initialGameState = {progress: "game not started yet", openCardsBeforeClick: 0, cardsShown: 0, cardClicks: 0, score: 0, match: false, card0: {id: "a"}, card1: {id: "b"} };
+const initialGameState = {progress: "game not started yet", openCardsBeforeClick: 0, cardsShown: 0, round: 1, score: 0, card0: {id: "a"}, card1: {id: "b"} };
 
 // ASCII Sets
 const ABCSet = { setName: "ABCSet", typeOfSet: "ASCII", setList: ["A", "B", "C", "D", "E", "F", "G", "H", "A", "B", "C", "D", "E", "F", "G", "H"] };

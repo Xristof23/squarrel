@@ -99,13 +99,12 @@ height: 600px;
 
 
 export default function HomePage() {
-  const [options, setOptions] = useState({ gameMode: "memory", root: 4, shuffle: false, set: euAnimals, typeOfSet: "img" });
+  const [options, setOptions] = useState({ gameMode: "memory", root: 4, shuffle: true, set: euAnimals, typeOfSet: "img" });
   const { gameMode, root, shuffle, set, typeOfSet } = options;
   const [squareState, setSquareState] = useState(initialCardState);
   const [gameState, setGameState] = useState(initialGameState);
-  const { progress, openCardsBeforeClick, cardsShown, score, cardClicks, match, card0, card1 } = gameState;
+  const { progress, cardsShown, score, round, card0, card1 } = gameState;
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L");
-
   
   // root: even numbers >= 4
   function generateSquareArray(root, shuffle, set) {
@@ -127,24 +126,22 @@ export default function HomePage() {
     const backLetters = "s Q U A R R E L "
     const backSideArray = cardNumbers.map((number) => backLetters);
     
-    const squareArray = cardNumbers.map((number) => {
+    const cardsArray = cardNumbers.map((number) => {
       const frontASCII = set === "smallNumbers" ? Math.ceil(number / 2) : setList[number - 1];
       const frontImage = `${setName}-${setList[Math.ceil(number / 2)]}.jpg`;
 
       const front = typeOfSet === "img" ? frontImage : frontASCII;
-      const squareObject = { id: number, front, back: backSideArray, typeOfSet, isShown: false, won: false };
-      return squareObject;
+      const cardObject = { id: number, front, back: backSideArray, typeOfSet, isShown: false, won: false };
+      return cardObject;
     });
-   
-    return shuffle === true ? shuffleArray(squareArray) : squareArray;
+    return shuffle === true ? shuffleArray(cardsArray) : cardsArray;
   }
   
   function handleStart() {
     setSquareState(generateSquareArray(root, shuffle, euAnimals));
    //not needed right now
-    setGameState({ ...gameState, progress: "generated" })
-
-    setMessage(`Started a ${gameMode} game!`);
+    setGameState({ ...initialGameState, progress: "generated" });
+    setMessage(`Started a ${gameMode} game! Click on a card to start!`);
   }
 
   //need two kinds of resets
@@ -163,153 +160,100 @@ export default function HomePage() {
       return newCard;
     }));
 
-    setGameState(initialGameState);
+    setGameState({ ...initialGameState, progress: "generated" });
    setMessage("Click on a card to start!");
       }
   
+  function showDebugInfo() {
+    console.log("Squarestate", squareState);
+    console.log("Gamestate", gameState);
+  }
   
+  function cardClick(id) {
+  
+    //just for fun, will be replaced with next update of memorydata
+    const cardClicked = squareState.find((card) => card.id === id).front;
+    const cardName = cardClicked.slice(10, -4);
 
-  
-  
-    function handleNoMatch(card0, card1) {
-       //close cards delay needed or dialog
-       const noMatchSquareState = squareState.map((card) => {
-        if (card.id === card0.id) {
-          return {
-            ...card, isShown: !card.isShown
-          }
-        
-       } else {
-        return card
-       } 
-      })
-        .map((card) => {
-          if (card.id === card1.id) {
-            return {
-              ...card, isShown: !card.isShown
-            }
-          
-         } else {
-          return card
-         } 
-        });
-      setSquareState(noMatchSquareState);
-    }
-  
-  function turnAroundCard(id) {
-    const filteredSquareStatePreClick = squareState.filter((card) => card.isShown === true);
-    setGameState({...gameState, openCardsBeforeClick: filteredSquareStatePreClick.length })
-    // const openCardsBeforeClick = filteredSquareStatePreClick.length;
+      //react to clicking on same card again
+    cardsShown === 1 && card0.id === id ? setMessage("Turn another card!") : setMessage(`You turned card "${cardName}".`);
+    //set Card to show
+    let newSquareState = squareState.map((card) => card.id === id ? { ...card, isShown: true } : card
+    );
+    setSquareState(newSquareState);
+
+   const filteredSquareState = newSquareState.filter((card) => card.isShown === true);
+    setGameState({ ...gameState, cardsShown: filteredSquareState.length, card0: filteredSquareState[0] });
+    const openCards = filteredSquareState.length;
+   
+    openCards === 2 ? setGameState({ ...gameState, card1: filteredSquareState[1] }) : null;
+
+    function checkForMatchAndReset(openCards, card0) {
+      if (openCards === 2) {
       
-    if (openCardsBeforeClick <= 1) {
-      const newSquareState = squareState.map((card) => {
-        if (card.id === id) {
-          return {
-            ...card, isShown: true
+        const match = card0.front === filteredSquareState[1].front ? true : false;
+        const wonCardState = squareState.map((card) => {
+          if (card.front === card0.front) {
+            return {
+              ...card, won: true
+            }
+          } else {
+            return card
           }
+        });
+  
+        match ? setMessage("The cards match, yeah!") : setMessage("The cards do not match!");
         
-       } else {
-        return card
-       } 
-      });
-
-      setSquareState(newSquareState);
-      const filteredSquareState = newSquareState.filter((card) => card.isShown === true);
-      const openCardsCount = filteredSquareState.length;
-      setGameState({ ...gameState, cardsShown: openCardsCount, cardsClicked: gameState.cardClicks + 1, card0: filteredSquareState[0] });
-      setMessage(`You turned card no. ${id}.`);
-      card0.id === id ? setMessage("Turn another card") : setMessage(`You turned card no. ${id}.`);
-      if (openCardsCount === 2) {
-        setGameState({ ...gameState, card1: filteredSquareState[1] });
-        if (card0.front === filteredSquareState[1].front) {
-          setMessage("The cards match, yeah!");
-          setGameState({ ...gameState, match: true });
-          setTimeout(handleMatch, 1500, card0, card1);
-        
-          
-        } else {
-          setMessage("The cards do not match!");
-          setTimeout(handleNoMatch, 2000, card0, card1);
-          console.log("after no match");
-        }
-      }  
+      //reset CardState (squarestate)  and gamestate
+        const afterRoundCardState = match? wonCardState : squareState;
+        const resetCardState = afterRoundCardState.map((card) => {
+            const updatedCard = { ...card, isShown: false };
+            return updatedCard;
+        });
+        const timeToSee = match ? 500 : 3500;
+        setTimeout(setSquareState, timeToSee, resetCardState);
+        newSquareState = resetCardState;
+        //check for game End
+        const newScore = wonCardState.filter((card) => card.won === true).length; 
+        const newRound = newScore < 16 ? gameState.round + 1 : "Game won.";
+           //reset and gamestate
+        const afterRoundGameState = { ...gameState, cardsShown: 0, score: (match ? gameState.score + 2 : gameState.score), round: newRound, card0: { id: "a" }, card1: { id: "b" } };
+        setTimeout(() => {
+          setGameState(afterRoundGameState);
+          setMessage(match ? "You scored!" : "You may score next round!");
+          newScore === 16 &&  setMessage("All cards won!");
+        }, timeToSee + 500)
+      }
     }
-    
-    else {
-      setMessage("Test");
-    
-      }
-
-    
-    //check for too many cards not needed, instead check for match and autoclos
-         // card0.front === card1.front ? setMessage("The cards match, yeah!") : setMessage("The cards do not match!");
-      // make cards disappear and count points
-    
-  }
- 
-  function handleMatch(card0) {
-    const postMatchSquareState = squareState.map((card) => {
-      if (card.front === card0.front) {
-        return {
-          ...card, won: true
-        }
-      } else {
-        return card
-      }
-    });
-    setSquareState(postMatchSquareState);
-    const postWinGameState = { ...gameState, score: gameState.score + 2, match: false, }
-    setGameState(postWinGameState);
-    setMessage("You scored!");
-    postMatchSquareState.map((card) => {
-     if (card.front === card0.front) {
-      return {
-        ...card, isShown: false
-      }
-      } else {
-      return card
-      }
-  });
- setTimeout(setSquareState, 1000, postMatchSquareState);
- setTimeout(setGameState, 1000, { ...postWinGameState, cardsShown: 0, card0: {id: "a"}, card1: {id: "b"} })
-  }
-
-
-
-
+    checkForMatchAndReset(openCards, card0);
+}
 
   return (
     <>
       <SquarrelTitle>🟧 S Q U A R R E L 🟧</SquarrelTitle>
       <FlexSection><OptionsContainer>Options</OptionsContainer>
         <Stats>
-          Stats(some only for dev)  
-          <br />
-          <br />
-          Open cards before Click: {openCardsBeforeClick}
+          Stats 
           <br />
           Open Cards: {cardsShown}
           <br />
-          Card0.id: {card0.id}
-          <br />
-          Card1.id: {card1.id}
-          <br />
           Won Cards: {score}
           <br />
-          Cardclicks: {cardClicks}</Stats>
+          Round: {round}</Stats>
       </FlexSection>
 
-      <ButtonContainer><button onClick={handleStart}>START</button><MessageSlot>{message}</MessageSlot> <button onClick={handleRestart}>RESTART</button></ButtonContainer>
+      <ButtonContainer><button onClick={handleStart}>START</button>
+        <MessageSlot>{message}</MessageSlot>
+        <button onClick={handleRestart}>RESTART</button>
+        <button onClick={showDebugInfo}>DEBUG</button>
+      </ButtonContainer>
      
   
       <SquareSection>
-        {progress === "generated" ? (squareState.map((square) => <Card onTurn={turnAroundCard} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet}  />)) : null}
+        {progress === "generated" ? (squareState.map((square) => <Card onTurn={cardClick} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet}  />)) : null}
 
-  
       </SquareSection>
      
-     
-      
     </>
   );
 }
