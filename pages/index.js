@@ -2,53 +2,104 @@ import styled from "styled-components";
 import { useState } from "react";
 import { initialCardState, initialGameState, ABCSet, htmlSet, euAnimals, allSets } from "@/memoryData";
 import Card from "@/components/Card";
+import TitleStart from "@/components/TitleStart";
 
-const SquarrelTitle = styled.h1`
-  text-align: center;
-  font-weight: 800;
-  line-height: 3.6rem;
-  font-size: 3.5rem;
-  padding: 2rem auto 2rem;  
-  margin:  2rem auto 2rem;
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
+const StyledMain = styled.main`
+ display: grid;
+  grid-template-columns: 220px 936px 220px;
+  grid-template-rows: 60px 232px 232px 232px 232px;
+  position: absolute;
+  left: 12%;
+  margin: auto;
+  gap: 10px;
   flex-direction: row;
   padding: 0.5rem;
   margin: .5rem auto .5rem; 
-  min-height: 40px;
-  width: 50%;
   align-content: center;
-  align-items: center;
-  background-color: lightgray;
-  border: 1px solid black;
-  border-radius: 5px;
 `;
 
-const FlexSection = styled.section`
-  display: flex;
-  flex-direction: row;
-  padding: 0;
-  margin: 1rem auto 1rem; 
-  min-height: 40px;
-  width: 50%;
-  align-content: center;
-  align-items: center;
-  background-color: lightgray;
-  border: 1px solid black;
-  border-radius: 5px;
+const Spacer = styled.div`
+  // border: 1px solid black;
+  border-radius: 4px;
+  padding: .5rem;
+  margin: .5rem; 
+  width: 100%;
+  height:100%;
 `;
 
 const OptionsContainer = styled.div`
-  display: flex,
-  flex-direction: column;
+  // grid-row: 2 / span 3;
   padding: .5rem;
   margin: .5rem; 
-  width: 75%;
-  background-color: white;
+  min-width: 100px;
+  width: 100%;
+  height: 100%;
+  background-color: lightgray;
   border: 1px solid black;
-  border-radius: 5px;
+  border-radius: 4px;
+`;
+const ButtonAndMessageContainer = styled.div`
+grid-column: 1 / span 3; 
+padding: .5rem;
+  margin: .5rem; 
+  width: 100%;
+  height: 100%;
+  background-color: lightgray;
+  border: 1px solid black;
+  border-radius: 4px;
+`;
+const ButtonContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  padding: .5rem;
+  margin: 0 auto 0;
+  min-height: 50px;
+  width: 60%;
+  height: 100%;
+  align-content: center;
+  align-items: center;
+  border-radius: 4px;
+`;
+
+const MessageSlot = styled.div`
+ color: black;
+ font-weight: 400;
+ background-color: darkorange;
+ padding: 0.3rem;
+ border-radius: 4px;
+margin: 0 auto 0; 
+`;
+
+const Stats = styled.div`
+text-align: left; 
+color: black;
+background-color: lightgray;
+padding: .5rem;
+margin: .5rem; 
+width: 100%;
+height: 100%;
+border: 1px solid black;
+border-radius: 4px;
+`;
+
+const SquareSection = styled.section`
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  gap: 0.12rem;
+  width: 936px;
+  height: 936px;
+  margin: .5rem;
+  align-items: center;
+  border-radius: 4px;
+  justify-content: center;
+`;
+
+const SmallerHeadline = styled.h2`
+font-size: 1.05rem;
+font-weight: 600; 
+margin: 0 0 0.2rem;
+padding: 0;
 `;
 
 const StyledSelect = styled.select`
@@ -56,48 +107,13 @@ const StyledSelect = styled.select`
   margin: .3rem; 
 `;
 
-const Stats = styled.div`
-text-align: left; 
-color: orange;
-background-color: black;
-padding: 0.5rem;
-margin: .5rem; 
-width: 25%;
-border: 1px solid black;
-border-radius: 5px;
-`;
-
-const ConfirmMessage = styled.div`
-  display: flex;
-  flex-direction: row;
-  padding: 0.5rem;
-  margin: 1rem auto 1rem; 
-  min-height: 40px;
-  width: 50%;
-  align-content: center;
-  align-items: center;
-  border: 1px solid black;
-  border-radius: 5px;
-`;
-
-const MessageSlot = styled.div`
- color: darkorange;
- background-color: white;
- padding: 0.5rem;
-  margin: auto; 
-`;
-
-const SquareSection = styled.section`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr 1fr;
-  gap: 0.2rem;
-  width: 600px;
-  height: 600px;
-  margin: auto;
-  align-items: center;
-  border-radius: 2px;
-  justify-content: center;
+const StandardButton = styled.button`
+font-size: 1rem;
+font-weight: 500; 
+margin: 0.2rem;
+padding: 0.2rem;
+min-width: 3rem;
+min-height: 2rem;
 `;
 
 const StyledInput = styled.input`
@@ -107,8 +123,6 @@ min-width: 3.5rem;
 const SmalllStyledInput = styled.input`
 min-width: 2rem;
 `;
-
-
 
 export default function HomePage() {
   const [options, setOptions] = useState({ gameMode: "memory", root: 4, delayTime: 3000, shuffle: true, cardSet: euAnimals, typeOfSet: "img" });
@@ -253,11 +267,19 @@ export default function HomePage() {
   
   return (
     <>
-      <SquarrelTitle>🟧 S Q U A R R E L 🟧</SquarrelTitle>
-      <FlexSection>
+      <TitleStart/>
+      {/* <SquarrelTitle>🟧 S Q U A R R E L 🟧</SquarrelTitle> */}
+      <StyledMain>
+        <ButtonAndMessageContainer>
+          <ButtonContainer>
+            <StandardButton onClick={handleStart}>start</StandardButton>
+           <MessageSlot>{message}</MessageSlot>
+           <StandardButton onClick={handleRestart}>restart</StandardButton>
+        <StandardButton onClick={showDebugInfo}>debug</StandardButton>
+        </ButtonContainer>
+        </ButtonAndMessageContainer>
         <OptionsContainer>
-          <p>Options</p>
-          <br/>
+        <SmallerHeadline>  Options </SmallerHeadline>
           <label htmlFor="selectSet"  >Set:
             <StyledSelect aria-label="Choose a set of cards" id="selectSet" 
               name="selectSet" value={cardSet}
@@ -276,28 +298,23 @@ export default function HomePage() {
           <br/>
           <label htmlFor="root">Size<input name="root" id="root" type="number" min={4} max={8} set={2} onChange={(event) => setOptions({ ...options, root: Number(event.target.value) })} value={root} />x {root}</label>
         </OptionsContainer>
-        <Stats>
-          Stats 
+  
+      <SquareSection>
+        {progress === "generated" ? (squareState.map((square) => <Card onTurn={cardClick} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet}  />)) : null}
+
+        </SquareSection>
+        
+     <Stats>
+     <SmallerHeadline>Stats</SmallerHeadline>
           <br />
           Open Cards: {cardsShown}
           <br />
           Won Cards: {score}
           <br />
-          Round: {round}</Stats>
-      </FlexSection>
+          Round: {round}
+        </Stats>
+      </StyledMain>
 
-      <ButtonContainer><button onClick={handleStart}>START</button>
-        <MessageSlot>{message}</MessageSlot>
-        <button onClick={handleRestart}>RESTART</button>
-        <button onClick={showDebugInfo}>DEBUG</button>
-      </ButtonContainer>
-     
-  
-      <SquareSection>
-        {progress === "generated" ? (squareState.map((square) => <Card onTurn={cardClick} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet}  />)) : null}
-
-      </SquareSection>
-     
     </>
   );
 }
