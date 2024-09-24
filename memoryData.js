@@ -17,11 +17,13 @@ const abcDualSet = { setName: "abcDualSet", typeOfSet: "ASCII", setList: [{ pair
 
 const htmlSpecialSet = { setName: "htmlSpecialSet", typeOfSet: "ASCII", setList: [{ pairNo: 1, half0: "a", half1: "A" }, "C","D", "E", "F", "G", "H"] };
 
+const allSets = [euAnimals, ABCSet, htmlSet]
 
 export {
     initialCardState, 
     initialGameState,
    ABCSet, 
     htmlSet,
-    euAnimals
+    euAnimals,
+    allSets
 }
