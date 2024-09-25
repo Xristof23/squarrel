@@ -6,29 +6,50 @@ import TitleStart from "@/components/TitleStart";
 
 const StyledMain = styled.main`
  display: grid;
-  grid-template-columns: 220px 936px 220px;
-  grid-template-rows: 60px 232px 232px 232px 232px;
+  grid-template-columns: 228px 934px;
+  grid-template-rows: 120px 228px 228px 228px 228px;
+  width: 1180px;
   position: absolute;
-  left: 12%;
+  top: 0.5rem;
+  left: 1rem;
   margin: auto;
-  gap: 10px;
+  gap: 8px;
   flex-direction: row;
   padding: 0.5rem;
   margin: .5rem auto .5rem; 
   align-content: center;
 `;
 
-const Spacer = styled.div`
-  // border: 1px solid black;
-  border-radius: 4px;
-  padding: .5rem;
+const UpperSection = styled.section`
+grid-column: 1 / span 2; 
+display: flex;
+flex-direction: column; 
   margin: .5rem; 
   width: 100%;
-  height:100%;
+  height: 100%;
+  border-radius: 4px;
+`;
+
+const TitleContainer = styled.div`
+display: flex;
+flex-direction: row; 
+  width: 100%;
+  height: 60%;
+  border-radius: 4px;
+`;
+
+const ControlsContainer = styled.div`
+display: flex;
+flex-direction: row; 
+padding: .5rem;
+  width: 100%;
+  height: 3rem;
+  background-color: lightgray;
+  border: 1px solid black;
+  border-radius: 4px;
 `;
 
 const OptionsContainer = styled.div`
-  // grid-row: 2 / span 3;
   padding: .5rem;
   margin: .5rem; 
   min-width: 100px;
@@ -38,23 +59,14 @@ const OptionsContainer = styled.div`
   border: 1px solid black;
   border-radius: 4px;
 `;
-const ButtonAndMessageContainer = styled.div`
-grid-column: 1 / span 3; 
-padding: .5rem;
-  margin: .5rem; 
-  width: 100%;
-  height: 100%;
-  background-color: lightgray;
-  border: 1px solid black;
-  border-radius: 4px;
-`;
+
 const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
   padding: .5rem;
-  margin: 0 auto 0;
-  min-height: 50px;
-  width: 60%;
+  margin: -.3rem auto 0;
+  min-height: 40px;
+  width: 14rem;
   height: 100%;
   align-content: center;
   align-items: center;
@@ -65,22 +77,37 @@ const MessageSlot = styled.div`
  color: black;
  font-weight: 400;
  background-color: darkorange;
+ width: 80%;
+ height: 100%;
+ margin: 0.8rem auto .5rem;
  padding: 0.3rem;
  border-radius: 4px;
+ border: 1px solid black;
 margin: 0 auto 0; 
 `;
 
 const Stats = styled.div`
+ display: flex;
+flex-direction: row;
 text-align: left; 
 color: black;
-background-color: lightgray;
-padding: .5rem;
-margin: .5rem; 
-width: 100%;
-height: 100%;
-border: 1px solid black;
+padding: .5rem; 
+width: 70%;
+height: 90%;
 border-radius: 4px;
 `;
+
+const SmallerHeadline = styled.h2`
+font-size: 1.05rem;
+font-weight: 600; 
+margin: 0 0 0.4rem;
+`;
+
+const StatLine = styled.p`
+margin: 1.5rem 0 0 -2.5rem;
+text-align: left; 
+`;
+
 
 const SquareSection = styled.section`
   display: grid;
@@ -95,12 +122,7 @@ const SquareSection = styled.section`
   justify-content: center;
 `;
 
-const SmallerHeadline = styled.h2`
-font-size: 1.05rem;
-font-weight: 600; 
-margin: 0 0 0.2rem;
-padding: 0;
-`;
+
 
 const StyledSelect = styled.select`
  padding: .3rem;
@@ -267,17 +289,28 @@ export default function HomePage() {
   
   return (
     <>
-      <TitleStart/>
-      {/* <SquarrelTitle>🟧 S Q U A R R E L 🟧</SquarrelTitle> */}
+     
+      
       <StyledMain>
-        <ButtonAndMessageContainer>
+        <UpperSection>
+          <TitleContainer>
+            <TitleStart />
+          <Stats>
+            <SmallerHeadline>Stats<br/> </SmallerHeadline>
+              
+              <StatLine>🟧 Open Cards: {cardsShown}  🟧 Won Cards: {score}  🟧 Round: {round}</StatLine>
+            </Stats>
+          </TitleContainer>
+          <ControlsContainer>
           <ButtonContainer>
             <StandardButton onClick={handleStart}>start</StandardButton>
-           <MessageSlot>{message}</MessageSlot>
-           <StandardButton onClick={handleRestart}>restart</StandardButton>
-        <StandardButton onClick={showDebugInfo}>debug</StandardButton>
-        </ButtonContainer>
-        </ButtonAndMessageContainer>
+            <StandardButton onClick={handleRestart}>restart</StandardButton>
+            <StandardButton onClick={showDebugInfo}>debug</StandardButton>
+          </ButtonContainer>
+          <MessageSlot>{message}</MessageSlot>
+         
+          </ControlsContainer>
+          </UpperSection>
         <OptionsContainer>
         <SmallerHeadline>  Options </SmallerHeadline>
           <label htmlFor="selectSet"  >Set:
@@ -304,15 +337,7 @@ export default function HomePage() {
 
         </SquareSection>
         
-     <Stats>
-     <SmallerHeadline>Stats</SmallerHeadline>
-          <br />
-          Open Cards: {cardsShown}
-          <br />
-          Won Cards: {score}
-          <br />
-          Round: {round}
-        </Stats>
+    
       </StyledMain>
 
     </>

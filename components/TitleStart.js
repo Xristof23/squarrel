@@ -2,15 +2,15 @@ import { useEffect } from "react";
 import styled from "styled-components";
 
 const SquarrelTitle = styled.h1`
-    text-align: center;
+    text-align: left;
     font-weight: 800;
     line-height: 3.1rem;
     font-size: 3rem;
-    padding: .5rem auto .5rem;  
-    margin:  1.5rem auto 1rem;
+    width: 80%;
+    padding: 0;  
+    margin:  0 0 0 .2rem;
   `;
   
-
 
 export default function TitleStart() {
     function convertTitle() {

@@ -8,9 +8,9 @@ text-align: center;
   min-height: 100px;
   height: 100%;
   width: 100%;
-  border: 2px solid orange;
+  // border: 2px solid orange;
   border-radius: 5px;
-    background-color: black;
+  background-color: black;
 `;
 
 const LilSquareContainerWon = styled.div`
@@ -20,17 +20,7 @@ const LilSquareContainerWon = styled.div`
   height: 100%;
   width: 100%;
   border: none;
-  border-radius: 5px;
-`;
-
-
-const LilSquareBack = styled.p`
-color: orange;  
-
-text-align: left;  
-  padding: 0;
-  line-height: 0.77rem;
-  font-size: 0.77rem;
+  border-radius: 4px;
 `;
 
 const LilSquareFront = styled.div`
