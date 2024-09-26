@@ -12,6 +12,10 @@ const htmlSet = { setName: "htmlSet", typeOfSet: "ASCII", setList: ["<p>", "<h1>
 // classic image sets bw
 const euAnimals = { setName: "euAnimals", typeOfSet: "img", setList: ["bear", "boar", "crane", "deer", "dog", "eagle", "elk", "fawn", "fox", "hare", "hawk", "lynx", "marten", "mouse", "owl", "racoon", "raven", "squirrel", "wildcat", "wolf"] }
 
+// classic image sets colour
+const afrAnimals = {
+    setName: "afrAnimals", typeOfSet: "img", setList: [
+        "butterfly", "cheetah", "cheetah", "crocodile", "elephant", "gazelle", "gazelle2", "giraffe", "hippo", "hyena", "leopard", "leopard2", "lion", "okapi", "rhino", "shoebill", "snake", "warthog", "warthog2", "zebra", "zebra2" ]}
 // AscII sets with two different cards (not yet ready)
 const abcDualSetlist = ABCSet.setList.map((letter, index) => {
     const pairObject = {
@@ -25,7 +29,7 @@ const abcDualSet = { setName: "abcDualSet", typeOfSet: "ASCIIDual", setList: abc
 //has to be filled
 const htmlSpecialSet = { setName: "htmlSpecialSet", typeOfSet: "ASCIIDual", setList: [] };
 
-const allSets = [euAnimals, ABCSet, abcDualSet, htmlSet]
+const allSets = [euAnimals, afrAnimals, ABCSet, abcDualSet, htmlSet ]
 
 export {
     initialCardState, 

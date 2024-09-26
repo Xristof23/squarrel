@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useState } from "react";
-import { initialCardState, initialGameState, ABCSet, htmlSet, euAnimals, allSets } from "@/memoryData";
+import { initialCardState, initialGameState, euAnimals, allSets } from "@/memoryData";
 import Card from "@/components/Card";
 import TitleStart from "@/components/TitleStart";
 import {
@@ -19,9 +19,6 @@ import {
   StyledInput
 } from "@/styledcomponents";
 
-const SmalllStyledInput = styled.input`
-min-width: 2rem;
-`;
 
 const SquareSection = styled.section`
   display: grid;
@@ -70,9 +67,10 @@ export default function HomePage() {
     const { setName, typeOfSet, setList } = cardSet;
     shuffleArray(setList);
     
+    //needs to be checked for every set and made clearer with future update
     const cardsArray = cardNumbers.map((number) => {
-      const ASCIIDualFront = number%2 === 0 ? setList[number -2].half2 : setList[number - 1].half1;
-      const frontASCII = setName === "smallNumbers" ? Math.ceil(number / 2) : "abcDualSet" ? ASCIIDualFront : setList[number - 1];
+      const ASCIIDualFront = setName === "abcDualSet" ? (number % 2 === 0 ? setList[number - 2].half2 : setList[number - 1].half1) : "not needed";
+      const frontASCII = setName === "smallNumbers" ? Math.ceil(number / 2) : setName === "abcDualSet" ? ASCIIDualFront : setList[Math.ceil(number / 2)];
       const frontImage = `${setName}-${setList[Math.ceil(number / 2)]}.jpg`;
       const front = typeOfSet === "img" ? frontImage : frontASCII;
       const pairId = setName === "abcDualSet" ? Math.ceil(number / 2) : front;
@@ -216,10 +214,12 @@ export default function HomePage() {
               name="selectSet" value={cardSet} onChange={(event) => handleSelect(event.target.value)}
             >
           <option value="">--Please choose a card set--</option>
-          <option value="euAnimals">European animals in b&w</option>
-          <option value="ABCSet">Capital letters</option>
-          <option value="abcDualSet">Two kinds of letters</option>
-          <option value="htmlSet">HTML Tags</option>
+            <option value="euAnimals">European animals (b&w)</option>
+            <option value="afrAnimals">African animals (colour)</option>
+            <option value="ABCSet">Capital letters</option>
+            <option value="abcDualSet">Two kinds of letters</option>
+            <option value="smallNumbers">Small numbers</option>
+            <option value="htmlSet">HTML Tags</option>
             </StyledSelect>
           Set: {cardSet.setName}
           </label> 
