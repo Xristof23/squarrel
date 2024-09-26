@@ -3,116 +3,32 @@ import { useState } from "react";
 import { initialCardState, initialGameState, ABCSet, htmlSet, euAnimals, allSets } from "@/memoryData";
 import Card from "@/components/Card";
 import TitleStart from "@/components/TitleStart";
+import {
+  StyledMain,
+  ButtonContainer,
+  OptionsContainer,
+  ControlsContainer,
+  TitleContainer,
+  UpperSection,
+  MessageSlot,
+  SmallerHeadline,
+  StatLine,
+  Stats,
+  StyledSelect,
+  StandardButton,
+  StyledInput
+} from "@/styledcomponents";
 
-const StyledMain = styled.main`
- display: grid;
-  grid-template-columns: 228px 934px;
-  grid-template-rows: 120px 228px 228px 228px 228px;
-  width: 1180px;
-  position: absolute;
-  top: 0.5rem;
-  left: 1rem;
-  margin: auto;
-  gap: 8px;
-  flex-direction: row;
-  padding: 0.5rem;
-  margin: .5rem auto .5rem; 
-  align-content: center;
+const SmalllStyledInput = styled.input`
+min-width: 2rem;
 `;
-
-const UpperSection = styled.section`
-grid-column: 1 / span 2; 
-display: flex;
-flex-direction: column; 
-  margin: .5rem; 
-  width: 100%;
-  height: 100%;
-  border-radius: 4px;
-`;
-
-const TitleContainer = styled.div`
-display: flex;
-flex-direction: row; 
-  width: 100%;
-  height: 60%;
-  border-radius: 4px;
-`;
-
-const ControlsContainer = styled.div`
-display: flex;
-flex-direction: row; 
-padding: .5rem;
-  width: 100%;
-  height: 3rem;
-  background-color: lightgray;
-  border: 1px solid black;
-  border-radius: 4px;
-`;
-
-const OptionsContainer = styled.div`
-  padding: .5rem;
-  margin: .5rem; 
-  min-width: 100px;
-  width: 100%;
-  height: 100%;
-  background-color: lightgray;
-  border: 1px solid black;
-  border-radius: 4px;
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  padding: .5rem;
-  margin: -.3rem auto 0;
-  min-height: 40px;
-  width: 14rem;
-  height: 100%;
-  align-content: center;
-  align-items: center;
-  border-radius: 4px;
-`;
-
-const MessageSlot = styled.div`
- color: black;
- font-weight: 400;
- background-color: darkorange;
- width: 80%;
- height: 100%;
- margin: 0.8rem auto .5rem;
- padding: 0.3rem;
- border-radius: 4px;
- border: 1px solid black;
-margin: 0 auto 0; 
-`;
-
-const Stats = styled.div`
- display: flex;
-flex-direction: row;
-text-align: left; 
-color: black;
-padding: .5rem; 
-width: 70%;
-height: 90%;
-border-radius: 4px;
-`;
-
-const SmallerHeadline = styled.h2`
-font-size: 1.05rem;
-font-weight: 600; 
-margin: 0 0 0.4rem;
-`;
-
-const StatLine = styled.p`
-margin: 1.5rem 0 0 -2.5rem;
-text-align: left; 
-`;
-
 
 const SquareSection = styled.section`
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  position: relative;
+  grid-template-columns: 1fr 1fr 1fr 1fr ${({ $addColumns }) => $addColumns === 1? `1fr` : $addColumns === 2? `1fr 1fr` :null};
   grid-template-rows: 1fr 1fr 1fr 1fr;
+  left: ${({ $shiftRight }) => $shiftRight ? `${$shiftRight}px` : "0px"};
   gap: 0.12rem;
   width: 936px;
   height: 936px;
@@ -122,41 +38,24 @@ const SquareSection = styled.section`
   justify-content: center;
 `;
 
-
-
-const StyledSelect = styled.select`
- padding: .3rem;
-  margin: .3rem; 
-`;
-
-const StandardButton = styled.button`
-font-size: 1rem;
-font-weight: 500; 
-margin: 0.2rem;
-padding: 0.2rem;
-min-width: 3rem;
-min-height: 2rem;
-`;
-
-const StyledInput = styled.input`
-min-width: 3.5rem;
-`;
-
-const SmalllStyledInput = styled.input`
-min-width: 2rem;
-`;
-
 export default function HomePage() {
-  const [options, setOptions] = useState({ gameMode: "memory", root: 4, delayTime: 3000, shuffle: true, cardSet: euAnimals, typeOfSet: "img" });
-  const { gameMode, root, shuffle, delayTime, cardSet, typeOfSet } = options;
+  const [options, setOptions] = useState({ gameMode: "memory", cardRows: 4, cardColumns: 4, delayTime: 3000, shuffle: true, cardSet: euAnimals, typeOfSet: "img" });
+  const { gameMode, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet } = options;
   const [squareState, setSquareState] = useState(initialCardState);
   const [gameState, setGameState] = useState(initialGameState);
-  const { progress, cardsShown, score, round, card0, card1 } = gameState;
+  const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
+  const { cardCount, roundCount } = count;
+  const { progress, cardsShown, score, cardsOpened, round, card0, card1 } = gameState;
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L");
 
-  // root: even numbers 4 <= root <= 6 (8)
-  function generateSquareArray(root, shuffle, cardSet) {
-    const numberOfSquares = root ** 2;
+  // will be changed dynamically with responsive update.
+  const cardSectionWidth = 936;
+  const shiftRight = 112;
+
+
+  // card rows = 4 for now,  : numbers 4 <= cardColumns <= 6 (8)
+  function generateCardsArray(cardRows, cardColumns, shuffle, cardSet) {
+    const numberOfSquares = cardColumns * cardRows;
     const cardNumbers = [...Array(numberOfSquares + 1).keys()].slice(1);
 
     function shuffleArray(array) {
@@ -170,37 +69,30 @@ export default function HomePage() {
     }
     const { setName, typeOfSet, setList } = cardSet;
     shuffleArray(setList);
-
-    const backLetters = "s Q U A R R E L "
-    const backSideArray = cardNumbers.map((number) => backLetters);
     
     const cardsArray = cardNumbers.map((number) => {
-      const frontASCII = cardSet === "smallNumbers" ? Math.ceil(number / 2) : setList[number - 1];
+      const ASCIIDualFront = number%2 === 0 ? setList[number -2].half2 : setList[number - 1].half1;
+      const frontASCII = setName === "smallNumbers" ? Math.ceil(number / 2) : "abcDualSet" ? ASCIIDualFront : setList[number - 1];
       const frontImage = `${setName}-${setList[Math.ceil(number / 2)]}.jpg`;
-
       const front = typeOfSet === "img" ? frontImage : frontASCII;
-      const cardObject = { id: number, front, back: backSideArray, typeOfSet, isShown: false, won: false };
+      const pairId = setName === "abcDualSet" ? Math.ceil(number / 2) : front;
+      const cardObject = { id: number, front, pairId, back: "back", typeOfSet, isShown: false, won: false };
       return cardObject;
     });
+    console.log(cardsArray);
     return shuffle === true ? shuffleArray(cardsArray) : cardsArray;
   }
   
   function handleStart() {
-    setSquareState(generateSquareArray(root, shuffle, cardSet));
-   //not needed right now
+    setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
     setGameState({ ...initialGameState, progress: "generated" });
-    setMessage(`Started a ${gameMode} game! Click on a card to start!`);
+    setCount({cardCount: 0, roundCount: 1});
+    setMessage(`Started a ${gameMode} game. Click on a card to start!`);
   }
 
   //need two kinds of resets
   // total (not implemented yet)
-  function handletotalReset() {
-    setSquareState(initialCardState);
-    setGameState({ ...gameState, progress: "no game started yet" });
-    setMessage("no game started yet");
-    }
-
-  // restart
+  // restart with same cards
   function handleRestart() {
     //needs added confirm dialog
     setSquareState(squareState.map((card) => {
@@ -209,6 +101,7 @@ export default function HomePage() {
     }));
 
     setGameState({ ...initialGameState, progress: "generated" });
+    setCount({cardCount: 0, roundCount: 1});
    setMessage("Click on a card to start!");
       }
   
@@ -219,14 +112,20 @@ export default function HomePage() {
   }
   
   function cardClick(id) {
-
     //just for fun, might be replaced with next update of memorydata
     const cardClicked = squareState.find((card) => card.id === id).front;
     const cardName = typeOfSet === "img" ? cardClicked.slice(10, -4) : cardClicked;
 
-   //react to clicking on same card again
-    cardsShown === 1 && card0.id === id ? setMessage("Turn another card!") : setMessage(`You turned card "${cardName}".`);
-
+    //counting cards and rounds etc
+    if (cardsShown === 1 && card0.id === id) {
+      setMessage("Turn another card!");
+    } else {
+      setMessage(`You turned card "${cardName}".`);
+      const newCount = cardCount + 1;
+      const newRound = Math.ceil(newCount / 2);
+      setCount({cardCount: newCount, roundCount: newRound});
+    }
+  
     //react to third card (not) open at this place?
 
     //set Card to show
@@ -243,12 +142,10 @@ export default function HomePage() {
       const card0 = filteredState[0];
       const card1 = filteredState[1];
       setGameState({ ...gameState, card1: card1 });
-      const match = card0.front === card1.front ? true : false;
-        
+      const match = card0.pairId === card1.pairId ? true : false;
       const wonCardState = squareState.map((card) => 
-          card.front === card0.front ? {...card, won: true} : card
+          card.pairId === card0.pairId ? {...card, won: true} : card
          );
-  
       match ? setMessage("The cards match, yeah!") : setMessage("The cards do not match!");
         
       //reset CardState (squarestate)  and gamestate
@@ -265,21 +162,25 @@ export default function HomePage() {
         setTimeout(setSquareState, timeToSee, resetCardState);
         newSquareState = resetCardState;
       
-        //check for game End
-        const newScore = wonCardState.filter((card) => card.won === true).length; 
-        const newRound = newScore < 16 ? gameState.round + 1 : "Game won.";
+      //check for game End
+      const arrayOfWonCards = wonCardState.filter((card) => card.won === true);
+      const newScore = arrayOfWonCards.length; 
+    
+     newScore === (cardColumns * cardRows) && setMessage(`Game won in ${roundCount} rounds.`);
+      // setCount({ ...count, roundCount: finalRound });
+      // console.log("newRound: ", newRound);
+      
         //reset 2
-        const afterRoundGameState = { ...gameState, cardsShown: 0, score: (match ? gameState.score + 2 : gameState.score), round: newRound, card0: { id: "a" }, card1: { id: "b" } };
+        const afterRoundGameState = { ...gameState, cardsShown: 0, score: (match ? gameState.score + 2 : gameState.score), card0: { id: "a" }, card1: { id: "b" } };
         setTimeout(() => {
           setGameState(afterRoundGameState);
           setMessage(match ? "You scored!" : "You may score next round!");
-          newScore === root**2 && setMessage("All cards won!");
+          newScore === cardColumns*cardRows && setMessage(`Game won in ${roundCount} rounds.`);
         }, timeToSee + 500)
       }
     
    openCards === 2 && checkForMatchAndReset(filteredSquareState);
 }
-
 
   function handleSelect(optionValue) {
     const chosenArray = allSets.filter((set) => set.setName === optionValue);
@@ -289,16 +190,13 @@ export default function HomePage() {
   
   return (
     <>
-     
-      
       <StyledMain>
         <UpperSection>
           <TitleContainer>
             <TitleStart />
           <Stats>
-            <SmallerHeadline>Stats<br/> </SmallerHeadline>
-              
-              <StatLine>🟧 Open Cards: {cardsShown}  🟧 Won Cards: {score}  🟧 Round: {round}</StatLine>
+            <SmallerHeadline>Stats<br/> </SmallerHeadline>     
+              <StatLine>🟧 Open Cards: {cardsShown}  🟧 Won Cards: {score}  🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} </StatLine>
             </Stats>
           </TitleContainer>
           <ControlsContainer>
@@ -315,25 +213,25 @@ export default function HomePage() {
         <SmallerHeadline>  Options </SmallerHeadline>
           <label htmlFor="selectSet"  >Set:
             <StyledSelect aria-label="Choose a set of cards" id="selectSet" 
-              name="selectSet" value={cardSet}
-              onChange={(event) => handleSelect(event.target.value)}
-    
+              name="selectSet" value={cardSet} onChange={(event) => handleSelect(event.target.value)}
             >
           <option value="">--Please choose a card set--</option>
           <option value="euAnimals">European animals in b&w</option>
-          <option value="ABCSet">Letters</option>
+          <option value="ABCSet">Capital letters</option>
+          <option value="abcDualSet">Two kinds of letters</option>
           <option value="htmlSet">HTML Tags</option>
             </StyledSelect>
-            {cardSet.setName}
+          Set: {cardSet.setName}
           </label> 
           <br/>
           <label htmlFor="delayTime">Delay time<StyledInput name="delayTime" id="delayTime" type="number" min={1500} max={10000} step="500"  onChange={(event) => setOptions({ ...options, delayTime: event.target.value})}  value={delayTime} />  ms</label>
           <br/>
-          <label htmlFor="root">Size<input name="root" id="root" type="number" min={4} max={8} set={2} onChange={(event) => setOptions({ ...options, root: Number(event.target.value) })} value={root} />x {root}</label>
+          <label htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={6} set={2} onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></label>
         </OptionsContainer>
   
-      <SquareSection>
-        {progress === "generated" ? (squareState.map((square) => <Card onTurn={cardClick} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet}  />)) : null}
+        {/* $shiftRight={cardSectionWidth / cardColumns /2}  */}
+        <SquareSection $addColumns={cardColumns - 4} $shiftRight={shiftRight * (cardColumns - 4)} >
+        {progress === "generated" ? (squareState.map((square) => <Card onTurn={cardClick} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet} setName={cardSet.setName} />)) : null}
 
         </SquareSection>
         

@@ -26,13 +26,13 @@ const LilSquareContainerWon = styled.div`
 const LilSquareFront = styled.div`
 color: white;
 font-weight: 700;
+font-family: times;
 line-height: 8rem;
-  font-size: 6rem;
+font-size: 6rem;
 text-align: center;  
 padding: 2.7rem;
   height: 100%;
   width: 100%;
-  
 `;
 
 const CardImage = styled.img`
@@ -43,7 +43,7 @@ const CardImage = styled.img`
 
 
 
-export default function Card({ id, front, back, isShown, onTurn, won, set, typeOfSet }) {
+export default function Card({ id, front, isShown, onTurn, won, typeOfSet, setName }) {
   
   function handleCardClick(id) {
     onTurn(id);
@@ -55,7 +55,7 @@ export default function Card({ id, front, back, isShown, onTurn, won, set, typeO
     return (
       // <LilSquareContainer onClick={() => handleCardClick(id)}>{isShown ? (typeOfSet === "img" ? <CardImage src={"public/images/eu-a-bear.jpeg"} alt={"an animal" } /> : <LilSquareFront>{front}</LilSquareFront>) : <LilSquareBack>{back}</LilSquareBack>}</LilSquareContainer>)
       <>
-        <LilSquareContainer onClick={() => handleCardClick(id)}>{isShown ? (typeOfSet === "img" ? <CardImage src={`/images/${front}`} alt="A bear in black & white" /> : <LilSquareFront>{front}</LilSquareFront>) : <CardImage src="\images\SquarrelBackFarbe.png" />}</LilSquareContainer>
+        <LilSquareContainer onClick={() => handleCardClick(id)}>{isShown ? (typeOfSet === "img" ? <CardImage src={`/images/${setName}/${front}`} alt="A bear in black & white" /> : <LilSquareFront>{front}</LilSquareFront>) : <CardImage src="\images\SquarrelBackFarbe.png" />}</LilSquareContainer>
         
       </>)
   }
