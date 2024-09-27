@@ -36,14 +36,16 @@ const SquareSection = styled.section`
 `;
 
 export default function HomePage() {
-  const [options, setOptions] = useState({ gameMode: "memory", cardRows: 4, cardColumns: 4, delayTime: 3000, shuffle: true, cardSet: euAnimals, typeOfSet: "img" });
-  const { gameMode, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet } = options;
+  const [options, setOptions] = useState({ gameMode: "memory", cardRows: 4, cardColumns: 4, delayTime: 2500, shuffle: true, cardSet: euAnimals, typeOfSet: "img", size: 6 });
+  const { gameMode, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
   const [squareState, setSquareState] = useState(initialCardState);
   const [gameState, setGameState] = useState(initialGameState);
   const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
   const { cardCount, roundCount } = count;
   const { progress, cardsShown, score, cardsOpened, round, card0, card1 } = gameState;
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L");
+  // a way to prevent that early click
+  const [clickStop, setClickStop] = useState(false);
 
   // will be changed dynamically with responsive update.
   const cardSectionWidth = 936;
@@ -67,21 +69,22 @@ export default function HomePage() {
     const { setName, typeOfSet, setList } = cardSet;
     shuffleArray(setList);
     
-    //needs to be checked for every set and made clearer with future update
+    //may need to made clearer and bettere expandable (react to more sets) with future update
     const cardsArray = cardNumbers.map((number) => {
       const ASCIIDualFront = setName === "abcDualSet" ? (number % 2 === 0 ? setList[number - 2].half2 : setList[number - 1].half1) : "not needed";
-      const frontASCII = setName === "smallNumbers" ? Math.ceil(number / 2) : setName === "abcDualSet" ? ASCIIDualFront : setList[Math.ceil(number / 2)];
+      const frontASCII = setName === "abcDualSet" ? ASCIIDualFront : setList[Math.ceil(number / 2)];
       const frontImage = `${setName}-${setList[Math.ceil(number / 2)]}.jpg`;
       const front = typeOfSet === "img" ? frontImage : frontASCII;
       const pairId = setName === "abcDualSet" ? Math.ceil(number / 2) : front;
       const cardObject = { id: number, front, pairId, back: "back", typeOfSet, isShown: false, won: false };
       return cardObject;
     });
-    console.log(cardsArray);
+    
     return shuffle === true ? shuffleArray(cardsArray) : cardsArray;
   }
   
   function handleStart() {
+    setClickStop(false);
     setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
     setGameState({ ...initialGameState, progress: "generated" });
     setCount({cardCount: 0, roundCount: 1});
@@ -90,9 +93,11 @@ export default function HomePage() {
 
   //need two kinds of resets
   // total (not implemented yet)
+
   // restart with same cards
   function handleRestart() {
     //needs added confirm dialog
+    setClickStop(false);
     setSquareState(squareState.map((card) => {
       const newCard = { ...card, isShown: false, won: false }
       return newCard;
@@ -100,7 +105,7 @@ export default function HomePage() {
 
     setGameState({ ...initialGameState, progress: "generated" });
     setCount({cardCount: 0, roundCount: 1});
-   setMessage("Click on a card to start!");
+    setMessage("Click on a card to start!");
       }
   
   function showDebugInfo() {
@@ -108,11 +113,16 @@ export default function HomePage() {
     console.log("Gamestate", gameState);
     console.log("Options", options);
   }
-  
+
+  function noClick() {
+    setMessage("Only two cards can be shown at the same time!")
+  }
+
   function cardClick(id) {
-    //just for fun, might be replaced with next update of memorydata
+
     const cardClicked = squareState.find((card) => card.id === id).front;
-    const cardName = typeOfSet === "img" ? cardClicked.slice(10, -4) : cardClicked;
+    const cutLength = cardSet.setName.length + 1;
+    const cardName = typeOfSet === "img" ? cardClicked.slice(cutLength, -4) : cardClicked;
 
     //counting cards and rounds etc
     if (cardsShown === 1 && card0.id === id) {
@@ -137,6 +147,8 @@ export default function HomePage() {
   
     //will only run if opencards = 2
     function checkForMatchAndReset(filteredState) {
+      setClickStop(true);
+      
       const card0 = filteredState[0];
       const card1 = filteredState[1];
       setGameState({ ...gameState, card1: card1 });
@@ -155,26 +167,25 @@ export default function HomePage() {
         
         //set speed
       const timeToSee = match ? delayTime / 5 : delayTime;
-      
+   
       //reset 1
-        setTimeout(setSquareState, timeToSee, resetCardState);
-        newSquareState = resetCardState;
+      setTimeout(setClickStop, timeToSee, false);
+      setTimeout(setSquareState, timeToSee, resetCardState);
+      newSquareState = resetCardState;
       
-      //check for game End
+      //check for game end
       const arrayOfWonCards = wonCardState.filter((card) => card.won === true);
       const newScore = arrayOfWonCards.length; 
-    
-     newScore === (cardColumns * cardRows) && setMessage(`Game won in ${roundCount} rounds.`);
-      // setCount({ ...count, roundCount: finalRound });
-      // console.log("newRound: ", newRound);
+      newScore === (cardColumns * cardRows) && setMessage(`Game won in ${roundCount} rounds.`);
       
         //reset 2
         const afterRoundGameState = { ...gameState, cardsShown: 0, score: (match ? gameState.score + 2 : gameState.score), card0: { id: "a" }, card1: { id: "b" } };
         setTimeout(() => {
           setGameState(afterRoundGameState);
           setMessage(match ? "You scored!" : "You may score next round!");
-          newScore === cardColumns*cardRows && setMessage(`Game won in ${roundCount} rounds.`);
-        }, timeToSee + 500)
+          newScore === cardColumns * cardRows && setMessage(`Game won in ${roundCount} rounds.`);
+          // setClickStop(false);
+        }, timeToSee + 300)
       }
     
    openCards === 2 && checkForMatchAndReset(filteredSquareState);
@@ -183,7 +194,7 @@ export default function HomePage() {
   function handleSelect(optionValue) {
     const chosenArray = allSets.filter((set) => set.setName === optionValue);
     const chosenSet = chosenArray[0];
-    setOptions({ ...options, cardSet: chosenSet, typeOfSet: chosenSet.typeOfSet });
+    setOptions({ ...options, cardSet: chosenSet, typeOfSet: chosenSet.typeOfSet, size: chosenSet.size ? chosenSet.size : options.size });
 }
   
   return (
@@ -194,7 +205,7 @@ export default function HomePage() {
             <TitleStart />
           <Stats>
             <SmallerHeadline>Stats<br/> </SmallerHeadline>     
-              <StatLine>🟧 Open Cards: {cardsShown}  🟧 Won Cards: {score}  🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} </StatLine>
+              <StatLine> 🟧 Won Cards: {score}  🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} </StatLine>
             </Stats>
           </TitleContainer>
           <ControlsContainer>
@@ -215,7 +226,8 @@ export default function HomePage() {
             >
           <option value="">--Please choose a card set--</option>
             <option value="euAnimals">European animals (b&w)</option>
-            <option value="afrAnimals">African animals (colour)</option>
+              <option value="afrAnimals">African animals (colour)</option>
+              <option value="happy">Being happy (colour)</option>
             <option value="ABCSet">Capital letters</option>
             <option value="abcDualSet">Two kinds of letters</option>
             <option value="smallNumbers">Small numbers</option>
@@ -224,14 +236,14 @@ export default function HomePage() {
           Set: {cardSet.setName}
           </label> 
           <br/>
-          <label htmlFor="delayTime">Delay time<StyledInput name="delayTime" id="delayTime" type="number" min={1500} max={10000} step="500"  onChange={(event) => setOptions({ ...options, delayTime: event.target.value})}  value={delayTime} />  ms</label>
+          <label htmlFor="delayTime">Delay time<StyledInput name="delayTime" id="delayTime" type="number" min={1000} max={8000} step="500"  onChange={(event) => setOptions({ ...options, delayTime: event.target.value})}  value={delayTime} />  ms</label>
           <br/>
-          <label htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={6} set={2} onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></label>
+          <label htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={6} onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></label>
         </OptionsContainer>
   
         {/* $shiftRight={cardSectionWidth / cardColumns /2}  */}
         <SquareSection $addColumns={cardColumns - 4} $shiftRight={shiftRight * (cardColumns - 4)} >
-        {progress === "generated" ? (squareState.map((square) => <Card onTurn={cardClick} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet} setName={cardSet.setName} />)) : null}
+          {progress === "generated" ? (squareState.map((square) => <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet} setName={cardSet.setName} clickStop={clickStop} size={size}/>)) : null}
 
         </SquareSection>
         
