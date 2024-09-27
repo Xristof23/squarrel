@@ -11,6 +11,7 @@ import {
   TitleContainer,
   UpperSection,
   MessageSlot,
+  Placeholder,
   SmallerHeadline,
   StatLine,
   Stats,
@@ -166,7 +167,7 @@ export default function HomePage() {
         });
         
         //set speed
-      const timeToSee = match ? delayTime / 5 : delayTime;
+      const timeToSee = match ? delayTime / 4 : delayTime;
    
       //reset 1
       setTimeout(setClickStop, timeToSee, false);
@@ -209,11 +210,8 @@ export default function HomePage() {
             </Stats>
           </TitleContainer>
           <ControlsContainer>
-          <ButtonContainer>
-            <StandardButton onClick={handleStart}>start</StandardButton>
-            <StandardButton onClick={handleRestart}>restart</StandardButton>
-            <StandardButton onClick={showDebugInfo}>debug</StandardButton>
-          </ButtonContainer>
+          <Placeholder/>
+         
           <MessageSlot>{message}</MessageSlot>
          
           </ControlsContainer>
@@ -222,9 +220,9 @@ export default function HomePage() {
         <SmallerHeadline>  Options </SmallerHeadline>
           <label htmlFor="selectSet"  >Set:
             <StyledSelect aria-label="Choose a set of cards" id="selectSet" 
-              name="selectSet" value={cardSet} onChange={(event) => handleSelect(event.target.value)}
+              name="selectSet" value={`${cardSet.setName}`} onChange={(event) => handleSelect(event.target.value)}
             >
-          <option value="">--Please choose a card set--</option>
+              <option value={""}>--Please choose a card set--</option>
             <option value="euAnimals">European animals (b&w)</option>
               <option value="afrAnimals">African animals (colour)</option>
               <option value="happy">Being happy (colour)</option>
@@ -233,12 +231,18 @@ export default function HomePage() {
             <option value="smallNumbers">Small numbers</option>
             <option value="htmlSet">HTML Tags</option>
             </StyledSelect>
-          Set: {cardSet.setName}
           </label> 
           <br/>
-          <label htmlFor="delayTime">Delay time<StyledInput name="delayTime" id="delayTime" type="number" min={1000} max={8000} step="500"  onChange={(event) => setOptions({ ...options, delayTime: event.target.value})}  value={delayTime} />  ms</label>
+          <label htmlFor="delayTime">Delay time<StyledInput name="delayTime" id="delayTime" type="number" min={500} max={8000} step="500"  onChange={(event) => setOptions({ ...options, delayTime: event.target.value})}  value={delayTime} />  ms</label>
           <br/>
           <label htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={6} onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></label>
+          <p>  </p>
+          <SmallerHeadline>  Controls </SmallerHeadline>
+          <ButtonContainer>
+            <StandardButton onClick={handleStart}>start</StandardButton>
+            <StandardButton onClick={handleRestart}>restart</StandardButton>
+            <StandardButton onClick={showDebugInfo}>debug</StandardButton>
+          </ButtonContainer>
         </OptionsContainer>
   
         {/* $shiftRight={cardSectionWidth / cardColumns /2}  */}

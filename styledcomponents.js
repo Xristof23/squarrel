@@ -46,7 +46,8 @@ padding: .5rem;
 `;
 
 const OptionsContainer = styled.div`
-  padding: .5rem;
+grid-row: 2 / span 3;   
+padding: .5rem;
   margin: .5rem; 
   min-width: 100px;
   width: 100%;
@@ -56,17 +57,42 @@ const OptionsContainer = styled.div`
   border-radius: 4px;
 `;
 
-const ButtonContainer = styled.div`
+const Placeholder= styled.div`
   display: flex;
   flex-direction: row;
   padding: .5rem;
   margin: -.3rem auto 0;
   min-height: 40px;
   width: 14rem;
-  height: 100%;
+  height: 50%;
   align-content: center;
   align-items: center;
   border-radius: 4px;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin: -1rem auto 0;
+  min-height: 35px;
+  width: 15rem;
+  height: 5rem;
+  align-content: center;
+  align-items: center;
+  border-radius: 4px;
+`;
+
+const StandardButton = styled.button`
+font-size: 1rem;
+font-weight: 500; 
+margin: 0.2rem;
+padding: 0.2rem;
+width: 4rem;
+min-width: 3rem;
+min-height: 2rem;
+ border-radius: 4px;
+   border: 1px solid darkorange;
+ background-color: white;
 `;
 
 const MessageSlot = styled.div`
@@ -123,14 +149,7 @@ const StyledSelect = styled.select`
   margin: .3rem; 
 `;
 
-const StandardButton = styled.button`
-font-size: 1rem;
-font-weight: 500; 
-margin: 0.2rem;
-padding: 0.2rem;
-min-width: 3rem;
-min-height: 2rem;
-`;
+
 
 const StyledInput = styled.input`
 min-width: 3.5rem;
@@ -145,7 +164,8 @@ export {
     ControlsContainer,
     TitleContainer,
     UpperSection,
-    MessageSlot,
+  MessageSlot,
+    Placeholder,
     SmallerHeadline,
     SquareSectionStatic,
     StatLine,

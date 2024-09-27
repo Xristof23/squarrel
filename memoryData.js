@@ -4,7 +4,7 @@ const initialCardState = [];
 const initialGameState = {progress: "game not started yet", cardsOpened: 0, cardsShown: 0, round: 1, score: 0, card0: {id: "a"}, card1: {id: "b"} };
 
 // ASCII Sets
-const ABCSet = { setName: "ABCSet", typeOfSet: "ASCII", size: 6, setList: ["A", "B", "C", "D", "E", "F", "G", "H", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N" ] };
+const ABCSet = { setName: "ABCSet", typeOfSet: "ASCII", size: 6, setList: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"] };
 const htmlSet = { setName: "htmlSet", typeOfSet: "ASCII", size: 2.3, setList: ["<p>", "<h1>", "<h2>","<div>", "<section>", "<button>", "<span>","<ul>", "<ol>", "<li>", "<main>", "<body>", "<form>", "<a>",  "<head>", "<img>"] }
 const smallNumbersSetlist = [...Array(51).keys()].slice(1);
 
