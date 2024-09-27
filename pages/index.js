@@ -1,10 +1,9 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { initialCardState, initialGameState, euAnimals, allSets } from "@/memoryData";
 import Card from "@/components/Card";
 import TitleStart from "@/components/TitleStart";
 import {
-  StyledMain,
   ButtonContainer,
   OptionsContainer,
   ControlsContainer,
@@ -19,6 +18,22 @@ import {
   StandardButton,
   StyledInput
 } from "@/styledcomponents";
+
+const StyledMain = styled.main`
+ display: grid;
+  grid-template-columns: 228px 934px;
+  grid-template-rows: 80px 228px 228px 228px 228px;
+  width: 98%;
+  position: absolute;
+  top: 0;
+  left: 0.5rem;
+  margin: .2rem;
+  gap: 8px;
+  flex-direction: row;
+  padding: 0.5rem;
+  margin: .5rem auto .5rem; 
+  align-content: center;
+`;
 
 
 const SquareSection = styled.section`
@@ -37,6 +52,7 @@ const SquareSection = styled.section`
 `;
 
 export default function HomePage() {
+ 
   const [options, setOptions] = useState({ gameMode: "memory", cardRows: 4, cardColumns: 4, delayTime: 2500, shuffle: true, cardSet: euAnimals, typeOfSet: "img", size: 6 });
   const { gameMode, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
   const [squareState, setSquareState] = useState(initialCardState);
@@ -44,11 +60,27 @@ export default function HomePage() {
   const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
   const { cardCount, roundCount } = count;
   const { progress, cardsShown, score, cardsOpened, round, card0, card1 } = gameState;
-  const [message, setMessage] = useState("Welcome to  S Q U A R R E L");
-  // a way to prevent that early click
+  const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! New set: Cult of wolves. Try it!");
   const [clickStop, setClickStop] = useState(false);
 
-  // will be changed dynamically with responsive update.
+  //  responsive
+ const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+ const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+
+ function updateWindowSize() {
+   setWindowWidth(window.innerWidth);
+   setWindowHeight(window.innerHeight);
+ }
+ useEffect(() => {
+   window.addEventListener("resize", updateWindowSize);
+   return () => window.removeEventListener("resize", updateWindowSize);
+ }, []);
+  console.log("windowwidth: ", windowWidth);
+  console.log("windowheight: ", windowHeight);
+
+  const cardGridHeight = windowHeight - 140;
+
+
   const cardSectionWidth = 936;
   const shiftRight = 112;
 
@@ -202,19 +234,14 @@ export default function HomePage() {
     <>
       <StyledMain>
         <UpperSection>
-          <TitleContainer>
+         
             <TitleStart />
+            <MessageSlot>{message}</MessageSlot>
           <Stats>
             <SmallerHeadline>Stats<br/> </SmallerHeadline>     
               <StatLine> 🟧 Won Cards: {score}  🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} </StatLine>
             </Stats>
-          </TitleContainer>
-          <ControlsContainer>
-          <Placeholder/>
-         
-          <MessageSlot>{message}</MessageSlot>
-         
-          </ControlsContainer>
+      
           </UpperSection>
         <OptionsContainer>
         <SmallerHeadline>  Options </SmallerHeadline>
@@ -223,7 +250,8 @@ export default function HomePage() {
               name="selectSet" value={`${cardSet.setName}`} onChange={(event) => handleSelect(event.target.value)}
             >
               <option value={""}>--Please choose a card set--</option>
-            <option value="euAnimals">European animals (b&w)</option>
+              <option value="euAnimals">European animals (b&w)</option>
+              <option value="wolfpack">Cult of wolves (b&w)</option>
               <option value="afrAnimals">African animals (colour)</option>
               <option value="happy">Being happy (colour)</option>
             <option value="ABCSet">Capital letters</option>

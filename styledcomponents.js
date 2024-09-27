@@ -17,12 +17,15 @@ const StyledMain = styled.main`
 `;
 
 const UpperSection = styled.section`
-grid-column: 1 / span 2; 
+grid-column: 1 / span 3; 
 display: flex;
-flex-direction: column; 
+flex-direction: row; 
   margin: .5rem; 
   width: 100%;
   height: 100%;
+  border-radius: 4px;
+    background-color: lightgray;
+  border: 1px solid black;
   border-radius: 4px;
 `;
 
@@ -99,13 +102,13 @@ const MessageSlot = styled.div`
  color: black;
  font-weight: 400;
  background-color: darkorange;
- width: 80%;
- height: 100%;
- margin: 0.8rem auto .5rem;
+ width: 90%;
+ height: 2.5rem;
+ line-height: 2.5rem; 
+ margin: 1.5rem 2rem 2rem 0;
  padding: 0.3rem;
  border-radius: 4px;
  border: 1px solid black;
-margin: 0 auto 0; 
 `;
 
 const Stats = styled.div`
@@ -113,9 +116,10 @@ const Stats = styled.div`
 flex-direction: row;
 text-align: left; 
 color: black;
+ margin: .5rem 2rem 2rem 0;
 padding: .5rem; 
 width: 70%;
-height: 90%;
+height: 2.5rem;
 border-radius: 4px;
 `;
 
