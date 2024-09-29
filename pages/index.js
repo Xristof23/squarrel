@@ -1,16 +1,13 @@
 import styled from "styled-components";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { initialCardState, initialGameState, euAnimals, allSets } from "@/memoryData";
 import Card from "@/components/Card";
 import TitleStart from "@/components/TitleStart";
 import {
   ButtonContainer,
   OptionsContainer,
-  ControlsContainer,
-  TitleContainer,
   UpperSection,
   MessageSlot,
-  Placeholder,
   SmallerHeadline,
   StatLine,
   Stats,
@@ -64,22 +61,6 @@ export default function HomePage() {
   const [clickStop, setClickStop] = useState(false);
 
   //  responsive
- const [windowWidth, setWindowWidth] = useState(window.innerWidth);
- const [windowHeight, setWindowHeight] = useState(window.innerHeight);
-
- function updateWindowSize() {
-   setWindowWidth(window.innerWidth);
-   setWindowHeight(window.innerHeight);
- }
- useEffect(() => {
-   window.addEventListener("resize", updateWindowSize);
-   return () => window.removeEventListener("resize", updateWindowSize);
- }, []);
-  console.log("windowwidth: ", windowWidth);
-  console.log("windowheight: ", windowHeight);
-
-  const cardGridHeight = windowHeight - 140;
-
 
   const cardSectionWidth = 936;
   const shiftRight = 112;

@@ -102,7 +102,7 @@ const MessageSlot = styled.div`
  color: black;
  font-weight: 400;
  background-color: darkorange;
- width: 90%;
+ width: 95%;
  height: 2.5rem;
  line-height: 2.5rem; 
  margin: 1.5rem 2rem 2rem 0;
