@@ -13,6 +13,7 @@ import {
   Stats,
   StyledSelect,
   StandardButton,
+  DebugButton,
   StyledInput
 } from "@/styledcomponents";
 
@@ -250,7 +251,7 @@ export default function HomePage() {
           <ButtonContainer>
             <StandardButton onClick={handleStart}>start</StandardButton>
             <StandardButton onClick={handleRestart}>restart</StandardButton>
-            <StandardButton onClick={showDebugInfo}>debug</StandardButton>
+            <DebugButton onClick={showDebugInfo}>debug</DebugButton>
           </ButtonContainer>
         </OptionsContainer>
   

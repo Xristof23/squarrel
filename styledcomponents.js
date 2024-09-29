@@ -98,6 +98,22 @@ min-height: 2rem;
  background-color: white;
 `;
 
+const DebugButton = styled(StandardButton)`
+color: lightgrey;
+font-size: 1rem;
+font-weight: 500; 
+margin: 0.2rem;
+padding: 0.2rem;
+width: 4rem;
+min-width: 3rem;
+min-height: 2rem;
+ border-radius: 4px;
+border: 1px solid transparent; 
+background-color: lightgray;
+
+`;
+
+
 const MessageSlot = styled.div`
  color: black;
  font-weight: 400;
@@ -176,5 +192,6 @@ export {
     Stats,
     StyledSelect,
     StyledInput,
-    StandardButton
+  StandardButton,
+    DebugButton
 }
