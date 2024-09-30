@@ -14,7 +14,8 @@ import {
   StyledSelect,
   StandardButton,
   DebugButton,
-  StyledInput
+  StyledInput, 
+  SquarrelTitle
 } from "@/styledcomponents";
 
 const StyledMain = styled.main`
@@ -50,7 +51,8 @@ const SquareSection = styled.section`
 `;
 
 export default function HomePage() {
- 
+  const [intro, setIntro] = useState({ introIsShown: true, mainIsShown: false });
+  const { introIsShown, mainIsShown } = intro;
   const [options, setOptions] = useState({ gameMode: "memory", cardRows: 4, cardColumns: 4, delayTime: 2500, shuffle: true, cardSet: euAnimals, typeOfSet: "img", size: 6 });
   const { gameMode, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
   const [squareState, setSquareState] = useState(initialCardState);
@@ -60,6 +62,15 @@ export default function HomePage() {
   const { progress, cardsShown, score, cardsOpened, round, card0, card1 } = gameState;
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! New set: Cult of wolves. Try it!");
   const [clickStop, setClickStop] = useState(false);
+  const [testCount, setTestCount] = useState(0);
+
+  function countSeconds(delayTime) {
+    console.log("clicked test")
+    setTimeout(setTestCount, delayTime, 1);
+    setTimeout(setTestCount, delayTime + 1000, 2);
+    setTimeout(setTestCount, delayTime + 2000, 3);
+
+  }
 
   //  responsive
 
@@ -214,21 +225,23 @@ export default function HomePage() {
   
   return (
     <>
-      <StyledMain>
+      {introIsShown &&  <TitleStart />}
+      {mainIsShown && <StyledMain>
         <UpperSection>
          
-            <TitleStart />
-            <MessageSlot>{message}</MessageSlot>
+        
+          <SquarrelTitle>🟧 S Q U A R R E L 🟧</SquarrelTitle>
+          <MessageSlot>{message}</MessageSlot>
           <Stats>
-            <SmallerHeadline>Stats<br/> </SmallerHeadline>     
-              <StatLine> 🟧 Won Cards: {score}  🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} </StatLine>
-            </Stats>
+            <SmallerHeadline>Stats<br /> </SmallerHeadline>
+            <StatLine> 🟧 Won Cards: {score}  🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} 🟧 Tst {testCount} </StatLine>
+          </Stats>
       
-          </UpperSection>
+        </UpperSection>
         <OptionsContainer>
-        <SmallerHeadline>  Options </SmallerHeadline>
+          <SmallerHeadline>  Options </SmallerHeadline>
           <label htmlFor="selectSet"  >Set:
-            <StyledSelect aria-label="Choose a set of cards" id="selectSet" 
+            <StyledSelect aria-label="Choose a set of cards" id="selectSet"
               name="selectSet" value={`${cardSet.setName}`} onChange={(event) => handleSelect(event.target.value)}
             >
               <option value={""}>--Please choose a card set--</option>
@@ -236,33 +249,34 @@ export default function HomePage() {
               <option value="wolfpack">Cult of wolves (b&w)</option>
               <option value="afrAnimals">African animals (colour)</option>
               <option value="happy">Being happy (colour)</option>
-            <option value="ABCSet">Capital letters</option>
-            <option value="abcDualSet">Two kinds of letters</option>
-            <option value="smallNumbers">Small numbers</option>
-            <option value="htmlSet">HTML Tags</option>
+              <option value="ABCSet">Capital letters</option>
+              <option value="abcDualSet">Two kinds of letters</option>
+              <option value="smallNumbers">Small numbers</option>
+              <option value="htmlSet">HTML Tags</option>
             </StyledSelect>
-          </label> 
-          <br/>
-          <label htmlFor="delayTime">Delay time<StyledInput name="delayTime" id="delayTime" type="number" min={500} max={8000} step="500"  onChange={(event) => setOptions({ ...options, delayTime: event.target.value})}  value={delayTime} />  ms</label>
-          <br/>
+          </label>
+          <br />
+          <label htmlFor="delayTime">Delay time<StyledInput name="delayTime" id="delayTime" type="number" min={500} max={8000} step="500" onChange={(event) => setOptions({ ...options, delayTime: event.target.value })} value={delayTime} />  ms</label>
+          <br />
           <label htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={6} onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></label>
           <p>  </p>
           <SmallerHeadline>  Controls </SmallerHeadline>
           <ButtonContainer>
             <StandardButton onClick={handleStart}>start</StandardButton>
             <StandardButton onClick={handleRestart}>restart</StandardButton>
+            <StandardButton onClick={() => countSeconds(1000)} >test</StandardButton>
             <DebugButton onClick={showDebugInfo}>debug</DebugButton>
           </ButtonContainer>
         </OptionsContainer>
   
         {/* $shiftRight={cardSectionWidth / cardColumns /2}  */}
         <SquareSection $addColumns={cardColumns - 4} $shiftRight={shiftRight * (cardColumns - 4)} >
-          {progress === "generated" ? (squareState.map((square) => <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet} setName={cardSet.setName} clickStop={clickStop} size={size}/>)) : null}
+          {progress === "generated" ? (squareState.map((square) => <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet} setName={cardSet.setName} clickStop={clickStop} size={size} />)) : null}
 
         </SquareSection>
         
     
-      </StyledMain>
+      </StyledMain>}
 
     </>
   );

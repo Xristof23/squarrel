@@ -1,5 +1,15 @@
 import styled from "styled-components";
 
+const SquarrelTitle = styled.h1`
+    text-align: left;
+    font-weight: 800;
+    line-height: 2.7rem;
+    font-size: 2.7rem;
+    width: 100%;
+    padding: 0;  
+    margin:  1rem .5rem 0;
+  `;
+
 const StyledMain = styled.main`
  display: grid;
   grid-template-columns: 228px 934px;
@@ -193,5 +203,6 @@ export {
     StyledSelect,
     StyledInput,
   StandardButton,
+  SquarrelTitle, 
     DebugButton
 }
