@@ -3,6 +3,7 @@ import { useState } from "react";
 import { initialCardState, initialGameState, euAnimals, allSets } from "@/memoryData";
 import Card from "@/components/Card";
 import TitleStart from "@/components/TitleStart";
+import Timer from "@/components/Timer";
 import {
   ButtonContainer,
   OptionsContainer,
@@ -34,7 +35,6 @@ const StyledMain = styled.main`
   align-content: center;
 `;
 
-
 const SquareSection = styled.section`
   display: grid;
   position: relative;
@@ -65,7 +65,6 @@ export default function HomePage() {
 
 
   //  responsive
-
   const cardSectionWidth = 936;
   const shiftRight = 112;
 
@@ -224,15 +223,12 @@ export default function HomePage() {
       {introIsShown && <TitleStart endOfIntro={handleEndOfIntro} />}
       {mainIsShown && <StyledMain>
         <UpperSection>
-         
-        
           <SquarrelTitle>🟧 S Q U A R R E L 🟧</SquarrelTitle>
           <MessageSlot>{message}</MessageSlot>
           <Stats>
             <SmallerHeadline>Stats<br /> </SmallerHeadline>
             <StatLine> 🟧 Won Cards: {score}  🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} 🟧 </StatLine>
           </Stats>
-      
         </UpperSection>
         <OptionsContainer>
           <SmallerHeadline>  Options </SmallerHeadline>
@@ -262,6 +258,7 @@ export default function HomePage() {
             <StandardButton onClick={handleRestart}>restart</StandardButton>
             <DebugButton onClick={showDebugInfo}>debug</DebugButton>
           </ButtonContainer>
+          <Timer/>
         </OptionsContainer>
   
         {/* $shiftRight={cardSectionWidth / cardColumns /2}  */}
