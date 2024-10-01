@@ -6,96 +6,64 @@ const SquarrelIntro = styled.div`
     flex-direction: row;
     text-align: center;
     font-weight: 800;
-    line-height: 8rem;
-    font-size: 8rem;
+    line-height: 7rem;
+    font-size: 7rem;
     width: 100%;
-    padding: 0;  
-    margin:  6rem auto 6rem;
+    position: absolute;
+    padding: 0;
+    margin:  0;
+    align-items: center;
+    align-self: center;
   `;
   
-  const Letter = styled.div`
+  const IntroContainer = styled.section`
+   display: block:
+   width: 800px;
+   height: 600px;
+   gap: 8px;
+   margin: .5rem auto .5rem; 
+   align-content: center;
+ `;
+ 
+const Letter = styled.div`
+    display: ${({ $isShown }) => $isShown? `block`: `none`}; 
+    flex-grow: 1;
     text-align: center;
     padding: 0;  
-    margin:  0.5rem;
+    margin: .5rem;
   `;
-  
 
+export default function TitleStart({endOfIntro}) {
 
+    const [testCount, setTestCount] = useState(0);
 
-function RenderIntro({ titleString, delaytime }) {
-    const titleArray = titleString.split("");
-    const readyArray = titleArray.map((thing, index) => {
-        const object = { letter: thing, show: false, delay: index*delaytime };
-        return object;
-    })
-
-    return (
-        <>
-            <Letter>🟧</Letter>
-            {readyArray.map((eins, index) =>
-                <Letter key={index} >{eins.show&& eins.letter}</Letter> 
-                
-            
-            )
-            } 
-            <Letter>🟧</Letter>
-    </>
-    )
-}
-
-
-export default function TitleStart() {
-
-    const [showDelayedText, setShowDelayedText] = useState({ firstSquare: false, s: false, q: false });
-
-async function delay(ms)  {
-    return new Promise((resolve) => 
-        setTimeout(resolve, ms));
-};
-const delayArray = [500, 1000, 1500]
-    
-    async function showStuff(delayArray) {
-        console.log("clicked");
-        gi
-        await delay(500);
-        const showFirst = {...showDelayedText, firstSquare: true}
-        setShowDelayedText(showFirst);
-        await delay(1000);
-        const showSecond = {...showFirst, s: true }
-        setShowDelayedText(showSecond);
-        await delay(1500);
-        setShowDelayedText({...showDelayedText, firstSquare: true, s: true, q: true});
-        console.log(showDelayedText);
-};
-
-    
-    function convertTitle() {
-        const titleString = "🟧 S Q U A R R E L 🟧";
-        const titleArray = titleString.split("");
-        return titleArray;
+    function countLetters(delayTime, upperLimit) {
+        const numbers = [...Array(upperLimit + 1).keys()].slice(1);
+        numbers.forEach((number) => setTimeout(setTestCount, delayTime * number, number));
+        //make letters disappear again
+        const reverseNumbers = numbers.toReversed();
+        setTimeout(()=> reverseNumbers.forEach((number, index) => 
+            setTimeout(setTestCount, delayTime*index, number)
+        ), delayTime*upperLimit + 800);
+        //go to main
+        setTimeout(()=>endOfIntro(), delayTime*upperLimit*2 +1100);
     }
-    const shownTitle = convertTitle();
-    
+
+    function makeTitleArray(string) {
+        const array  = string.split("");
+        array.unshift("🟧");
+        array.push("🟧");
+        return array;
+    }
    
+    const finalTitle = (makeTitleArray("SQUARREL"));
     
-    
-    // useEffect(()=>{
-    //     displayTitleLetter("test", 1, 1000);
-    // }, [])
+    useEffect(()=>{
+        countLetters(250, 10);
+    }, [])
 
     return (
-    <><button onClick={showStuff}>start</button>
-            {/* <SquarrelIntro><RenderIntro titleString="SQUARREL" delaytime={200}/></SquarrelIntro> */}
-            {/* <SquarrelIntro>🟧 S Q U A R R E L 🟧</SquarrelIntro> */}
-            
-            <SquarrelIntro>
-            {showDelayedText.firstSquare && (
-                    <div>🟧</div>)}
-           {showDelayedText.s && (
-                    <div> S</div>)}
-                
-                {showDelayedText.q && (
-                <div> Q</div>)}
-                </SquarrelIntro>
-    </>)
+        <IntroContainer>
+            <SquarrelIntro>{finalTitle.map((letter, index) => <Letter key={index} $isShown={testCount >= index+1 ? true : false} >{letter}</Letter>)}</SquarrelIntro>
+        </IntroContainer>)
 }

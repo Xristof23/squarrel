@@ -62,15 +62,7 @@ export default function HomePage() {
   const { progress, cardsShown, score, cardsOpened, round, card0, card1 } = gameState;
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! New set: Cult of wolves. Try it!");
   const [clickStop, setClickStop] = useState(false);
-  const [testCount, setTestCount] = useState(0);
 
-  function countSeconds(delayTime) {
-    console.log("clicked test")
-    setTimeout(setTestCount, delayTime, 1);
-    setTimeout(setTestCount, delayTime + 1000, 2);
-    setTimeout(setTestCount, delayTime + 2000, 3);
-
-  }
 
   //  responsive
 
@@ -221,11 +213,15 @@ export default function HomePage() {
     const chosenArray = allSets.filter((set) => set.setName === optionValue);
     const chosenSet = chosenArray[0];
     setOptions({ ...options, cardSet: chosenSet, typeOfSet: chosenSet.typeOfSet, size: chosenSet.size ? chosenSet.size : options.size });
-}
+  }
+  
+  function handleEndOfIntro() {
+    setIntro({ introIsShown: false, mainIsShown: true })
+  }
   
   return (
     <>
-      {introIsShown &&  <TitleStart />}
+      {introIsShown && <TitleStart endOfIntro={handleEndOfIntro} />}
       {mainIsShown && <StyledMain>
         <UpperSection>
          
@@ -234,7 +230,7 @@ export default function HomePage() {
           <MessageSlot>{message}</MessageSlot>
           <Stats>
             <SmallerHeadline>Stats<br /> </SmallerHeadline>
-            <StatLine> 🟧 Won Cards: {score}  🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} 🟧 Tst {testCount} </StatLine>
+            <StatLine> 🟧 Won Cards: {score}  🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} 🟧 </StatLine>
           </Stats>
       
         </UpperSection>
@@ -264,7 +260,6 @@ export default function HomePage() {
           <ButtonContainer>
             <StandardButton onClick={handleStart}>start</StandardButton>
             <StandardButton onClick={handleRestart}>restart</StandardButton>
-            <StandardButton onClick={() => countSeconds(1000)} >test</StandardButton>
             <DebugButton onClick={showDebugInfo}>debug</DebugButton>
           </ButtonContainer>
         </OptionsContainer>
