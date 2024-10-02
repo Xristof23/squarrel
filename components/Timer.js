@@ -1,5 +1,5 @@
 import { ButtonContainer, SmallerHeadline, StandardButton } from "@/styledcomponents"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components"
 
 const TimerSection = styled.section`
@@ -14,9 +14,9 @@ margin: 0 0 0 1rem;
 padding: .5rem;
 
 `;
-export default function Timer() {
+export default function Timer({runTimer, resetTimer}) {
     const [timeTools, setTimeTools] = useState({ start: 0, running: false })
-    const { start, running, interval1, interval2 } = timeTools;
+    const { start, interval1 } = timeTools;
     const [timespan, setTimespan] = useState(0);
     const [hundredth, setHundredth] = useState(0);
 
@@ -25,14 +25,13 @@ export default function Timer() {
         const first = Date.now();
         
         if (run === true) {
-            const running = true;
-            setTimeTools({ start: first, running });
+            setTimeTools({ start: first });
 
             function updateTimespan() {
                 const newTimespan = (Date.now() - first) / 1000;
                 const roundedTime = Math.round(newTimespan);
                 setTimespan(roundedTime);
-                
+
                 function fakeHundredth() {
                     const numbers = [...Array(100).keys()];
                    numbers.forEach((number) => setTimeout(setHundredth, 10 * number, number));        
@@ -51,7 +50,16 @@ export default function Timer() {
       
     }
 
+    useEffect(()=>{
+        advancedTiming(runTimer ? true : false);
+    }, [runTimer])
     
+    function resetToZero() {
+        setTimespan(0);
+        setHundredth(0);
+    }
+
+    resetTimer && resetToZero();
 
     function formatHundredth(number) {
         const formattedNumber = number.toLocaleString('en-US', {
@@ -69,11 +77,7 @@ export default function Timer() {
             <ButtonContainer>
             <StandardButton onClick={()=>advancedTiming(true)}>Start</StandardButton>
             <StandardButton onClick={()=>advancedTiming(false)}>Stop</StandardButton>
-                <StandardButton onClick={() => {
-                    setTimespan(0);
-                    setHundredth(0);
-                }
-                 }>Reset</StandardButton>
+            <StandardButton onClick={resetToZero}>Reset</StandardButton>
             </ButtonContainer>
         </TimerSection>
     )

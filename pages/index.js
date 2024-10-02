@@ -57,9 +57,10 @@ export default function HomePage() {
   const { gameMode, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
   const [squareState, setSquareState] = useState(initialCardState);
   const [gameState, setGameState] = useState(initialGameState);
+  const { running, cardsShown, score, resetTimer, card0, card1 } = gameState;
   const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
   const { cardCount, roundCount } = count;
-  const { progress, cardsShown, score, cardsOpened, round, card0, card1 } = gameState;
+ 
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! New set: Cult of wolves. Try it!");
   const [clickStop, setClickStop] = useState(false);
 
@@ -103,7 +104,8 @@ export default function HomePage() {
   function handleStart() {
     setClickStop(false);
     setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
-    setGameState({ ...initialGameState, progress: "generated" });
+    setGameState({ ...initialGameState, resetTimer: true});
+    setGameState({ ...initialGameState, running: true});
     setCount({cardCount: 0, roundCount: 1});
     setMessage(`Started a ${gameMode} game. Click on a card to start!`);
   }
@@ -119,8 +121,8 @@ export default function HomePage() {
       const newCard = { ...card, isShown: false, won: false }
       return newCard;
     }));
-
-    setGameState({ ...initialGameState, progress: "generated" });
+    setGameState({ ...initialGameState, resetTimer: true});
+    setGameState({ ...initialGameState, running: true});
     setCount({cardCount: 0, roundCount: 1});
     setMessage("Click on a card to start!");
       }
@@ -132,7 +134,7 @@ export default function HomePage() {
   }
 
   function noClick() {
-    setMessage("Only two cards can be shown at the same time!")
+    setMessage("Sorry, only two cards can be shown at the same time!")
   }
 
   function cardClick(id) {
@@ -175,7 +177,7 @@ export default function HomePage() {
          );
       match ? setMessage("The cards match, yeah!") : setMessage("The cards do not match!");
         
-      //reset CardState (squarestate)  and gamestate
+      //reset CardState (squarestate) 
         const afterRoundCardState = match? wonCardState : squareState;
         const resetCardState = afterRoundCardState.map((card) => {
             const updatedCard = { ...card, isShown: false };
@@ -193,14 +195,24 @@ export default function HomePage() {
       //check for game end
       const arrayOfWonCards = wonCardState.filter((card) => card.won === true);
       const newScore = arrayOfWonCards.length; 
-      newScore === (cardColumns * cardRows) && setMessage(`Game won in ${roundCount} rounds.`);
+      // if(newScore === (cardColumns * cardRows)) {
+      //   setMessage(`Game won in ${roundCount} rounds.`);
+      //   const gameWon = true;
+      //   setGameState({ ...gameState, running: false, gameWon});
+      // };
       
         //reset 2
         const afterRoundGameState = { ...gameState, cardsShown: 0, score: (match ? gameState.score + 2 : gameState.score), card0: { id: "a" }, card1: { id: "b" } };
         setTimeout(() => {
           setGameState(afterRoundGameState);
           setMessage(match ? "You scored!" : "You may score next round!");
-          newScore === cardColumns * cardRows && setMessage(`Game won in ${roundCount} rounds.`);
+
+          if(newScore === (cardColumns * cardRows)) {
+            setMessage(`Game won in ${roundCount} rounds.`);
+            const gameWon = true;
+            setGameState({ ...gameState, running: false, gameWon});
+          };
+          // newScore === cardColumns * cardRows && setMessage(`Game won in ${roundCount} rounds.`);
           // setClickStop(false);
         }, timeToSee + 300)
       }
@@ -227,7 +239,7 @@ export default function HomePage() {
           <MessageSlot>{message}</MessageSlot>
           <Stats>
             <SmallerHeadline>Stats<br /> </SmallerHeadline>
-            <StatLine> 🟧 Won Cards: {score}  🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} 🟧 </StatLine>
+            <StatLine>Won Cards: {score}  🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} 🟧 </StatLine>
           </Stats>
         </UpperSection>
         <OptionsContainer>
@@ -258,12 +270,12 @@ export default function HomePage() {
             <StandardButton onClick={handleRestart}>restart</StandardButton>
             <DebugButton onClick={showDebugInfo}>debug</DebugButton>
           </ButtonContainer>
-          <Timer/>
+          <Timer runTimer={running} resetTimer={resetTimer} />
         </OptionsContainer>
   
         {/* $shiftRight={cardSectionWidth / cardColumns /2}  */}
         <SquareSection $addColumns={cardColumns - 4} $shiftRight={shiftRight * (cardColumns - 4)} >
-          {progress === "generated" ? (squareState.map((square) => <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet} setName={cardSet.setName} clickStop={clickStop} size={size} />)) : null}
+          {running === true ? (squareState.map((square) => <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet} setName={cardSet.setName} clickStop={clickStop} size={size} />)) : null}
 
         </SquareSection>
         
