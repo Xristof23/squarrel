@@ -31,6 +31,9 @@ const happy = {
     setName: "happy", typeOfSet: "img", setList: [
         "bees", "bees2", "bees3", "butterflies", "butterflies2", "butterflies3", "cars", "cats", "computer", "computer2", "dogs", "dogs2", "dogs3", "laptops", "laptops4", "owls", "owls2", "people", "people2", "phones", "phones2",  "radios", "radios2" ]}
 
+const jrpg = {
+    setName: "jrpg", typeOfSet: "img", setList: [
+        "druid", "druid2", "fighter3", "fighter", "healer2", "healer4", "mage2", "mage3", "mage4", "ninja", "ninja2", "rogue", "samurai", "samurai3", "samurai4", "starfighter2", "starfighter4", "sword2", "sword4"]}
 
 // AscII sets with two different cards 
 const abcDualSetlist = ABCSet.setList.map((letter, index) => {
@@ -45,7 +48,7 @@ const abcDualSet = { setName: "abcDualSet", typeOfSet: "ASCIIDual", size: 6, set
 //(not yet ready) has to be filled
 const htmlSpecialSet = { setName: "htmlSpecialSet", typeOfSet: "ASCIIDual", setList: [] };
 
-const allSets = [euAnimals, afrAnimals, happy, ABCSet, abcDualSet, htmlSet, smallNumbers, wolfpack ]
+const allSets = [euAnimals, afrAnimals, happy, ABCSet, abcDualSet, htmlSet, smallNumbers, wolfpack, jrpg ]
 
 export {
     initialCardState, 
