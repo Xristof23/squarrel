@@ -18,6 +18,7 @@ import {
   StyledInput, 
   SquarrelTitle
 } from "@/styledcomponents";
+import { formatDuration } from "@/utils";
 
 const StyledMain = styled.main`
  display: grid;
@@ -53,7 +54,7 @@ const SquareSection = styled.section`
 export default function HomePage() {
   const [intro, setIntro] = useState({ introIsShown: true, mainIsShown: false });
   const { introIsShown, mainIsShown } = intro;
-  const [options, setOptions] = useState({ gameMode: "memory", cardRows: 4, cardColumns: 4, delayTime: 2500, shuffle: true, cardSet: euAnimals, typeOfSet: "img", size: 6 });
+  const [options, setOptions] = useState({ gameMode: "memory", cardRows: 4, cardColumns: 4, delayTime: 2000, shuffle: true, cardSet: euAnimals, typeOfSet: "img", size: 6 });
   const { gameMode, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
   const [squareState, setSquareState] = useState(initialCardState);
   const [gameState, setGameState] = useState(initialGameState);
@@ -138,7 +139,6 @@ export default function HomePage() {
   }
 
   function cardClick(id) {
-
     const cardClicked = squareState.find((card) => card.id === id).front;
     const cutLength = cardSet.setName.length + 1;
     const cardName = typeOfSet === "img" ? cardClicked.slice(cutLength, -4) : cardClicked;
@@ -184,7 +184,7 @@ export default function HomePage() {
             return updatedCard;
         });
         
-        //set speed
+      //set speed
       const timeToSee = match ? delayTime / 4 : delayTime;
    
       //reset 1
@@ -195,15 +195,10 @@ export default function HomePage() {
       //check for game end
       const arrayOfWonCards = wonCardState.filter((card) => card.won === true);
       const newScore = arrayOfWonCards.length; 
-      // if(newScore === (cardColumns * cardRows)) {
-      //   setMessage(`Game won in ${roundCount} rounds.`);
-      //   const gameWon = true;
-      //   setGameState({ ...gameState, running: false, gameWon});
-      // };
-      
-        //reset 2
-        const afterRoundGameState = { ...gameState, cardsShown: 0, score: (match ? gameState.score + 2 : gameState.score), card0: { id: "a" }, card1: { id: "b" } };
-        setTimeout(() => {
+  
+      //reset 2
+      const afterRoundGameState = { ...gameState, cardsShown: 0, score: (match ? gameState.score + 2 : gameState.score), card0: { id: "a" }, card1: { id: "b" } };
+      setTimeout(() => {
           setGameState(afterRoundGameState);
           setMessage(match ? "You scored!" : "You may score next round!");
 
@@ -212,8 +207,6 @@ export default function HomePage() {
             const gameWon = true;
             setGameState({ ...gameState, running: false, gameWon});
           };
-          // newScore === cardColumns * cardRows && setMessage(`Game won in ${roundCount} rounds.`);
-          // setClickStop(false);
         }, timeToSee + 300)
       }
     
@@ -230,6 +223,12 @@ export default function HomePage() {
     setIntro({ introIsShown: false, mainIsShown: true })
   }
   
+  function handleGameTime(timespan) {
+    const finalTime = formatDuration(timespan, true);
+    setGameState({...gameState, gameTime: finalTime})
+
+  }
+
   return (
     <>
       {introIsShown && <TitleStart endOfIntro={handleEndOfIntro} />}
@@ -270,10 +269,10 @@ export default function HomePage() {
             <StandardButton onClick={handleRestart}>restart</StandardButton>
             <DebugButton onClick={showDebugInfo}>debug</DebugButton>
           </ButtonContainer>
-          <Timer runTimer={running} resetTimer={resetTimer} />
+          <Timer runTimer={running} resetTimer={resetTimer} sendTime={handleGameTime}
+          />
         </OptionsContainer>
   
-        {/* $shiftRight={cardSectionWidth / cardColumns /2}  */}
         <SquareSection $addColumns={cardColumns - 4} $shiftRight={shiftRight * (cardColumns - 4)} >
           {running === true ? (squareState.map((square) => <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet} setName={cardSet.setName} clickStop={clickStop} size={size} />)) : null}
 
