@@ -58,7 +58,7 @@ export default function HomePage() {
   const { gameMode, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
   const [squareState, setSquareState] = useState(initialCardState);
   const [gameState, setGameState] = useState(initialGameState);
-  const { running, cardsShown, score, resetTimer, card0, card1 } = gameState;
+  const { running, cardsShown, resetTimer, card0, card1 } = gameState;
   const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
   const { cardCount, roundCount } = count;
   const [points, setPoints] = useState(0);
@@ -105,10 +105,11 @@ export default function HomePage() {
   
   function handleStart() {
     setClickStop(false);
+    setPoints(0);
     setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
     setGameState({ ...initialGameState, resetTimer: true});
     setGameState({ ...initialGameState, running: true});
-    setCount({cardCount: 0, roundCount: 1});
+    setCount({ cardCount: 0, roundCount: 1 });
     setMessage(`Started a ${gameMode} game. Click on a card to start!`);
   }
 
@@ -119,6 +120,7 @@ export default function HomePage() {
   function handleRestart() {
     //needs added confirm dialog
     setClickStop(false);
+    setPoints(0);
     setSquareState(squareState.map((card) => {
       const newCard = { ...card, isShown: false, won: false }
       return newCard;
@@ -192,12 +194,12 @@ export default function HomePage() {
       setTimeout(setSquareState, timeToSee, resetCardState);
       newSquareState = resetCardState;
       
-      //needed for check for game end
+      //needed for check for game end (change for new points State?)
       const arrayOfWonCards = wonCardState.filter((card) => card.won === true);
       const newScore = arrayOfWonCards.length; 
-      console.log(newScore);
+      
       //reset 2
-      const afterRoundGameState = { ...gameState, cardsShown: 0, score: newScore, card0: { id: "a" }, card1: { id: "b" } };
+      const afterRoundGameState = { ...gameState, cardsShown: 0, card0: { id: "a" }, card1: { id: "b" } };
       setTimeout(() => {
           setGameState(afterRoundGameState);
           setMessage(match ? "You scored!" : "You may score next round!");

@@ -1,7 +1,7 @@
 // initial states
 
 const initialCardState = [];
-const initialGameState = { running: false, resetTimer: false, gameWon: false, gameTime: 0, cardsShown: 0, score: 0, card0: {id: "a"}, card1: {id: "b"} };
+const initialGameState = { running: false, resetTimer: false, gameWon: false, gameTime: 0, cardsShown: 0, card0: {id: "a"}, card1: {id: "b"} };
 
 // ASCII Sets
 const ABCSet = { setName: "ABCSet", typeOfSet: "ASCII", size: 6, setList: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"] };
