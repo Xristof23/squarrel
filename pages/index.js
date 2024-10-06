@@ -3,6 +3,7 @@ import { useState } from "react";
 import { initialCardState, initialGameState, euAnimals, allSets } from "@/memoryData";
 import Card from "@/components/Card";
 import TitleStart from "@/components/TitleStart";
+import Timer from "@/components/Timer";
 import {
   ButtonContainer,
   OptionsContainer,
@@ -17,6 +18,7 @@ import {
   StyledInput, 
   SquarrelTitle
 } from "@/styledcomponents";
+import { formatDuration } from "@/utils";
 
 const StyledMain = styled.main`
  display: grid;
@@ -33,7 +35,6 @@ const StyledMain = styled.main`
   margin: .5rem auto .5rem; 
   align-content: center;
 `;
-
 
 const SquareSection = styled.section`
   display: grid;
@@ -53,19 +54,20 @@ const SquareSection = styled.section`
 export default function HomePage() {
   const [intro, setIntro] = useState({ introIsShown: true, mainIsShown: false });
   const { introIsShown, mainIsShown } = intro;
-  const [options, setOptions] = useState({ gameMode: "memory", cardRows: 4, cardColumns: 4, delayTime: 2500, shuffle: true, cardSet: euAnimals, typeOfSet: "img", size: 6 });
+  const [options, setOptions] = useState({ gameMode: "memory", cardRows: 4, cardColumns: 4, delayTime: 2000, shuffle: true, cardSet: euAnimals, typeOfSet: "img", size: 6 });
   const { gameMode, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
   const [squareState, setSquareState] = useState(initialCardState);
   const [gameState, setGameState] = useState(initialGameState);
+  const { running, cardsShown, resetTimer, card0, card1 } = gameState;
   const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
   const { cardCount, roundCount } = count;
-  const { progress, cardsShown, score, cardsOpened, round, card0, card1 } = gameState;
-  const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! New set: Cult of wolves. Try it!");
+  const [points, setPoints] = useState(0);
+ 
+  const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! New JRPG style set. Try it!");
   const [clickStop, setClickStop] = useState(false);
 
 
   //  responsive
-
   const cardSectionWidth = 936;
   const shiftRight = 112;
 
@@ -103,9 +105,11 @@ export default function HomePage() {
   
   function handleStart() {
     setClickStop(false);
+    setPoints(0);
     setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
-    setGameState({ ...initialGameState, progress: "generated" });
-    setCount({cardCount: 0, roundCount: 1});
+    setGameState({ ...initialGameState, resetTimer: true});
+    setGameState({ ...initialGameState, running: true});
+    setCount({ cardCount: 0, roundCount: 1 });
     setMessage(`Started a ${gameMode} game. Click on a card to start!`);
   }
 
@@ -116,12 +120,13 @@ export default function HomePage() {
   function handleRestart() {
     //needs added confirm dialog
     setClickStop(false);
+    setPoints(0);
     setSquareState(squareState.map((card) => {
       const newCard = { ...card, isShown: false, won: false }
       return newCard;
     }));
-
-    setGameState({ ...initialGameState, progress: "generated" });
+    setGameState({ ...initialGameState, resetTimer: true});
+    setGameState({ ...initialGameState, running: true});
     setCount({cardCount: 0, roundCount: 1});
     setMessage("Click on a card to start!");
       }
@@ -133,11 +138,10 @@ export default function HomePage() {
   }
 
   function noClick() {
-    setMessage("Only two cards can be shown at the same time!")
+    setMessage("Sorry, only two cards can be shown at the same time!")
   }
 
   function cardClick(id) {
-
     const cardClicked = squareState.find((card) => card.id === id).front;
     const cutLength = cardSet.setName.length + 1;
     const cardName = typeOfSet === "img" ? cardClicked.slice(cutLength, -4) : cardClicked;
@@ -152,8 +156,6 @@ export default function HomePage() {
       setCount({cardCount: newCount, roundCount: newRound});
     }
   
-    //react to third card (not) open at this place?
-
     //set Card to show
     let newSquareState = squareState.map((card) => card.id === id ? { ...card, isShown: true } : card
     );
@@ -175,15 +177,16 @@ export default function HomePage() {
           card.pairId === card0.pairId ? {...card, won: true} : card
          );
       match ? setMessage("The cards match, yeah!") : setMessage("The cards do not match!");
-        
-      //reset CardState (squarestate)  and gamestate
-        const afterRoundCardState = match? wonCardState : squareState;
+      match && setPoints(points + 2);  
+      //reset CardState (squarestate) 
+      const afterRoundCardState = match ? wonCardState : squareState;
+      
         const resetCardState = afterRoundCardState.map((card) => {
             const updatedCard = { ...card, isShown: false };
             return updatedCard;
         });
         
-        //set speed
+      //set speed
       const timeToSee = match ? delayTime / 4 : delayTime;
    
       //reset 1
@@ -191,18 +194,21 @@ export default function HomePage() {
       setTimeout(setSquareState, timeToSee, resetCardState);
       newSquareState = resetCardState;
       
-      //check for game end
+      //needed for check for game end (change for new points State?)
       const arrayOfWonCards = wonCardState.filter((card) => card.won === true);
       const newScore = arrayOfWonCards.length; 
-      newScore === (cardColumns * cardRows) && setMessage(`Game won in ${roundCount} rounds.`);
       
-        //reset 2
-        const afterRoundGameState = { ...gameState, cardsShown: 0, score: (match ? gameState.score + 2 : gameState.score), card0: { id: "a" }, card1: { id: "b" } };
-        setTimeout(() => {
+      //reset 2
+      const afterRoundGameState = { ...gameState, cardsShown: 0, card0: { id: "a" }, card1: { id: "b" } };
+      setTimeout(() => {
           setGameState(afterRoundGameState);
           setMessage(match ? "You scored!" : "You may score next round!");
-          newScore === cardColumns * cardRows && setMessage(`Game won in ${roundCount} rounds.`);
-          // setClickStop(false);
+
+          if(newScore === (cardColumns * cardRows)) {
+            setMessage(`Game won in ${roundCount} rounds.`);
+            const gameWon = true;
+            setGameState({ ...gameState, running: false, gameWon});
+          };
         }, timeToSee + 300)
       }
     
@@ -219,20 +225,23 @@ export default function HomePage() {
     setIntro({ introIsShown: false, mainIsShown: true })
   }
   
+  function handleGameTime(timespan) {
+    const finalTime = formatDuration(timespan, true);
+    setGameState({...gameState, gameTime: finalTime})
+
+  }
+
   return (
     <>
       {introIsShown && <TitleStart endOfIntro={handleEndOfIntro} />}
       {mainIsShown && <StyledMain>
         <UpperSection>
-         
-        
           <SquarrelTitle>🟧 S Q U A R R E L 🟧</SquarrelTitle>
           <MessageSlot>{message}</MessageSlot>
           <Stats>
             <SmallerHeadline>Stats<br /> </SmallerHeadline>
-            <StatLine> 🟧 Won Cards: {score}  🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} 🟧 </StatLine>
+            <StatLine>Won Cards: {points} 🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} 🟧 </StatLine>
           </Stats>
-      
         </UpperSection>
         <OptionsContainer>
           <SmallerHeadline>  Options </SmallerHeadline>
@@ -245,6 +254,7 @@ export default function HomePage() {
               <option value="wolfpack">Cult of wolves (b&w)</option>
               <option value="afrAnimals">African animals (colour)</option>
               <option value="happy">Being happy (colour)</option>
+              <option value="jrpg">JRPG party members (colour)</option>
               <option value="ABCSet">Capital letters</option>
               <option value="abcDualSet">Two kinds of letters</option>
               <option value="smallNumbers">Small numbers</option>
@@ -262,17 +272,15 @@ export default function HomePage() {
             <StandardButton onClick={handleRestart}>restart</StandardButton>
             <DebugButton onClick={showDebugInfo}>debug</DebugButton>
           </ButtonContainer>
+          <Timer runTimer={running} resetTimer={resetTimer} sendTime={handleGameTime}
+          />
         </OptionsContainer>
   
-        {/* $shiftRight={cardSectionWidth / cardColumns /2}  */}
         <SquareSection $addColumns={cardColumns - 4} $shiftRight={shiftRight * (cardColumns - 4)} >
-          {progress === "generated" ? (squareState.map((square) => <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet} setName={cardSet.setName} clickStop={clickStop} size={size} />)) : null}
+          {running === true ? (squareState.map((square) => <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet} setName={cardSet.setName} clickStop={clickStop} size={size} />)) : null}
 
         </SquareSection>
-        
-    
       </StyledMain>}
-
     </>
   );
 }

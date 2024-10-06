@@ -3,6 +3,7 @@ import styled from "styled-components";
 const SquarrelTitle = styled.h1`
     text-align: left;
     font-weight: 800;
+    flex-grow: 1;
     line-height: 2.7rem;
     font-size: 2.7rem;
     width: 100%;
@@ -120,12 +121,11 @@ min-height: 2rem;
  border-radius: 4px;
 border: 1px solid transparent; 
 background-color: lightgray;
-
 `;
-
 
 const MessageSlot = styled.div`
  color: black;
+ flex-grow: 1;
  font-weight: 400;
  background-color: darkorange;
  width: 95%;
@@ -139,6 +139,7 @@ const MessageSlot = styled.div`
 
 const Stats = styled.div`
  display: flex;
+ flex-grow: 1;
 flex-direction: row;
 text-align: left; 
 color: black;
