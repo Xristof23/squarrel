@@ -124,19 +124,52 @@ export default function HomePage() {
   const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
   const [squareState, setSquareState] = useState(initialCardState);
   const [gameState, setGameState] = useState(initialGameState);
-  const { running, cardsShown, resetTimer, gameWon, card0, card1 } = gameState;
+  const { running, cardsShown, gameWon, card0, card1 } = gameState;
   const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
   const { cardCount, roundCount } = count;
   const [points, setPoints] = useState(0);
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! New JRPG style set. Try it!");
   const [clickStop, setClickStop] = useState(false);
-  const [finalTime, setFinalTime] = useState(0);
-  // const [highscore, setHighscore] = useState([]);
   const [highscore, setHighscore]= useLocalStorageState("highscore", {
-        defaultValue: []})
+    defaultValue: []
+  })
+  const shownEntries = highscore.toSorted(sortEntriesLowToHigh);
+ //timer 
+  const [storedInterval, setStoredInterval] = useState(0);
+  const [timespan, setTimespan] = useState(0);
+ 
+ function advancedTiming(run) {
+     if (run === true) {
+        const first = Date.now();
+  
+        function updateTimespan() {
+            const newTimespan = (Date.now() - first);
+            setTimespan(newTimespan);
+        }
+      
+        const newIntervalId = setInterval(updateTimespan, 100);
+       setStoredInterval(newIntervalId);
+     
+    } else { 
+        const newIntervalId = storedInterval;
+         clearInterval(newIntervalId);
+    }
+}
 
- const shownEntries = highscore.toSorted(sortEntriesLowToHigh);
+//  useEffect(() => {
+//      advancedTiming(true);
+//  }, [)
+ 
+ function resetToZero() {
+     setTimespan(0);
+ }
 
+  //needs confirm dialog even for devmode
+  function handleHighscoreReset() {
+    setHighscore([]);
+}
+
+  
   //  responsive
   const cardSectionWidth = 936;
   const shiftRight = 112;
@@ -176,8 +209,9 @@ export default function HomePage() {
     setClickStop(false);
     setPoints(0);
     setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
-    setGameState({ ...initialGameState, resetTimer: true});
     setGameState({ ...initialGameState, running: true});
+    setTimespan(0);
+    advancedTiming(true);
     setCount({ cardCount: 0, roundCount: 1 });
     setMessage(`Started a ${gameMode} game. Click on a card to start!`);
   }
@@ -191,11 +225,12 @@ export default function HomePage() {
       const newCard = { ...card, isShown: false, won: false }
       return newCard;
     }));
-    setGameState({ ...initialGameState, resetTimer: true});
     setGameState({ ...initialGameState, running: true});
+    setTimespan(0);
+    advancedTiming(true);
     setCount({cardCount: 0, roundCount: 1});
     setMessage("Click on a card to start!");
-      }
+    }
   
   function showDebugInfo() {
     console.log("Squarestate", squareState);
@@ -263,7 +298,7 @@ export default function HomePage() {
       //needed for check for game end (change for new points State?)
       const arrayOfWonCards = wonCardState.filter((card) => card.won === true);
       const newScore = arrayOfWonCards.length; 
-      
+      newScore === (cardColumns * cardRows) && advancedTiming(false);
       //reset 2
       const afterRoundGameState = { ...gameState, cardsShown: 0, card0: { id: "a" }, card1: { id: "b" } };
       setTimeout(() => {
@@ -275,6 +310,7 @@ export default function HomePage() {
             const gameWon = true;
             setGameState({ ...gameState, running: false, gameWon});
             // setTimeout(makeHighscoreEntry, 100, finalTime);
+            makeHighscoreEntry(timespan);
            
           };
         }, timeToSee + 300)
@@ -293,37 +329,23 @@ export default function HomePage() {
     setIntro({ introIsShown: false, mainIsShown: true })
   }
   
-  function handleGameTime(timespan) {
-    const formattedTime = formatDuration(timespan, true);
-    setFinalTime(formattedTime);
-    gameWon && makeHighscoreEntry(timespan, formattedTime);
-    return finalTime;
-  }
-
- 
-
-
-  function makeHighscoreEntry(timespan, formattedTime) {
+  function makeHighscoreEntry(timespan) {
     const gameSize = cardColumns * cardRows;
-  
     const timestamp = Date.now();
     const highscoreDate = new Date(timestamp).toString();
-    const gameTime = formattedTime;
+    const gameTime = formatDuration(timespan, 1);
     const completeScore = Math.ceil((gameSize / timespan) * 1000000);
     const shortDate = highscoreDate.slice(4, 15);
     const newEntry = { id: uuidv4(6), timestamp, shortDate, gameTime, gameSize, completeScore,  cardSet: cardSet.setName, nameOfPlayer1 }
     setHighscore([...highscore, newEntry]);
   }
 
+  // gameWon && makeHighscoreEntry(timespan);
+
   function handleDelete(array, id) {
     const newArray = array.filter((element) => element.id != id);
     setHighscore(newArray);
   }
-  function resetAndStopTimer() {
-    setGameState({ ...gameState, running: false});
-    setGameState({ ...gameState, resetTimer: true });
-}  
-
 
   return (
     <>
@@ -383,10 +405,10 @@ export default function HomePage() {
           {devMode && <ButtonContainer>
             <DebugButton onClick={() => makeHighscoreEntry(finalTime)}>hs</DebugButton>
             <DebugButton onClick={showDebugInfo}>log</DebugButton>
-            <DebugButton onClick={resetAndStopTimer}>stop</DebugButton>
+            <DebugButton onClick={resetToZero}>stop</DebugButton>
+            <DebugButton onClick={handleHighscoreReset}>resetHs</DebugButton>
           </ButtonContainer>}
-          <Timer runTimer={running} resetTimer={resetTimer} sendTime={handleGameTime}
-          />
+          <Timer timespan={timespan} />
         </OptionsContainer>
   
         <SquareSection $addColumns={cardColumns - 4} $shiftRight={shiftRight * (cardColumns - 4)} >
