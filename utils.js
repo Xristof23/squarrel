@@ -6,6 +6,27 @@ export function formatTo2digits(number) {
     return formattedNumber;
 }
 
+export function sortEntriesLowToHigh(a, b) {
+    if (a.gameTime < b.gameTime) {
+      return -1;
+    }
+    if (a.gameTime > b.gameTime) {
+      return 1;
+    }
+    return 0;
+  }
+
+ export function sortEntriesHighToLow(a, b) {
+    if (a.gameTime > b.gameTime) {
+      return -1;
+    }
+    if (a.gameTime < b.gameTime) {
+      return 1;
+    }
+    return 0;
+  }
+
+
 export function formatDuration(number, highRes) {
     const allSeconds = Math.floor(number / 1000);
     const minutes = formatTo2digits(Math.floor(allSeconds / 60));

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useState } from "react";
-import { initialCardState, initialGameState, euAnimals, allSets } from "@/memoryData";
+import { initialCardState, initialGameState, euAnimals, allSets, initialOptions } from "@/memoryData";
 import Card from "@/components/Card";
 import TitleStart from "@/components/TitleStart";
 import Timer from "@/components/Timer";
@@ -15,10 +15,10 @@ import {
   StyledSelect,
   StandardButton,
   DebugButton,
-  StyledInput, 
   SquarrelTitle
 } from "@/styledcomponents";
-import { formatDuration } from "@/utils";
+import { formatDuration, sortEntriesHighToLow, sortEntriesLowToHigh } from "@/utils";
+import { v4 as uuidv4 } from 'uuid';
 
 const StyledMain = styled.main`
  display: grid;
@@ -51,26 +51,92 @@ const SquareSection = styled.section`
   justify-content: center;
 `;
 
+const StandardLabel = styled.label`
+  font-size: 0.9rem;
+  width: 90%;
+  margin: .5rem .5rem 1rem 0rem;
+  padding: .2rem;
+`;
+
+const StyledNrInput = styled.input`
+  font-size: 0.8rem;
+  width: 2.5rem;
+  margin: 0.3rem;
+  padding: .2rem;
+`;
+
+const StyledInput = styled.input`
+  min-width: 3.5rem;
+  width: 66%;
+  margin: 0.3rem;
+  padding: .2rem;
+`;
+
+
+const HighscoreSection = styled.section`
+  display: block;
+  width: 444px;
+  height: 100%; 
+  margin: .5rem;
+  padding: .5rem;
+  align-items: center;
+  border-radius: 4px;
+  justify-content: center;
+  border: 1px solid black;
+`;
+
+const Disorder = styled.ul`
+margin: 0;
+padding: .1rem;
+`;
+
+const HighscoreEntry = styled.li`
+  display: flex;
+  width: 98%;
+  margin: .2rem;
+  padding: 4px;
+  align-items: center;
+  background-color: orange;
+  justify-content: space-around;
+  border: 1px solid black;
+  border-radius: 4px;
+`;
+
+const HighscoreDetail = styled.span`
+flex-grow: 1;
+width: 30%;
+align.self: left;
+`;
+
+const HighscoreNumber = styled.span`
+flex-grow: 1;
+width: 10%;
+align.self: left;
+`;
+
+
 export default function HomePage() {
   const [intro, setIntro] = useState({ introIsShown: true, mainIsShown: false });
   const { introIsShown, mainIsShown } = intro;
-  const [options, setOptions] = useState({ gameMode: "memory", cardRows: 4, cardColumns: 4, delayTime: 2000, shuffle: true, cardSet: euAnimals, typeOfSet: "img", size: 6 });
-  const { gameMode, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
+  const [devMode, setDevMode] = useState(true);
+  const [options, setOptions] = useState(initialOptions);
+  const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
   const [squareState, setSquareState] = useState(initialCardState);
   const [gameState, setGameState] = useState(initialGameState);
-  const { running, cardsShown, resetTimer, card0, card1 } = gameState;
+  const { running, cardsShown, resetTimer, gameWon, card0, card1 } = gameState;
   const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
   const { cardCount, roundCount } = count;
   const [points, setPoints] = useState(0);
- 
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! New JRPG style set. Try it!");
   const [clickStop, setClickStop] = useState(false);
-
-
+  const [finalTime, setFinalTime] = useState(0);
+  const [highscore, setHighscore] = useState([]);
+ const shownEntries = highscore.toSorted(sortEntriesLowToHigh);
+    
+console.log(shownEntries);
   //  responsive
   const cardSectionWidth = 936;
   const shiftRight = 112;
-
 
   // card rows = 4 for now,  : numbers 4 <= cardColumns <= 6 (8)
   function generateCardsArray(cardRows, cardColumns, shuffle, cardSet) {
@@ -113,10 +179,7 @@ export default function HomePage() {
     setMessage(`Started a ${gameMode} game. Click on a card to start!`);
   }
 
-  //need two kinds of resets
-  // total (not implemented yet)
-
-  // restart with same cards
+  // restart with same cards (should be changed later) need two kinds of resets
   function handleRestart() {
     //needs added confirm dialog
     setClickStop(false);
@@ -208,6 +271,8 @@ export default function HomePage() {
             setMessage(`Game won in ${roundCount} rounds.`);
             const gameWon = true;
             setGameState({ ...gameState, running: false, gameWon});
+            // setTimeout(makeHighscoreEntry, 100, finalTime);
+           
           };
         }, timeToSee + 300)
       }
@@ -226,11 +291,31 @@ export default function HomePage() {
   }
   
   function handleGameTime(timespan) {
-    const finalTime = formatDuration(timespan, true);
-    setGameState({...gameState, gameTime: finalTime})
-
+    const timeUsed= formatDuration(timespan, true);
+    setFinalTime(timeUsed);
+    makeHighscoreEntry(timeUsed);
+    return finalTime;
   }
 
+ 
+
+
+  function makeHighscoreEntry(timeUsed) {
+    const gameSize = cardColumns * cardRows;
+    const timestamp = Date.now();
+    const highscoreDate = new Date(timestamp).toString();
+    const gameTime = timeUsed;
+    const shortDate = highscoreDate.slice(0, 10);
+    const newEntry = { id: uuidv4(6), timestamp, shortDate, gameTime, gameSize, cardSet: cardSet.setName, nameOfPlayer1 }
+    setHighscore([...highscore, newEntry]);
+  }
+
+  function handleDelete(array, id) {
+    const newArray = array.filter((element) => element.id != id);
+    setHighscore(newArray);
+  }
+  
+  
   return (
     <>
       {introIsShown && <TitleStart endOfIntro={handleEndOfIntro} />}
@@ -245,7 +330,20 @@ export default function HomePage() {
         </UpperSection>
         <OptionsContainer>
           <SmallerHeadline>  Options </SmallerHeadline>
-          <label htmlFor="selectSet"  >Set:
+         
+          <StandardLabel htmlFor="numberOfPlayers">Number of players: <StyledNrInput  name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={3}
+            onChange={(event) => setOptions({ ...options, numberOfPlayers: event.target.value })} value={numberOfPlayers} /></StandardLabel>
+   
+          <StandardLabel htmlFor="nameOfPlayer1">Player1: <StyledInput name="nameOfPlayer1" id="nameOfPlayer1" 
+            onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer1} /></StandardLabel>
+        
+          {numberOfPlayers >= 2 && <StandardLabel htmlFor="nameOfPlayer2">Player2: <StyledInput name="nameOfPlayer2" id="nameOfPlayer2" 
+            onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer2} /></StandardLabel>
+           }
+         {numberOfPlayers >= 3 && <StandardLabel htmlFor="nameOfPlayer3">Player3: <StyledInput name="nameOfPlayer3" id="nameOfPlayer3" 
+            onChange={(event) => setOptions({ ...options, nameOfPlayer3: event.target.value })} value={nameOfPlayer3} /></StandardLabel>
+         }
+          <StandardLabel htmlFor="selectSet"  >Set:
             <StyledSelect aria-label="Choose a set of cards" id="selectSet"
               name="selectSet" value={`${cardSet.setName}`} onChange={(event) => handleSelect(event.target.value)}
             >
@@ -260,18 +358,22 @@ export default function HomePage() {
               <option value="smallNumbers">Small numbers</option>
               <option value="htmlSet">HTML Tags</option>
             </StyledSelect>
-          </label>
-          <br />
-          <label htmlFor="delayTime">Delay time<StyledInput name="delayTime" id="delayTime" type="number" min={500} max={8000} step="500" onChange={(event) => setOptions({ ...options, delayTime: event.target.value })} value={delayTime} />  ms</label>
-          <br />
-          <label htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={6} onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></label>
+          </StandardLabel>
+       
+          <StandardLabel htmlFor="delayTime">Delay time<StyledInput name="delayTime" id="delayTime" type="number" min={500} max={8000} step="500"
+            onChange={(event) => setOptions({ ...options, delayTime: event.target.value })} value={delayTime} />  ms</StandardLabel>
+          <StandardLabel htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={6}
+            onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
           <p>  </p>
           <SmallerHeadline>  Controls </SmallerHeadline>
           <ButtonContainer>
             <StandardButton onClick={handleStart}>start</StandardButton>
             <StandardButton onClick={handleRestart}>restart</StandardButton>
-            <DebugButton onClick={showDebugInfo}>debug</DebugButton>
           </ButtonContainer>
+          {devMode && <ButtonContainer>
+            <DebugButton onClick={() => makeHighscoreEntry(finalTime)}>hs</DebugButton>
+            <DebugButton onClick={showDebugInfo}>log</DebugButton>
+          </ButtonContainer>}
           <Timer runTimer={running} resetTimer={resetTimer} sendTime={handleGameTime}
           />
         </OptionsContainer>
@@ -280,7 +382,25 @@ export default function HomePage() {
           {running === true ? (squareState.map((square) => <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet} setName={cardSet.setName} clickStop={clickStop} size={size} />)) : null}
 
         </SquareSection>
-      </StyledMain>}
+        <HighscoreSection>
+          <SmallerHeadline>Highscore</SmallerHeadline>
+          <Disorder>
+        
+             { shownEntries.map((entry, index) => <HighscoreEntry key={entry.id} >
+              <HighscoreNumber>{index + 1}</HighscoreNumber>
+              <HighscoreDetail>{entry.gameTime}</HighscoreDetail>
+              <HighscoreDetail>{entry.nameOfPlayer1}</HighscoreDetail>
+              <HighscoreDetail>{entry.cardSet}</HighscoreDetail>
+              <HighscoreDetail>{entry.shortDate}</HighscoreDetail>
+              
+              <DebugButton onClick={() => handleDelete(highscore, entry.id)}>x</DebugButton>
+            </HighscoreEntry>)}
+            </Disorder>
+        </HighscoreSection>
+      </StyledMain>
+      
+      }
+
     </>
   );
 }

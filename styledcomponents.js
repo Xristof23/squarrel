@@ -110,16 +110,16 @@ min-height: 2rem;
 `;
 
 const DebugButton = styled(StandardButton)`
-color: lightgrey;
+color: grey;
 font-size: 1rem;
 font-weight: 500; 
 margin: 0.2rem;
-padding: 0.2rem;
-width: 4rem;
-min-width: 3rem;
-min-height: 2rem;
+padding: 0.1rem;
+width: 2rem;
+min-width: 2rem;
+min-height: 1.5rem;
  border-radius: 4px;
-border: 1px solid transparent; 
+border: 1px solid grey; 
 background-color: lightgray;
 `;
 
@@ -180,14 +180,6 @@ const StyledSelect = styled.select`
   margin: .3rem; 
 `;
 
-
-
-const StyledInput = styled.input`
-min-width: 3.5rem;
-`;
-
-
-
 export {
     ButtonContainer,
     StyledMain,
@@ -202,7 +194,6 @@ export {
     StatLine,
     Stats,
     StyledSelect,
-    StyledInput,
   StandardButton,
   SquarrelTitle, 
     DebugButton
