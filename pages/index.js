@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { useState } from "react";
+import useLocalStorageState from 'use-local-storage-state'
 import { initialCardState, initialGameState, euAnimals, allSets, initialOptions } from "@/memoryData";
 import Card from "@/components/Card";
 import TitleStart from "@/components/TitleStart";
@@ -60,7 +61,7 @@ const StandardLabel = styled.label`
 
 const StyledNrInput = styled.input`
   font-size: 0.8rem;
-  width: 2.5rem;
+  width: 4rem;
   margin: 0.3rem;
   padding: .2rem;
 `;
@@ -72,17 +73,16 @@ const StyledInput = styled.input`
   padding: .2rem;
 `;
 
-
 const HighscoreSection = styled.section`
   display: block;
-  width: 444px;
+  width: 465px;
   height: 100%; 
-  margin: .5rem;
+  margin: .5rem -0.5rem .5rem .5rem;
   padding: .5rem;
   align-items: center;
   border-radius: 4px;
   justify-content: center;
-  border: 1px solid black;
+
 `;
 
 const Disorder = styled.ul`
@@ -92,25 +92,26 @@ padding: .1rem;
 
 const HighscoreEntry = styled.li`
   display: flex;
+  font-size: 0.9rem;
   width: 98%;
   margin: .2rem;
-  padding: 4px;
+  padding: 3px;
   align-items: center;
   background-color: orange;
-  justify-content: space-around;
+  justify-content: space-between;
   border: 1px solid black;
   border-radius: 4px;
 `;
 
 const HighscoreDetail = styled.span`
 flex-grow: 1;
-width: 30%;
+width: 25%;
 align.self: left;
 `;
 
 const HighscoreNumber = styled.span`
 flex-grow: 1;
-width: 10%;
+width: 8%;
 align.self: left;
 `;
 
@@ -130,10 +131,12 @@ export default function HomePage() {
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! New JRPG style set. Try it!");
   const [clickStop, setClickStop] = useState(false);
   const [finalTime, setFinalTime] = useState(0);
-  const [highscore, setHighscore] = useState([]);
+  // const [highscore, setHighscore] = useState([]);
+  const [highscore, setHighscore]= useLocalStorageState("highscore", {
+        defaultValue: []})
+
  const shownEntries = highscore.toSorted(sortEntriesLowToHigh);
-    
-console.log(shownEntries);
+
   //  responsive
   const cardSectionWidth = 936;
   const shiftRight = 112;
@@ -291,22 +294,24 @@ console.log(shownEntries);
   }
   
   function handleGameTime(timespan) {
-    const timeUsed= formatDuration(timespan, true);
-    setFinalTime(timeUsed);
-    makeHighscoreEntry(timeUsed);
+    const formattedTime = formatDuration(timespan, true);
+    setFinalTime(formattedTime);
+    gameWon && makeHighscoreEntry(timespan, formattedTime);
     return finalTime;
   }
 
  
 
 
-  function makeHighscoreEntry(timeUsed) {
+  function makeHighscoreEntry(timespan, formattedTime) {
     const gameSize = cardColumns * cardRows;
+  
     const timestamp = Date.now();
     const highscoreDate = new Date(timestamp).toString();
-    const gameTime = timeUsed;
-    const shortDate = highscoreDate.slice(0, 10);
-    const newEntry = { id: uuidv4(6), timestamp, shortDate, gameTime, gameSize, cardSet: cardSet.setName, nameOfPlayer1 }
+    const gameTime = formattedTime;
+    const completeScore = Math.ceil((gameSize / timespan) * 1000000);
+    const shortDate = highscoreDate.slice(4, 15);
+    const newEntry = { id: uuidv4(6), timestamp, shortDate, gameTime, gameSize, completeScore,  cardSet: cardSet.setName, nameOfPlayer1 }
     setHighscore([...highscore, newEntry]);
   }
 
@@ -314,8 +319,12 @@ console.log(shownEntries);
     const newArray = array.filter((element) => element.id != id);
     setHighscore(newArray);
   }
-  
-  
+  function resetAndStopTimer() {
+    setGameState({ ...gameState, running: false});
+    setGameState({ ...gameState, resetTimer: true });
+}  
+
+
   return (
     <>
       {introIsShown && <TitleStart endOfIntro={handleEndOfIntro} />}
@@ -360,8 +369,9 @@ console.log(shownEntries);
             </StyledSelect>
           </StandardLabel>
        
-          <StandardLabel htmlFor="delayTime">Delay time<StyledInput name="delayTime" id="delayTime" type="number" min={500} max={8000} step="500"
-            onChange={(event) => setOptions({ ...options, delayTime: event.target.value })} value={delayTime} />  ms</StandardLabel>
+          <StandardLabel htmlFor="delayTime">Delay time<StyledNrInput name="delayTime" id="delayTime" type="number" min={500} max={8000} step="500"
+            onChange={(event) => setOptions({ ...options, delayTime: event.target.value })} value={delayTime} /> ms</StandardLabel>
+          <br/>
           <StandardLabel htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={6}
             onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
           <p>  </p>
@@ -373,6 +383,7 @@ console.log(shownEntries);
           {devMode && <ButtonContainer>
             <DebugButton onClick={() => makeHighscoreEntry(finalTime)}>hs</DebugButton>
             <DebugButton onClick={showDebugInfo}>log</DebugButton>
+            <DebugButton onClick={resetAndStopTimer}>stop</DebugButton>
           </ButtonContainer>}
           <Timer runTimer={running} resetTimer={resetTimer} sendTime={handleGameTime}
           />
@@ -391,6 +402,7 @@ console.log(shownEntries);
               <HighscoreDetail>{entry.gameTime}</HighscoreDetail>
               <HighscoreDetail>{entry.nameOfPlayer1}</HighscoreDetail>
               <HighscoreDetail>{entry.cardSet}</HighscoreDetail>
+              <HighscoreDetail>{entry.completeScore}</HighscoreDetail>
               <HighscoreDetail>{entry.shortDate}</HighscoreDetail>
               
               <DebugButton onClick={() => handleDelete(highscore, entry.id)}>x</DebugButton>
