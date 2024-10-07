@@ -1,6 +1,6 @@
-import { SmallerHeadline } from "@/styledcomponents"
+import { SmallerHeadline } from "@/styledcomponents";
 import { formatDuration } from "@/utils";
-import styled from "styled-components"
+import styled from "styled-components";
 
 const TimerSection = styled.section`
 width: 8rem;
@@ -18,8 +18,6 @@ const TimeDisplay = styled.div`
     background-color: white;
 `;
 export default function Timer({timespan}) {
-  
-
     return(
         <TimerSection>
             <SmallerHeadline> Time</SmallerHeadline>

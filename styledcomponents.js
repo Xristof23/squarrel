@@ -59,7 +59,7 @@ padding: .5rem;
   border-radius: 4px;
 `;
 
-const OptionsContainer = styled.div`
+const LeftSide = styled.div`
 grid-row: 2 / span 3;   
 padding: .5rem;
   margin: .5rem; 
@@ -111,8 +111,17 @@ min-height: 2rem;
 
 const DebugButton = styled(StandardButton)`
 color: grey;
-font-size: 1rem;
-font-weight: 500; 
+padding: 0.1rem;
+width: 3.5rem;
+min-width: 2rem;
+min-height: 1.5rem;
+ border-radius: 4px;
+border: 1px solid grey; 
+background-color: lightgray;
+`;
+
+const DeleteButton = styled(StandardButton)`
+color: red;
 margin: 0.2rem;
 padding: 0.1rem;
 width: 2rem;
@@ -183,7 +192,6 @@ const StyledSelect = styled.select`
 export {
     ButtonContainer,
     StyledMain,
-    OptionsContainer,
     ControlsContainer,
     TitleContainer,
     UpperSection,
@@ -194,7 +202,9 @@ export {
     StatLine,
     Stats,
     StyledSelect,
-  StandardButton,
-  SquarrelTitle, 
-    DebugButton
+    StandardButton,
+    SquarrelTitle, 
+    DebugButton,
+  DeleteButton,
+  LeftSide,
 }

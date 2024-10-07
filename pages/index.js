@@ -1,13 +1,13 @@
 import styled from "styled-components";
 import { useState } from "react";
 import useLocalStorageState from 'use-local-storage-state'
-import { initialCardState, initialGameState, euAnimals, allSets, initialOptions } from "@/memoryData";
+import { initialCardState, initialGameState, allSets, initialOptions } from "@/memoryData";
 import Card from "@/components/Card";
 import TitleStart from "@/components/TitleStart";
 import Timer from "@/components/Timer";
+import Highscore from "@/components/Highscore";
 import {
   ButtonContainer,
-  OptionsContainer,
   UpperSection,
   MessageSlot,
   SmallerHeadline,
@@ -16,7 +16,9 @@ import {
   StyledSelect,
   StandardButton,
   DebugButton,
-  SquarrelTitle
+  SquarrelTitle,
+  DeleteButton,
+  LeftSide
 } from "@/styledcomponents";
 import { formatDuration, sortEntriesHighToLow, sortEntriesLowToHigh } from "@/utils";
 import { v4 as uuidv4 } from 'uuid';
@@ -52,6 +54,23 @@ const SquareSection = styled.section`
   justify-content: center;
 `;
 
+const DevSquare = styled.span`
+`;
+
+const DevButtonContainer = styled.div`
+  display: flex;
+  position: absolute;
+  flex-direction: row;
+  margin: -2rem 2rem 1rem 0;
+  min-height: 35px;
+  width: 15rem;
+  height: 5rem;
+  align-content: center;
+  align-items: center;
+  border-radius: 4px;
+  z-index: 2;
+`;
+
 const StandardLabel = styled.label`
   font-size: 0.9rem;
   width: 90%;
@@ -73,49 +92,6 @@ const StyledInput = styled.input`
   padding: .2rem;
 `;
 
-const HighscoreSection = styled.section`
-  display: block;
-  width: 465px;
-  height: 100%; 
-  margin: .5rem -0.5rem .5rem .5rem;
-  padding: .5rem;
-  align-items: center;
-  border-radius: 4px;
-  justify-content: center;
-
-`;
-
-const Disorder = styled.ul`
-margin: 0;
-padding: .1rem;
-`;
-
-const HighscoreEntry = styled.li`
-  display: flex;
-  font-size: 0.9rem;
-  width: 98%;
-  margin: .2rem;
-  padding: 3px;
-  align-items: center;
-  background-color: orange;
-  justify-content: space-between;
-  border: 1px solid black;
-  border-radius: 4px;
-`;
-
-const HighscoreDetail = styled.span`
-flex-grow: 1;
-width: 25%;
-align.self: left;
-`;
-
-const HighscoreNumber = styled.span`
-flex-grow: 1;
-width: 8%;
-align.self: left;
-`;
-
-
 export default function HomePage() {
   const [intro, setIntro] = useState({ introIsShown: true, mainIsShown: false });
   const { introIsShown, mainIsShown } = intro;
@@ -133,8 +109,7 @@ export default function HomePage() {
   const [highscore, setHighscore]= useLocalStorageState("highscore", {
     defaultValue: []
   })
-  const shownEntries = highscore.toSorted(sortEntriesLowToHigh);
- //timer 
+  //timer 
   const [storedInterval, setStoredInterval] = useState(0);
   const [timespan, setTimespan] = useState(0);
  
@@ -156,10 +131,6 @@ export default function HomePage() {
     }
 }
 
-//  useEffect(() => {
-//      advancedTiming(true);
-//  }, [)
- 
  function resetToZero() {
      setTimespan(0);
  }
@@ -169,7 +140,6 @@ export default function HomePage() {
     setHighscore([]);
 }
 
-  
   //  responsive
   const cardSectionWidth = 936;
   const shiftRight = 112;
@@ -309,9 +279,7 @@ export default function HomePage() {
             setMessage(`Game won in ${roundCount} rounds.`);
             const gameWon = true;
             setGameState({ ...gameState, running: false, gameWon});
-            // setTimeout(makeHighscoreEntry, 100, finalTime);
             makeHighscoreEntry(timespan);
-           
           };
         }, timeToSee + 300)
       }
@@ -340,10 +308,8 @@ export default function HomePage() {
     setHighscore([...highscore, newEntry]);
   }
 
-  // gameWon && makeHighscoreEntry(timespan);
-
-  function handleDelete(array, id) {
-    const newArray = array.filter((element) => element.id != id);
+  function handleDelete(id) {
+    const newArray = highscore.filter((element) => element.id != id);
     setHighscore(newArray);
   }
 
@@ -352,14 +318,14 @@ export default function HomePage() {
       {introIsShown && <TitleStart endOfIntro={handleEndOfIntro} />}
       {mainIsShown && <StyledMain>
         <UpperSection>
-          <SquarrelTitle>🟧 S Q U A R R E L 🟧</SquarrelTitle>
+          <SquarrelTitle>🟧 S Q U A R R E L <DevSquare onClick={()=>setDevMode(!devMode) }>🟧</DevSquare></SquarrelTitle>
           <MessageSlot>{message}</MessageSlot>
           <Stats>
             <SmallerHeadline>Stats<br /> </SmallerHeadline>
             <StatLine>Won Cards: {points} 🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} 🟧 </StatLine>
           </Stats>
         </UpperSection>
-        <OptionsContainer>
+        <LeftSide>
           <SmallerHeadline>  Options </SmallerHeadline>
          
           <StandardLabel htmlFor="numberOfPlayers">Number of players: <StyledNrInput  name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={3}
@@ -402,37 +368,23 @@ export default function HomePage() {
             <StandardButton onClick={handleStart}>start</StandardButton>
             <StandardButton onClick={handleRestart}>restart</StandardButton>
           </ButtonContainer>
-          {devMode && <ButtonContainer>
-            <DebugButton onClick={() => makeHighscoreEntry(finalTime)}>hs</DebugButton>
+          <Timer timespan={timespan} />
+        </LeftSide>
+  
+        <SquareSection $addColumns={cardColumns - 4} $shiftRight={shiftRight * (cardColumns - 4)} >
+          {running === true ? (squareState.map((square) => <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id}
+            front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet}
+            setName={cardSet.setName} clickStop={clickStop} size={size} />)) : null}
+
+        </SquareSection>
+        <Highscore highscore={highscore} devMode={devMode} clickedDelete={handleDelete}/>
+     
+        {devMode && <DevButtonContainer>
             <DebugButton onClick={showDebugInfo}>log</DebugButton>
             <DebugButton onClick={resetToZero}>stop</DebugButton>
             <DebugButton onClick={handleHighscoreReset}>resetHs</DebugButton>
-          </ButtonContainer>}
-          <Timer timespan={timespan} />
-        </OptionsContainer>
-  
-        <SquareSection $addColumns={cardColumns - 4} $shiftRight={shiftRight * (cardColumns - 4)} >
-          {running === true ? (squareState.map((square) => <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet} setName={cardSet.setName} clickStop={clickStop} size={size} />)) : null}
-
-        </SquareSection>
-        <HighscoreSection>
-          <SmallerHeadline>Highscore</SmallerHeadline>
-          <Disorder>
-        
-             { shownEntries.map((entry, index) => <HighscoreEntry key={entry.id} >
-              <HighscoreNumber>{index + 1}</HighscoreNumber>
-              <HighscoreDetail>{entry.gameTime}</HighscoreDetail>
-              <HighscoreDetail>{entry.nameOfPlayer1}</HighscoreDetail>
-              <HighscoreDetail>{entry.cardSet}</HighscoreDetail>
-              <HighscoreDetail>{entry.completeScore}</HighscoreDetail>
-              <HighscoreDetail>{entry.shortDate}</HighscoreDetail>
-              
-              <DebugButton onClick={() => handleDelete(highscore, entry.id)}>x</DebugButton>
-            </HighscoreEntry>)}
-            </Disorder>
-        </HighscoreSection>
+          </DevButtonContainer>}
       </StyledMain>
-      
       }
 
     </>
