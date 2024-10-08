@@ -114,7 +114,7 @@ margin: .5rem .5rem .5rem 0;
 export default function HomePage() {
   const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: true });
   const { introIsShown, mainIsShown, highscoreIsShown } = whatIsShown;
-  const [devMode, setDevMode] = useState(true);
+  const [devMode, setDevMode] = useState(false);
   const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
   const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
   const [squareState, setSquareState] = useState(initialCardState);
@@ -267,7 +267,6 @@ export default function HomePage() {
     //will only run if opencards = 2
     function checkForMatchAndReset(filteredState) {
       setClickStop(true);
-      
       const card0 = filteredState[0];
       const card1 = filteredState[1];
       setGameState({ ...gameState, card1: card1 });
@@ -308,6 +307,7 @@ export default function HomePage() {
             const gameWon = true;
             setGameState({ ...gameState, running: false, gameWon});
             makeHighscoreEntry(timespan);
+            setWhatIsShown({ ...whatIsShown, highscoreIsShown: true });
           };
         }, timeToSee + 300)
       }
@@ -396,8 +396,7 @@ export default function HomePage() {
           <SmallerHeadline>Controls </SmallerHeadline>
           <ButtonContainer>
             <StandardButton onClick={handleStart}>start</StandardButton>
-            <StandardButton onClick={handlePause}>pause</StandardButton>
-            <div>{gameIsPaused.toString()}</div>
+            <StandardButton onClick={handlePause}>{gameIsPaused? "continue" : "pause"}</StandardButton>
           </ButtonContainer>
           <Timer timespan={timespan} />
           <br></br>
@@ -406,7 +405,8 @@ export default function HomePage() {
         </LeftSide>
   
         <SquareSection $addColumns={cardColumns - 4} $shiftRight={shiftRight * (cardColumns - 4)} >
-          {running === true ? (squareState.map((square) => <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id}
+          {running === true ? (squareState.map((square) =>
+            <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id}
             front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet}
             setName={cardSet.setName} clickStop={clickStop} size={size} />)) : null}
         </SquareSection>

@@ -15,18 +15,32 @@ export function formatTo1digit(number) {
 }
 
 
-export function sortEntriesLowToHigh(a, b) {
-    if (a.gameTime < b.gameTime) {
+export function sortEntriesLowToHigh(array, Criterium, lowToHigh) {
+  function sortLowToHigh(a,b) {
+    if (a[Criterium]  < b[Criterium]) {
       return -1;
     }
-    if (a.gameTime > b.gameTime) {
+    if (a[Criterium]  > b[Criterium]) {
       return 1;
     }
     return 0;
   }
+  function sortHighToLow(a,b) {
+    if (a[Criterium]  > b[Criterium]) {
+      return -1;
+    }
+    if (a[Criterium]  < b[Criterium]) {
+      return 1;
+    }
+    return 0;
+  }
+  const sortedArray = array.toSorted(lowToHigh? sortLowToHigh : sortHighToLow);
+  return sortedArray;
+  }
 
- export function sortEntriesHighToLow(a, b) {
-    if (a.gameTime > b.gameTime) {
+ export function sortEntriesHighToLow(a, b, aCriterium, bCriterium) {
+    
+   if (a.gameTime   > b.gameTime) {
       return -1;
     }
     if (a.gameTime < b.gameTime) {

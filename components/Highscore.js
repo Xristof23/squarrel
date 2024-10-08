@@ -1,5 +1,6 @@
 import { StandardButton, SmallerHeadline, DeleteButton } from "@/styledcomponents";
 import { sortEntriesHighToLow, sortEntriesLowToHigh } from "@/utils";
+import { useState } from "react";
 import styled from "styled-components";
 
 const HighscoreSection = styled.section`
@@ -57,12 +58,15 @@ padding: 2px;
 font-weight: 500;
 height: 20px;
 min-height: .9rem;
-width: 3rem;
+min-width: 2.5rem;
+width: fit-content;
 `;
 
-export default function Highscore({highscore, devMode, clickedDelete, highscoreIsShown, clickedChangeShow}) {
-    const shownEntries = highscore.toSorted(sortEntriesLowToHigh);
-
+export default function Highscore({ highscore, devMode, clickedDelete, highscoreIsShown, clickedChangeShow }) {
+    const [sortValue, setSortValue] = useState("gameTime");
+    const [lowToHigh, setLowToHigh] = useState(true);
+    const shownEntries = sortEntriesLowToHigh(highscore, sortValue, lowToHigh);
+    // const shownEntries = highscore;
     function onDelete(id) {
         clickedDelete(id);
     }
@@ -75,15 +79,16 @@ export default function Highscore({highscore, devMode, clickedDelete, highscoreI
             <FlexRowWrapper>
                 <SmallerHeadline>Highscore</SmallerHeadline>
                 <SmallerButton onClick={onHandleShow} >{highscoreIsShown ? "hide" : "show"}</SmallerButton>
+                <SmallerButton onClick={()=>setLowToHigh(!lowToHigh)} >{lowToHigh? "▲" : "▼"}</SmallerButton>
             </FlexRowWrapper> 
             <Disorder>
             <HighscoreEntry>
                 <HighscoreNumber>#</HighscoreNumber>
-                <HighscoreDetail>Time</HighscoreDetail>
-                <HighscoreDetail>Name</HighscoreDetail>
-                <HighscoreDetail>Cardset</HighscoreDetail>
-                <HighscoreDetail>Size</HighscoreDetail>
-                <HighscoreDetail>Points</HighscoreDetail>
+                <HighscoreDetail onClick={()=>setSortValue("gameTime")}>Time</HighscoreDetail>
+                <HighscoreDetail >Name</HighscoreDetail>
+                <HighscoreDetail onClick={()=>setSortValue("cardSet")}>Cardset</HighscoreDetail>
+                <HighscoreDetail onClick={()=>setSortValue("gameSize")}>Size</HighscoreDetail>
+                <HighscoreDetail onClick={()=>setSortValue("completeScore")}>Points</HighscoreDetail>
                 <HighscoreDetail>Date</HighscoreDetail>
                 {devMode && <HighscoreDetail>x</HighscoreDetail>}
                 </HighscoreEntry>
