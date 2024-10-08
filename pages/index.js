@@ -125,6 +125,7 @@ export default function HomePage() {
   const [points, setPoints] = useState(0);
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! New JRPG style set. Try it!");
   const [clickStop, setClickStop] = useState(false);
+  const [gameIsPaused, setGameIsPaused] = useState(false);
   const [highscore, setHighscore]= useLocalStorageState("highscore", {
     defaultValue: []
   })
@@ -132,27 +133,27 @@ export default function HomePage() {
   const [storedInterval, setStoredInterval] = useState(0);
   const [timespan, setTimespan] = useState(0);
  
- function advancedTiming(run) {
+  function advancedTiming(run, lapTime) {
+    let newIntervalId;
      if (run === true) {
-        const first = Date.now();
-  
+        const firstTime = Date.now();
+      
         function updateTimespan() {
-            const newTimespan = (Date.now() - first);
+            const newTimespan = !lapTime? (Date.now() - firstTime) : (Date.now() - firstTime + lapTime);
             setTimespan(newTimespan);
         }
-      
+      if (!newIntervalId) {
         const newIntervalId = setInterval(updateTimespan, 100);
-       setStoredInterval(newIntervalId);
+        console.log("newIntervalId",newIntervalId);
+        setStoredInterval(newIntervalId);
+      }
      
     } else { 
-        const newIntervalId = storedInterval;
+       const newIntervalId = storedInterval;
+       console.log("storedInterval", storedInterval);
          clearInterval(newIntervalId);
     }
 }
-
- function resetToZero() {
-     setTimespan(0);
- }
 
  function handleEndOfIntro() {
   setWhatIsShown({...whatIsShown,  introIsShown: false, mainIsShown: true })
@@ -213,22 +214,22 @@ export default function HomePage() {
     setMessage(`Started a ${gameMode} game. Click on a card to start!`);
   }
 
-  // restart with same cards (should be changed later) need two kinds of resets
-  function handleRestart() {
-    //needs added confirm dialog
-    setClickStop(false);
-    setPoints(0);
-    setSquareState(squareState.map((card) => {
-      const newCard = { ...card, isShown: false, won: false }
-      return newCard;
-    }));
-    setGameState({ ...initialGameState, running: true});
-    setTimespan(0);
-    advancedTiming(true);
-    setCount({cardCount: 0, roundCount: 1});
-    setMessage("Click on a card to start!");
+  function handlePause() {
+    switch (gameIsPaused) {
+      case false:
+        setMessage("Game paused.");
+        setClickStop(true);
+        advancedTiming(false);
+        break;
+      case true:
+        setClickStop(false);
+        advancedTiming(true, timespan);
+        setMessage("Game continues.");
+        break;
     }
-  
+    setGameIsPaused(!gameIsPaused);
+  }
+
   function showDebugInfo() {
     console.log("Squarestate", squareState);
     console.log("Gamestate", gameState);
@@ -392,13 +393,15 @@ export default function HomePage() {
           <StandardLabel htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={6}
             onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
           <p>  </p>
-          <SmallerHeadline>  Controls </SmallerHeadline>
+          <SmallerHeadline>Controls </SmallerHeadline>
           <ButtonContainer>
             <StandardButton onClick={handleStart}>start</StandardButton>
-            <StandardButton onClick={handleRestart}>restart</StandardButton>
-            
+            <StandardButton onClick={handlePause}>pause</StandardButton>
+            <div>{gameIsPaused.toString()}</div>
           </ButtonContainer>
           <Timer timespan={timespan} />
+          <br></br>
+          <SmallerHeadline>More Controls </SmallerHeadline>
           <HighscoreButton onClick={()=>setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} >{highscoreIsShown? "hide highscore" : "show highscore"}</HighscoreButton>
         </LeftSide>
   
@@ -414,7 +417,7 @@ export default function HomePage() {
         </HighScoreContainer> 
         {devMode && <DevButtonContainer>
             <DebugButton onClick={showDebugInfo}>log</DebugButton>
-            <DebugButton onClick={resetToZero}>stop</DebugButton>
+            <DebugButton onClick={()=>setTimespan(0)}>stop</DebugButton>
             <DebugButton onClick={handleHighscoreReset}>resetHs</DebugButton>
           </DevButtonContainer>}
       </StyledMain>
