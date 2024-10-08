@@ -60,13 +60,28 @@ const DevSquare = styled.span`
 const DevButtonContainer = styled.div`
   display: flex;
   position: absolute;
+
   flex-direction: row;
-  margin: -2rem 2rem 1rem 0;
+  margin: -2.2rem 2rem 1rem .8rem;
   min-height: 35px;
   width: 15rem;
   height: 5rem;
   align-content: center;
   align-items: center;
+  border-radius: 4px;
+  z-index: 2;
+`;
+
+const HighScoreContainer = styled.div`
+position: absolute;
+padding: 0;
+top: 95px;
+right: -8px;
+  margin: .5rem; 
+  min-width: 400px;
+  width: 470px;
+  height: fit-content;
+  background-color: white;
   border-radius: 4px;
   z-index: 2;
 `;
@@ -92,9 +107,14 @@ const StyledInput = styled.input`
   padding: .2rem;
 `;
 
+const HighscoreButton = styled(StandardButton)`
+width: 8rem;
+margin: .5rem .5rem .5rem 0;
+`;
+
 export default function HomePage() {
-  const [intro, setIntro] = useState({ introIsShown: true, mainIsShown: false });
-  const { introIsShown, mainIsShown } = intro;
+  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: true });
+  const { introIsShown, mainIsShown, highscoreIsShown } = whatIsShown;
   const [devMode, setDevMode] = useState(true);
   const [options, setOptions] = useState(initialOptions);
   const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
@@ -135,11 +155,10 @@ export default function HomePage() {
      setTimespan(0);
  }
 
-  //needs confirm dialog even for devmode
-  function handleHighscoreReset() {
-    setHighscore([]);
+ function handleEndOfIntro() {
+  setWhatIsShown({...whatIsShown,  introIsShown: false, mainIsShown: true })
 }
-
+ 
   //  responsive
   const cardSectionWidth = 936;
   const shiftRight = 112;
@@ -293,10 +312,6 @@ export default function HomePage() {
     setOptions({ ...options, cardSet: chosenSet, typeOfSet: chosenSet.typeOfSet, size: chosenSet.size ? chosenSet.size : options.size });
   }
   
-  function handleEndOfIntro() {
-    setIntro({ introIsShown: false, mainIsShown: true })
-  }
-  
   function makeHighscoreEntry(timespan) {
     const gameSize = cardColumns * cardRows;
     const timestamp = Date.now();
@@ -307,6 +322,12 @@ export default function HomePage() {
     const newEntry = { id: uuidv4(6), timestamp, shortDate, gameTime, gameSize, completeScore,  cardSet: cardSet.setName, nameOfPlayer1 }
     setHighscore([...highscore, newEntry]);
   }
+
+  //needs confirm dialog even for devmode
+  function handleHighscoreReset() {
+    setMessage("Do you really want to reset the complete highscore?")
+    // setHighscore([]);
+}
 
   function handleDelete(id) {
     const newArray = highscore.filter((element) => element.id != id);
@@ -367,18 +388,22 @@ export default function HomePage() {
           <ButtonContainer>
             <StandardButton onClick={handleStart}>start</StandardButton>
             <StandardButton onClick={handleRestart}>restart</StandardButton>
+            
           </ButtonContainer>
           <Timer timespan={timespan} />
+          <HighscoreButton onClick={()=>setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} >{highscoreIsShown? "hide highscore" : "show highscore"}</HighscoreButton>
         </LeftSide>
   
         <SquareSection $addColumns={cardColumns - 4} $shiftRight={shiftRight * (cardColumns - 4)} >
           {running === true ? (squareState.map((square) => <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id}
             front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet}
             setName={cardSet.setName} clickStop={clickStop} size={size} />)) : null}
-
         </SquareSection>
-        <Highscore highscore={highscore} devMode={devMode} clickedDelete={handleDelete}/>
-     
+        <HighScoreContainer>
+       
+          {highscoreIsShown && <Highscore highscore={highscore} devMode={devMode} clickedDelete={handleDelete} highscoreIsShown={highscoreIsShown}
+            clickedChangeShow={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} />}
+        </HighScoreContainer> 
         {devMode && <DevButtonContainer>
             <DebugButton onClick={showDebugInfo}>log</DebugButton>
             <DebugButton onClick={resetToZero}>stop</DebugButton>

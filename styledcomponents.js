@@ -87,12 +87,12 @@ const Placeholder= styled.div`
 const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
-  margin: -1rem auto 0;
+  margin: 0 0 0 -.2rem;
   min-height: 35px;
   width: 15rem;
   height: 5rem;
   align-content: center;
-  align-items: center;
+  align-items: flex-start;
   border-radius: 4px;
 `;
 
@@ -110,12 +110,13 @@ min-height: 2rem;
 `;
 
 const DebugButton = styled(StandardButton)`
+font-size: .7rem;
 color: grey;
 padding: 0.1rem;
-width: 3.5rem;
+width: 3rem;
 min-width: 2rem;
-min-height: 1.5rem;
- border-radius: 4px;
+min-height: 1rem;
+border-radius: 4px;
 border: 1px solid grey; 
 background-color: lightgray;
 `;
