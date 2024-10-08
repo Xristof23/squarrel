@@ -1,4 +1,4 @@
-import { StandardButton, SmallerHeadline, StyledSelect } from "@/styledcomponents";
+import { SmallerHeadline, StyledSelect } from "@/styledcomponents";
 import styled from "styled-components"
 
 const OptionsForm = styled.form`

@@ -25,40 +25,39 @@ padding: .1rem;
 `;
 
 const HighscoreEntry = styled.li`
-  display: flex;
-  align-text: left;
-  font-size: 0.9rem;
+    display: grid;
+    grid-template-columns: 1.2fr 5fr 6fr 7fr 2.5fr 3.5fr 7fr 1fr;
+    gap: 0.5rem; 
+  font-size: 0.8rem;
+  line-height: 0.8rem;
   width: 98%;
   margin: .2rem;
-  padding: .3rem;
+  padding: .5rem;
   align-items: center;
   background-color: orange;
-  justify-content: space-between;
   border: 1px solid black;
   border-radius: 4px;
 `;
 
-const HighscoreDetail = styled.span`
-flex-grow: 1;
-width: 25%;
-align.self: left;
+const HighscoreDetail = styled.div`
+text-align: left;
+width: 100%;
 `;
 
-const HighscoreNumber = styled.span`
-flex-grow: 1;
-width: 8%;
+const HighscoreNumber = styled.div`
+width: 100%;
+text-align: right;
 `;
 
 const SmallerButton = styled(StandardButton)`
 font-size: .8rem;
 line-height: .8rem;
-margin: 0rem .5rem .5rem 1rem;
+margin: .1rem .5rem .5rem 1rem;
 padding: 2px;
 font-weight: 500;
 height: 20px;
 min-height: .9rem;
 width: 3rem;
-
 `;
 
 export default function Highscore({highscore, devMode, clickedDelete, highscoreIsShown, clickedChangeShow}) {
@@ -77,24 +76,29 @@ export default function Highscore({highscore, devMode, clickedDelete, highscoreI
                 <SmallerHeadline>Highscore</SmallerHeadline>
                 <SmallerButton onClick={onHandleShow} >{highscoreIsShown ? "hide" : "show"}</SmallerButton>
             </FlexRowWrapper> 
+            <Disorder>
             <HighscoreEntry>
                 <HighscoreNumber>#</HighscoreNumber>
                 <HighscoreDetail>Time</HighscoreDetail>
                 <HighscoreDetail>Name</HighscoreDetail>
                 <HighscoreDetail>Cardset</HighscoreDetail>
+                <HighscoreDetail>Size</HighscoreDetail>
                 <HighscoreDetail>Points</HighscoreDetail>
                 <HighscoreDetail>Date</HighscoreDetail>
-            </HighscoreEntry>
+                {devMode && <HighscoreDetail>x</HighscoreDetail>}
+                </HighscoreEntry>
+                </Disorder>
           <Disorder>
-        
-             {shownEntries.map((entry, index) => <HighscoreEntry key={entry.id} >
+                {shownEntries.map((entry, index) =>
+            <HighscoreEntry key={entry.id} >
               <HighscoreNumber>{index + 1}</HighscoreNumber>
               <HighscoreDetail>{entry.gameTime}</HighscoreDetail>
               <HighscoreDetail>{entry.nameOfPlayer1}</HighscoreDetail>
               <HighscoreDetail>{entry.cardSet}</HighscoreDetail>
-              <HighscoreDetail>{entry.completeScore}</HighscoreDetail>
+              <HighscoreDetail>{entry.gameSize}</HighscoreDetail>
+              <HighscoreNumber>{entry.completeScore}</HighscoreNumber>
               <HighscoreDetail>{entry.shortDate}</HighscoreDetail>
-              
+ 
                {devMode && <DeleteButton onClick={()=>onDelete(entry.id)}>x</DeleteButton>}
             </HighscoreEntry>)}
           </Disorder>

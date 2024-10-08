@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useLocalStorageState from 'use-local-storage-state'
 import { initialCardState, initialGameState, allSets, initialOptions } from "@/memoryData";
 import Card from "@/components/Card";
@@ -60,7 +60,6 @@ const DevSquare = styled.span`
 const DevButtonContainer = styled.div`
   display: flex;
   position: absolute;
-
   flex-direction: row;
   margin: -2.2rem 2rem 1rem .8rem;
   min-height: 35px;
@@ -116,7 +115,7 @@ export default function HomePage() {
   const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: true });
   const { introIsShown, mainIsShown, highscoreIsShown } = whatIsShown;
   const [devMode, setDevMode] = useState(true);
-  const [options, setOptions] = useState(initialOptions);
+  const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
   const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
   const [squareState, setSquareState] = useState(initialCardState);
   const [gameState, setGameState] = useState(initialGameState);
@@ -163,6 +162,12 @@ export default function HomePage() {
   const cardSectionWidth = 936;
   const shiftRight = 112;
 
+  useEffect(() => {
+    if (cardColumns > 4) {
+      setWhatIsShown({ ...whatIsShown, highscoreIsShown: false })
+    };
+  }, [cardColumns]);
+ 
   // card rows = 4 for now,  : numbers 4 <= cardColumns <= 6 (8)
   function generateCardsArray(cardRows, cardColumns, shuffle, cardSet) {
     const numberOfSquares = cardColumns * cardRows;
@@ -197,6 +202,9 @@ export default function HomePage() {
   function handleStart() {
     setClickStop(false);
     setPoints(0);
+    if (cardColumns > 4) {
+      setWhatIsShown({ ...whatIsShown, highscoreIsShown: false })
+    };
     setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
     setGameState({ ...initialGameState, running: true});
     setTimespan(0);
@@ -317,7 +325,7 @@ export default function HomePage() {
     const timestamp = Date.now();
     const highscoreDate = new Date(timestamp).toString();
     const gameTime = formatDuration(timespan, 1);
-    const completeScore = Math.ceil((gameSize / timespan) * 1000000);
+    const completeScore = Math.ceil((gameSize**2 / timespan) * 100000);
     const shortDate = highscoreDate.slice(4, 15);
     const newEntry = { id: uuidv4(6), timestamp, shortDate, gameTime, gameSize, completeScore,  cardSet: cardSet.setName, nameOfPlayer1 }
     setHighscore([...highscore, newEntry]);
