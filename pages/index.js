@@ -1,12 +1,13 @@
 import styled from "styled-components";
-import { useState } from "react";
-import { initialCardState, initialGameState, euAnimals, allSets } from "@/memoryData";
+import { useEffect, useState } from "react";
+import useLocalStorageState from 'use-local-storage-state'
+import { initialCardState, initialGameState, allSets, initialOptions } from "@/memoryData";
 import Card from "@/components/Card";
 import TitleStart from "@/components/TitleStart";
 import Timer from "@/components/Timer";
+import Highscore from "@/components/Highscore";
 import {
   ButtonContainer,
-  OptionsContainer,
   UpperSection,
   MessageSlot,
   SmallerHeadline,
@@ -15,19 +16,20 @@ import {
   StyledSelect,
   StandardButton,
   DebugButton,
-  StyledInput, 
-  SquarrelTitle
+  SquarrelTitle,
+  LeftSide
 } from "@/styledcomponents";
 import { formatDuration } from "@/utils";
+import { v4 as uuidv4 } from 'uuid';
 
 const StyledMain = styled.main`
  display: grid;
   grid-template-columns: 228px 934px;
-  grid-template-rows: 80px 228px 228px 228px 228px;
-  width: 98%;
+  grid-template-rows: 78px 228px 228px 228px 228px;
+  width: 99.5%;
   position: absolute;
-  top: 0;
-  left: 0.5rem;
+  top: -1rem;
+  left: -0.5rem;
   margin: .2rem;
   gap: 8px;
   flex-direction: row;
@@ -51,27 +53,121 @@ const SquareSection = styled.section`
   justify-content: center;
 `;
 
+const DevSquare = styled.span`
+`;
+
+const DevButtonContainer = styled.div`
+  display: flex;
+  position: absolute;
+  flex-direction: row;
+  min-height: 35px;
+  top: 80px;
+  left: 100px;
+  width: 10rem;
+  height: 5rem;
+  align-content: center;
+  align-items: center;
+  border-radius: 4px;
+  z-index: 2;
+`;
+
+const HighScoreContainer = styled.div`
+position: absolute;
+padding: 0;
+top: 95px;
+left: 246px;
+  margin: .5rem; 
+  min-width: 500px;
+  width: 800px;
+  height: fit-content;
+  background-color: white;
+  border-radius: 4px;
+  z-index: 2;
+`;
+
+const StandardLabel = styled.label`
+  font-size: 0.9rem;
+  width: 90%;
+  margin: .5rem .5rem 1rem 0rem;
+  padding: .2rem;
+`;
+
+const StyledNrInput = styled.input`
+  font-size: 0.8rem;
+  width: 4rem;
+  margin: 0.3rem;
+  padding: .2rem;
+`;
+
+const StyledInput = styled.input`
+  min-width: 3.5rem;
+  width: 66%;
+  margin: 0.3rem;
+  padding: .2rem;
+`;
+
+const HighscoreButton = styled(StandardButton)`
+font-size: 0.95rem;
+width: 8rem;
+margin: .5rem .5rem .5rem 0;
+`;
+
 export default function HomePage() {
-  const [intro, setIntro] = useState({ introIsShown: true, mainIsShown: false });
-  const { introIsShown, mainIsShown } = intro;
-  const [options, setOptions] = useState({ gameMode: "memory", cardRows: 4, cardColumns: 4, delayTime: 2000, shuffle: true, cardSet: euAnimals, typeOfSet: "img", size: 6 });
-  const { gameMode, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
+  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: false });
+  const { introIsShown, mainIsShown, highscoreIsShown } = whatIsShown;
+  const [devMode, setDevMode] = useState(false);
+  const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
+  const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
   const [squareState, setSquareState] = useState(initialCardState);
   const [gameState, setGameState] = useState(initialGameState);
-  const { running, cardsShown, resetTimer, card0, card1 } = gameState;
+  const { running, cardsShown, gameWon, card0, card1 } = gameState;
   const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
   const { cardCount, roundCount } = count;
   const [points, setPoints] = useState(0);
- 
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! New JRPG style set. Try it!");
   const [clickStop, setClickStop] = useState(false);
+  const [gameIsPaused, setGameIsPaused] = useState(false);
+  const [highscore, setHighscore]= useLocalStorageState("highscore", {
+    defaultValue: []
+  })
+  //timer 
+  const [storedInterval, setStoredInterval] = useState(0);
+  const [timespan, setTimespan] = useState(0);
 
+  function advancedTiming(run, lapTime) {
+    let newIntervalId;
+     if (run === true) {
+        const firstTime = Date.now();
+      
+        function updateTimespan() {
+            const newTimespan = !lapTime? (Date.now() - firstTime) : (Date.now() - firstTime + lapTime);
+            setTimespan(newTimespan);
+        }
+      if (!newIntervalId) {
+        const newIntervalId = setInterval(updateTimespan, 100);
+        setStoredInterval(newIntervalId);
+      }
+     
+    } else { 
+       const newIntervalId = storedInterval;
+       clearInterval(newIntervalId);
+    }
+}
 
+ function handleEndOfIntro() {
+  setWhatIsShown({...whatIsShown,  introIsShown: false, mainIsShown: true })
+}
+ 
   //  responsive
   const cardSectionWidth = 936;
   const shiftRight = 112;
 
-
+  useEffect(() => {
+    if (cardColumns > 4) {
+      setWhatIsShown({ ...whatIsShown, highscoreIsShown: false })
+    };
+  }, [cardColumns]);
+ 
   // card rows = 4 for now,  : numbers 4 <= cardColumns <= 6 (8)
   function generateCardsArray(cardRows, cardColumns, shuffle, cardSet) {
     const numberOfSquares = cardColumns * cardRows;
@@ -106,31 +202,47 @@ export default function HomePage() {
   function handleStart() {
     setClickStop(false);
     setPoints(0);
+    setWhatIsShown({ ...whatIsShown, highscoreIsShown: false });
     setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
-    setGameState({ ...initialGameState, resetTimer: true});
-    setGameState({ ...initialGameState, running: true});
+    setGameState({ ...initialGameState, running: true });
+    
+    setTimespan(0);
+    advancedTiming(true);
     setCount({ cardCount: 0, roundCount: 1 });
     setMessage(`Started a ${gameMode} game. Click on a card to start!`);
   }
 
-  //need two kinds of resets
-  // total (not implemented yet)
+  function handlePause() {
+    switch (gameIsPaused) {
+      case false:
+        setMessage("Game paused.");
+        setClickStop(true);
+        advancedTiming(false);
+        break;
+      case true:
+        setClickStop(false);
+        advancedTiming(true, timespan);
+        setMessage("Game continues.");
+        break;
+    }
+    setGameIsPaused(!gameIsPaused);
+  }
 
-  // restart with same cards
-  function handleRestart() {
-    //needs added confirm dialog
-    setClickStop(false);
+  function handleReset() {
+    advancedTiming(false);
+    setTimespan(0);
+    setClickStop(true);
+    setGameIsPaused(false);
     setPoints(0);
-    setSquareState(squareState.map((card) => {
-      const newCard = { ...card, isShown: false, won: false }
-      return newCard;
-    }));
-    setGameState({ ...initialGameState, resetTimer: true});
-    setGameState({ ...initialGameState, running: true});
-    setCount({cardCount: 0, roundCount: 1});
-    setMessage("Click on a card to start!");
-      }
-  
+    setCount({ cardCount: 0, roundCount: 1 });
+    if (cardColumns > 4) {
+      setWhatIsShown({ ...whatIsShown, highscoreIsShown: false })
+    };
+    setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
+    setMessage("Game reset. Click start to begin a new game.");
+}
+
+
   function showDebugInfo() {
     console.log("Squarestate", squareState);
     console.log("Gamestate", gameState);
@@ -138,7 +250,8 @@ export default function HomePage() {
   }
 
   function noClick() {
-    setMessage("Sorry, only two cards can be shown at the same time!")
+    const newMessage = gameIsPaused ? "Game is paused!" : message.includes("reset") ? "Click start to begin a new game." : "Sorry, only two cards can be shown at the same time!" ;
+    setMessage(newMessage);
   }
 
   function cardClick(id) {
@@ -168,7 +281,6 @@ export default function HomePage() {
     //will only run if opencards = 2
     function checkForMatchAndReset(filteredState) {
       setClickStop(true);
-      
       const card0 = filteredState[0];
       const card1 = filteredState[1];
       setGameState({ ...gameState, card1: card1 });
@@ -197,7 +309,7 @@ export default function HomePage() {
       //needed for check for game end (change for new points State?)
       const arrayOfWonCards = wonCardState.filter((card) => card.won === true);
       const newScore = arrayOfWonCards.length; 
-      
+      newScore === (cardColumns * cardRows) && advancedTiming(false);
       //reset 2
       const afterRoundGameState = { ...gameState, cardsShown: 0, card0: { id: "a" }, card1: { id: "b" } };
       setTimeout(() => {
@@ -208,6 +320,8 @@ export default function HomePage() {
             setMessage(`Game won in ${roundCount} rounds.`);
             const gameWon = true;
             setGameState({ ...gameState, running: false, gameWon});
+            makeHighscoreEntry(timespan);
+            setWhatIsShown({ ...whatIsShown, highscoreIsShown: true });
           };
         }, timeToSee + 300)
       }
@@ -221,14 +335,41 @@ export default function HomePage() {
     setOptions({ ...options, cardSet: chosenSet, typeOfSet: chosenSet.typeOfSet, size: chosenSet.size ? chosenSet.size : options.size });
   }
   
-  function handleEndOfIntro() {
-    setIntro({ introIsShown: false, mainIsShown: true })
-  }
-  
-  function handleGameTime(timespan) {
-    const finalTime = formatDuration(timespan, true);
-    setGameState({...gameState, gameTime: finalTime})
 
+  function calculatePoints(timespan, gameSize, rounds) {
+    const timeToBeat = gameSize === 24 ? 50000 : gameSize === 20 ? 40000 : 30000;
+    const timeBonus = timespan < timeToBeat ? Math.round((timeToBeat - timespan) / 33.3) : 0;
+    const roundsToBeat = Math.round(gameSize * 0.9);
+    const roundBonusArray = [0, 1, 2, 4, 8, 16, 32, 64]
+    const roundBonus = rounds < roundsToBeat ? roundBonusArray[(roundsToBeat - rounds)] * 100 : 0
+    const roundMalus = rounds > roundsToBeat ? (rounds - roundsToBeat) * 15 : 0;
+    const completeScore = gameSize * 15 + timeBonus + roundBonus - roundMalus;
+    return completeScore;
+}
+
+  function makeHighscoreEntry(timespan) {
+    const gameSize = cardColumns * cardRows;
+    const timestamp = Date.now();
+    const highscoreDate = new Date(timestamp).toString();
+    const gameTime = formatDuration(timespan, 1);
+    const completeScore = calculatePoints(timespan, gameSize, roundCount);
+    //Old
+    const oldScore = Math.floor((gameSize ** 1.7 / timespan) * 200000);
+    //
+    const shortDate = highscoreDate.slice(4, 21);
+    const newEntry = { id: uuidv4(6), timestamp, shortDate, timespan, gameTime, gameSize, rounds: roundCount, completeScore, cardSet: cardSet.setName, nameOfPlayer1 }
+    setHighscore([...highscore, newEntry]);
+  }
+
+  //needs confirm dialog even for devmode
+  function handleHighscoreReset() {
+    setMessage("Do you really want to reset the complete highscore?")
+    // setHighscore([]);
+}
+
+  function handleDelete(id) {
+    const newArray = highscore.filter((element) => element.id != id);
+    setHighscore(newArray);
   }
 
   return (
@@ -236,16 +377,29 @@ export default function HomePage() {
       {introIsShown && <TitleStart endOfIntro={handleEndOfIntro} />}
       {mainIsShown && <StyledMain>
         <UpperSection>
-          <SquarrelTitle>🟧 S Q U A R R E L 🟧</SquarrelTitle>
+          <SquarrelTitle>🟧 S Q U A R R E L <DevSquare onClick={()=>setDevMode(!devMode) }>🟧</DevSquare></SquarrelTitle>
           <MessageSlot>{message}</MessageSlot>
           <Stats>
             <SmallerHeadline>Stats<br /> </SmallerHeadline>
             <StatLine>Won Cards: {points} 🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} 🟧 </StatLine>
           </Stats>
         </UpperSection>
-        <OptionsContainer>
+        <LeftSide>
           <SmallerHeadline>  Options </SmallerHeadline>
-          <label htmlFor="selectSet"  >Set:
+         
+          <StandardLabel htmlFor="numberOfPlayers">Number of players: <StyledNrInput  name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={3}
+            onChange={(event) => setOptions({ ...options, numberOfPlayers: event.target.value })} value={numberOfPlayers} /></StandardLabel>
+   
+          <StandardLabel htmlFor="nameOfPlayer1">Player1: <StyledInput name="nameOfPlayer1" id="nameOfPlayer1" 
+            onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer1} /></StandardLabel>
+        
+          {numberOfPlayers >= 2 && <StandardLabel htmlFor="nameOfPlayer2">Player2: <StyledInput name="nameOfPlayer2" id="nameOfPlayer2" 
+            onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer2} /></StandardLabel>
+           }
+         {numberOfPlayers >= 3 && <StandardLabel htmlFor="nameOfPlayer3">Player3: <StyledInput name="nameOfPlayer3" id="nameOfPlayer3" 
+            onChange={(event) => setOptions({ ...options, nameOfPlayer3: event.target.value })} value={nameOfPlayer3} /></StandardLabel>
+         }
+          <StandardLabel htmlFor="selectSet"  >Set:
             <StyledSelect aria-label="Choose a set of cards" id="selectSet"
               name="selectSet" value={`${cardSet.setName}`} onChange={(event) => handleSelect(event.target.value)}
             >
@@ -260,27 +414,44 @@ export default function HomePage() {
               <option value="smallNumbers">Small numbers</option>
               <option value="htmlSet">HTML Tags</option>
             </StyledSelect>
-          </label>
-          <br />
-          <label htmlFor="delayTime">Delay time<StyledInput name="delayTime" id="delayTime" type="number" min={500} max={8000} step="500" onChange={(event) => setOptions({ ...options, delayTime: event.target.value })} value={delayTime} />  ms</label>
-          <br />
-          <label htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={6} onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></label>
+          </StandardLabel>
+       
+          <StandardLabel htmlFor="delayTime">Delay time<StyledNrInput name="delayTime" id="delayTime" type="number" min={500} max={8000} step="500"
+            onChange={(event) => setOptions({ ...options, delayTime: event.target.value })} value={delayTime} /> ms</StandardLabel>
+          <br/>
+          <StandardLabel htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={6}
+            onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
           <p>  </p>
-          <SmallerHeadline>  Controls </SmallerHeadline>
+          <SmallerHeadline>Controls </SmallerHeadline>
           <ButtonContainer>
             <StandardButton onClick={handleStart}>start</StandardButton>
-            <StandardButton onClick={handleRestart}>restart</StandardButton>
-            <DebugButton onClick={showDebugInfo}>debug</DebugButton>
+            <StandardButton onClick={handlePause}>{gameIsPaused ? "continue" : "pause"}</StandardButton>
+            <StandardButton onClick={handleReset}>reset</StandardButton>
           </ButtonContainer>
-          <Timer runTimer={running} resetTimer={resetTimer} sendTime={handleGameTime}
-          />
-        </OptionsContainer>
+          <Timer timespan={timespan} />
+          <br></br>
+          <SmallerHeadline>More Controls </SmallerHeadline>
+          <HighscoreButton onClick={()=>setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} >{highscoreIsShown? "hide highscore" : "show highscore"}</HighscoreButton>
+        </LeftSide>
   
         <SquareSection $addColumns={cardColumns - 4} $shiftRight={shiftRight * (cardColumns - 4)} >
-          {running === true ? (squareState.map((square) => <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id} front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet} setName={cardSet.setName} clickStop={clickStop} size={size} />)) : null}
-
+          {running === true ? (squareState.map((square) =>
+            <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id}
+            front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet}
+            setName={cardSet.setName} clickStop={clickStop} size={size} />)) : null}
         </SquareSection>
-      </StyledMain>}
+        <HighScoreContainer>
+       
+          {highscoreIsShown && <Highscore highscore={highscore} devMode={devMode} clickedDelete={handleDelete} highscoreIsShown={highscoreIsShown}
+            clickedChangeShow={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} />}
+        </HighScoreContainer> 
+        {devMode && <DevButtonContainer>
+            <DebugButton onClick={showDebugInfo}>log</DebugButton>
+            <DebugButton onClick={handleHighscoreReset}>resetHs</DebugButton>
+          </DevButtonContainer>}
+      </StyledMain>
+      }
+
     </>
   );
 }

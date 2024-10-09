@@ -4,8 +4,8 @@ const SquarrelTitle = styled.h1`
     text-align: left;
     font-weight: 800;
     flex-grow: 1;
-    line-height: 2.7rem;
-    font-size: 2.7rem;
+    line-height: 2.6rem;
+    font-size: 2.6rem;
     width: 100%;
     padding: 0;  
     margin:  1rem .5rem 0;
@@ -59,7 +59,7 @@ padding: .5rem;
   border-radius: 4px;
 `;
 
-const OptionsContainer = styled.div`
+const LeftSide = styled.div`
 grid-row: 2 / span 3;   
 padding: .5rem;
   margin: .5rem; 
@@ -87,39 +87,49 @@ const Placeholder= styled.div`
 const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
-  margin: -1rem auto 0;
+  margin: 0 0 0 -.2rem;
   min-height: 35px;
   width: 15rem;
   height: 5rem;
   align-content: center;
-  align-items: center;
+  align-items: flex-start;
   border-radius: 4px;
 `;
 
 const StandardButton = styled.button`
-font-size: 1rem;
-font-weight: 500; 
+font-size: 0.95rem;
+font-weight: 400; 
 margin: 0.2rem;
 padding: 0.2rem;
-width: 4rem;
-min-width: 3rem;
+width: 4.1rem;
+min-width: 3.5rem;
 min-height: 2rem;
- border-radius: 4px;
-   border: 1px solid darkorange;
- background-color: white;
+border-radius: 4px;
+border: 1px solid darkorange;
+background-color: white;
 `;
 
 const DebugButton = styled(StandardButton)`
-color: lightgrey;
-font-size: 1rem;
-font-weight: 500; 
+font-size: .7rem;
+color: grey;
+padding: 0.1rem;
+width: 3rem;
+min-width: 2rem;
+min-height: 1rem;
+border-radius: 4px;
+border: 1px solid grey; 
+background-color: lightgray;
+`;
+
+const DeleteButton = styled(StandardButton)`
+color: red;
 margin: 0.2rem;
-padding: 0.2rem;
-width: 4rem;
-min-width: 3rem;
-min-height: 2rem;
+padding: 0.1rem;
+width: 2rem;
+min-width: 2rem;
+min-height: 1.5rem;
  border-radius: 4px;
-border: 1px solid transparent; 
+border: 1px solid grey; 
 background-color: lightgray;
 `;
 
@@ -127,7 +137,7 @@ const MessageSlot = styled.div`
  color: black;
  flex-grow: 1;
  font-weight: 400;
- background-color: darkorange;
+ background-color: orange;
  width: 95%;
  height: 2.5rem;
  line-height: 2.5rem; 
@@ -180,18 +190,9 @@ const StyledSelect = styled.select`
   margin: .3rem; 
 `;
 
-
-
-const StyledInput = styled.input`
-min-width: 3.5rem;
-`;
-
-
-
 export {
     ButtonContainer,
     StyledMain,
-    OptionsContainer,
     ControlsContainer,
     TitleContainer,
     UpperSection,
@@ -202,8 +203,9 @@ export {
     StatLine,
     Stats,
     StyledSelect,
-    StyledInput,
-  StandardButton,
-  SquarrelTitle, 
-    DebugButton
+    StandardButton,
+    SquarrelTitle, 
+    DebugButton,
+  DeleteButton,
+  LeftSide,
 }
