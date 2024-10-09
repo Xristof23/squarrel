@@ -21,7 +21,7 @@ const wolfpack = {
 // classic image sets colour
 const afrAnimals = {
     setName: "afrAnimals", typeOfSet: "img", setList: [
-        "butterfly", "cheetah", "cheetah", "crocodile", "elephant", "gazelle", "gazelle2", "giraffe", "hippo", "hyena", "leopard", "leopard2", "lion", "okapi", "rhino", "shoebill", "snake", "warthog", "warthog2", "zebra", "zebra2" ]}
+        "butterfly", "cheetah", "cheetah2", "crocodile", "elephant", "gazelle", "gazelle2", "giraffe", "hippo", "hyena", "leopard", "leopard2", "lion", "okapi", "rhino", "shoebill", "snake", "warthog", "warthog2", "zebra", "zebra2" ]}
 
 const happy = {
     setName: "happy", typeOfSet: "img", setList: [

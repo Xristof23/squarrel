@@ -4,8 +4,8 @@ const SquarrelTitle = styled.h1`
     text-align: left;
     font-weight: 800;
     flex-grow: 1;
-    line-height: 2.7rem;
-    font-size: 2.7rem;
+    line-height: 2.6rem;
+    font-size: 2.6rem;
     width: 100%;
     padding: 0;  
     margin:  1rem .5rem 0;
@@ -97,16 +97,16 @@ const ButtonContainer = styled.div`
 `;
 
 const StandardButton = styled.button`
-font-size: 1rem;
-font-weight: 500; 
+font-size: 0.95rem;
+font-weight: 400; 
 margin: 0.2rem;
 padding: 0.2rem;
-width: 6rem;
-min-width: 4rem;
+width: 4.1rem;
+min-width: 3.5rem;
 min-height: 2rem;
- border-radius: 4px;
-   border: 1px solid darkorange;
- background-color: white;
+border-radius: 4px;
+border: 1px solid darkorange;
+background-color: white;
 `;
 
 const DebugButton = styled(StandardButton)`

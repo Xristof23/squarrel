@@ -17,20 +17,19 @@ import {
   StandardButton,
   DebugButton,
   SquarrelTitle,
-  DeleteButton,
   LeftSide
 } from "@/styledcomponents";
-import { formatDuration, sortEntriesHighToLow, sortEntriesLowToHigh } from "@/utils";
+import { formatDuration } from "@/utils";
 import { v4 as uuidv4 } from 'uuid';
 
 const StyledMain = styled.main`
  display: grid;
   grid-template-columns: 228px 934px;
-  grid-template-rows: 80px 228px 228px 228px 228px;
-  width: 98%;
+  grid-template-rows: 78px 228px 228px 228px 228px;
+  width: 99.5%;
   position: absolute;
-  top: 0;
-  left: 0.5rem;
+  top: -1rem;
+  left: -0.5rem;
   margin: .2rem;
   gap: 8px;
   flex-direction: row;
@@ -61,9 +60,10 @@ const DevButtonContainer = styled.div`
   display: flex;
   position: absolute;
   flex-direction: row;
-  margin: -2.2rem 2rem 1rem .8rem;
   min-height: 35px;
-  width: 15rem;
+  top: 80px;
+  left: 100px;
+  width: 10rem;
   height: 5rem;
   align-content: center;
   align-items: center;
@@ -75,10 +75,10 @@ const HighScoreContainer = styled.div`
 position: absolute;
 padding: 0;
 top: 95px;
-right: -8px;
+left: 246px;
   margin: .5rem; 
-  min-width: 400px;
-  width: 470px;
+  min-width: 500px;
+  width: 800px;
   height: fit-content;
   background-color: white;
   border-radius: 4px;
@@ -107,6 +107,7 @@ const StyledInput = styled.input`
 `;
 
 const HighscoreButton = styled(StandardButton)`
+font-size: 0.95rem;
 width: 8rem;
 margin: .5rem .5rem .5rem 0;
 `;
@@ -132,7 +133,7 @@ export default function HomePage() {
   //timer 
   const [storedInterval, setStoredInterval] = useState(0);
   const [timespan, setTimespan] = useState(0);
- 
+
   function advancedTiming(run, lapTime) {
     let newIntervalId;
      if (run === true) {
@@ -144,14 +145,12 @@ export default function HomePage() {
         }
       if (!newIntervalId) {
         const newIntervalId = setInterval(updateTimespan, 100);
-        console.log("newIntervalId",newIntervalId);
         setStoredInterval(newIntervalId);
       }
      
     } else { 
        const newIntervalId = storedInterval;
-       console.log("storedInterval", storedInterval);
-         clearInterval(newIntervalId);
+       clearInterval(newIntervalId);
     }
 }
 
@@ -203,11 +202,10 @@ export default function HomePage() {
   function handleStart() {
     setClickStop(false);
     setPoints(0);
-    if (cardColumns > 4) {
-      setWhatIsShown({ ...whatIsShown, highscoreIsShown: false })
-    };
+    setWhatIsShown({ ...whatIsShown, highscoreIsShown: false });
     setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
-    setGameState({ ...initialGameState, running: true});
+    setGameState({ ...initialGameState, running: true });
+    
     setTimespan(0);
     advancedTiming(true);
     setCount({ cardCount: 0, roundCount: 1 });
@@ -230,6 +228,21 @@ export default function HomePage() {
     setGameIsPaused(!gameIsPaused);
   }
 
+  function handleReset() {
+    advancedTiming(false);
+    setTimespan(0);
+    setClickStop(true);
+    setGameIsPaused(false);
+    setPoints(0);
+    setCount({ cardCount: 0, roundCount: 1 });
+    if (cardColumns > 4) {
+      setWhatIsShown({ ...whatIsShown, highscoreIsShown: false })
+    };
+    setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
+    setMessage("Game reset. Click start to begin a new game.");
+}
+
+
   function showDebugInfo() {
     console.log("Squarestate", squareState);
     console.log("Gamestate", gameState);
@@ -237,7 +250,8 @@ export default function HomePage() {
   }
 
   function noClick() {
-    setMessage("Sorry, only two cards can be shown at the same time!")
+    const newMessage = gameIsPaused ? "Game is paused!" : message.includes("reset") ? "Click start to begin a new game." : "Sorry, only two cards can be shown at the same time!" ;
+    setMessage(newMessage);
   }
 
   function cardClick(id) {
@@ -321,14 +335,29 @@ export default function HomePage() {
     setOptions({ ...options, cardSet: chosenSet, typeOfSet: chosenSet.typeOfSet, size: chosenSet.size ? chosenSet.size : options.size });
   }
   
+
+  function calculatePoints(timespan, gameSize, rounds) {
+    const timeToBeat = gameSize === 24 ? 50000 : gameSize === 20 ? 40000 : 30000;
+    const timeBonus = timespan < timeToBeat ? Math.round((timeToBeat - timespan) / 33.3) : 0;
+    const roundsToBeat = Math.round(gameSize * 0.9);
+    const roundBonusArray = [0, 1, 2, 4, 8, 16, 32, 64]
+    const roundBonus = rounds < roundsToBeat ? roundBonusArray[(roundsToBeat - rounds)] * 100 : 0
+    const roundMalus = rounds > roundsToBeat ? (rounds - roundsToBeat) * 15 : 0;
+    const completeScore = gameSize * 15 + timeBonus + roundBonus - roundMalus;
+    return completeScore;
+}
+
   function makeHighscoreEntry(timespan) {
     const gameSize = cardColumns * cardRows;
     const timestamp = Date.now();
     const highscoreDate = new Date(timestamp).toString();
     const gameTime = formatDuration(timespan, 1);
-    const completeScore = Math.ceil((gameSize**2 / timespan) * 100000);
-    const shortDate = highscoreDate.slice(4, 15);
-    const newEntry = { id: uuidv4(6), timestamp, shortDate, gameTime, gameSize, completeScore,  cardSet: cardSet.setName, nameOfPlayer1 }
+    const completeScore = calculatePoints(timespan, gameSize, roundCount);
+    //Old
+    const oldScore = Math.floor((gameSize ** 1.7 / timespan) * 200000);
+    //
+    const shortDate = highscoreDate.slice(4, 21);
+    const newEntry = { id: uuidv4(6), timestamp, shortDate, timespan, gameTime, gameSize, rounds: roundCount, completeScore, cardSet: cardSet.setName, nameOfPlayer1 }
     setHighscore([...highscore, newEntry]);
   }
 
@@ -396,7 +425,8 @@ export default function HomePage() {
           <SmallerHeadline>Controls </SmallerHeadline>
           <ButtonContainer>
             <StandardButton onClick={handleStart}>start</StandardButton>
-            <StandardButton onClick={handlePause}>{gameIsPaused? "continue" : "pause"}</StandardButton>
+            <StandardButton onClick={handlePause}>{gameIsPaused ? "continue" : "pause"}</StandardButton>
+            <StandardButton onClick={handleReset}>reset</StandardButton>
           </ButtonContainer>
           <Timer timespan={timespan} />
           <br></br>
@@ -417,7 +447,6 @@ export default function HomePage() {
         </HighScoreContainer> 
         {devMode && <DevButtonContainer>
             <DebugButton onClick={showDebugInfo}>log</DebugButton>
-            <DebugButton onClick={()=>setTimespan(0)}>stop</DebugButton>
             <DebugButton onClick={handleHighscoreReset}>resetHs</DebugButton>
           </DevButtonContainer>}
       </StyledMain>

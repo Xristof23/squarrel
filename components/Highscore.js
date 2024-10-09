@@ -1,5 +1,5 @@
 import { StandardButton, SmallerHeadline, DeleteButton } from "@/styledcomponents";
-import { sortEntriesHighToLow, sortEntriesLowToHigh } from "@/utils";
+import { sortEntries} from "@/utils";
 import { useState } from "react";
 import styled from "styled-components";
 
@@ -12,7 +12,7 @@ const HighscoreSection = styled.section`
   align-items: center;
   border-radius: 4px;
   justify-content: center;
-  border: 1px solid orange;
+  border: 1px solid black;
 `;
 
 const FlexRowWrapper = styled.div`
@@ -27,10 +27,10 @@ padding: .1rem;
 
 const HighscoreEntry = styled.li`
     display: grid;
-    grid-template-columns: 1.2fr 5fr 6fr 7fr 2.5fr 3.5fr 7fr 1fr;
+    grid-template-columns: 1.2fr 5fr 5fr 7fr 3fr 3fr 4fr 7fr 1fr;
     gap: 0.5rem; 
-  font-size: 0.8rem;
-  line-height: 0.8rem;
+  font-size: 1rem;
+  line-height: 1rem;
   width: 98%;
   margin: .2rem;
   padding: .5rem;
@@ -43,6 +43,15 @@ const HighscoreEntry = styled.li`
 const HighscoreDetail = styled.div`
 text-align: left;
 width: 100%;
+`;
+
+const HighscoreListButton = styled.button`
+text-align: center;
+width: 4rem;
+margin: 0;
+border: 1px solid black;
+border-radius: 4px;
+padding: 2px;
 `;
 
 const HighscoreNumber = styled.div`
@@ -65,8 +74,9 @@ width: fit-content;
 export default function Highscore({ highscore, devMode, clickedDelete, highscoreIsShown, clickedChangeShow }) {
     const [sortValue, setSortValue] = useState("gameTime");
     const [lowToHigh, setLowToHigh] = useState(true);
-    const shownEntries = sortEntriesLowToHigh(highscore, sortValue, lowToHigh);
-    // const shownEntries = highscore;
+    
+    const shownEntries = sortEntries(highscore, sortValue, lowToHigh);
+ 
     function onDelete(id) {
         clickedDelete(id);
     }
@@ -79,18 +89,40 @@ export default function Highscore({ highscore, devMode, clickedDelete, highscore
             <FlexRowWrapper>
                 <SmallerHeadline>Highscore</SmallerHeadline>
                 <SmallerButton onClick={onHandleShow} >{highscoreIsShown ? "hide" : "show"}</SmallerButton>
-                <SmallerButton onClick={()=>setLowToHigh(!lowToHigh)} >{lowToHigh? "▲" : "▼"}</SmallerButton>
             </FlexRowWrapper> 
             <Disorder>
             <HighscoreEntry>
-                <HighscoreNumber>#</HighscoreNumber>
-                <HighscoreDetail onClick={()=>setSortValue("gameTime")}>Time</HighscoreDetail>
-                <HighscoreDetail >Name</HighscoreDetail>
-                <HighscoreDetail onClick={()=>setSortValue("cardSet")}>Cardset</HighscoreDetail>
-                <HighscoreDetail onClick={()=>setSortValue("gameSize")}>Size</HighscoreDetail>
-                <HighscoreDetail onClick={()=>setSortValue("completeScore")}>Points</HighscoreDetail>
-                <HighscoreDetail>Date</HighscoreDetail>
-                {devMode && <HighscoreDetail>x</HighscoreDetail>}
+                    <HighscoreNumber>#</HighscoreNumber>
+                    <HighscoreListButton onClick={() => {
+                        setSortValue("gameTime");
+                        setLowToHigh(!lowToHigh);}}>Time
+                    </HighscoreListButton>
+                    <HighscoreDetail >Name</HighscoreDetail>
+                    <HighscoreListButton onClick={() => {
+                        setSortValue("cardSet");
+                        setLowToHigh(!lowToHigh);}
+                    }>Cardset
+                    </HighscoreListButton>
+                    <HighscoreListButton onClick={() => {
+                        setSortValue("gameSize");
+                        setLowToHigh(!lowToHigh);}
+                    }>Size
+                    </HighscoreListButton>
+                    <HighscoreListButton onClick={() => { 
+                        setSortValue("rounds");
+                        setLowToHigh(!lowToHigh);}
+                      }>Rounds
+                    </HighscoreListButton>
+                    <HighscoreListButton onClick={() => {
+                        setSortValue("completeScore");
+                        setLowToHigh(!lowToHigh);}
+                      }>Points
+                    </HighscoreListButton>
+                    <HighscoreListButton onClick={() => {
+                        setSortValue("shortDate");
+                        setLowToHigh(!lowToHigh);}
+                      }>Date</HighscoreListButton>
+               <HighscoreListButton onClick={()=>setLowToHigh(!lowToHigh)} >{lowToHigh? "▲" : "▼"}</HighscoreListButton>
                 </HighscoreEntry>
                 </Disorder>
           <Disorder>
@@ -100,14 +132,14 @@ export default function Highscore({ highscore, devMode, clickedDelete, highscore
               <HighscoreDetail>{entry.gameTime}</HighscoreDetail>
               <HighscoreDetail>{entry.nameOfPlayer1}</HighscoreDetail>
               <HighscoreDetail>{entry.cardSet}</HighscoreDetail>
-              <HighscoreDetail>{entry.gameSize}</HighscoreDetail>
+                        <HighscoreDetail>{entry.gameSize}</HighscoreDetail>
+                        <HighscoreDetail>{entry.rounds}</HighscoreDetail>
               <HighscoreNumber>{entry.completeScore}</HighscoreNumber>
               <HighscoreDetail>{entry.shortDate}</HighscoreDetail>
  
                {devMode && <DeleteButton onClick={()=>onDelete(entry.id)}>x</DeleteButton>}
             </HighscoreEntry>)}
-          </Disorder>
-         
+          </Disorder>    
         </HighscoreSection>
     )
 }
