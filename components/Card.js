@@ -15,7 +15,7 @@ text-align: center;
 const LilSquareContainerWon = styled.div`
   text-align: center;  
   padding: 0.1rem;
-  height: 100%;
+  height: 194px;
   width: 194px;
   border: none;
   border-radius: 4px;
@@ -26,7 +26,7 @@ color: white;
 font-weight: 700;
 font-family: times;
 font-size: ${({ $size }) => `${$size}rem`};
-line-height: 200px;
+line-height: 194px;
 text-align: center;  
 padding: auto;
 height: 100%;
@@ -35,8 +35,8 @@ width: 100%;
 
 const CardImage = styled.img`
   display: block;
-  height: 192px;
-  width: 192px;
+  height: 190px;
+  width: 190px;
 `;
 
 

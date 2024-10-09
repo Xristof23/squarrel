@@ -8,6 +8,7 @@ import Timer from "@/components/Timer";
 import Highscore from "@/components/Highscore";
 import {
   ButtonContainer,
+  DevSquare,
   UpperSection,
   MessageSlot,
   SmallerHeadline,
@@ -17,20 +18,20 @@ import {
   StandardButton,
   DebugButton,
   SquarrelTitle,
-  LeftSide
+  LeftSide,
+  TitleContainer
 } from "@/styledcomponents";
-import { formatDuration } from "@/utils";
+import { formatDuration, calculatePoints } from "@/utils";
 import { v4 as uuidv4 } from 'uuid';
 
 const StyledMain = styled.main`
  display: grid;
-  grid-template-columns: 228px 934px;
-  grid-template-rows: 78px 228px 228px 228px 228px;
+  grid-template-columns: 228px 800px;
+  grid-template-rows: 78px 194px 194px 194px 194px;
   width: 99.5%;
   position: absolute;
   top: -1rem;
   left: -0.5rem;
-  margin: .2rem;
   gap: 8px;
   flex-direction: row;
   padding: 0.5rem;
@@ -51,9 +52,6 @@ const SquareSection = styled.section`
   align-items: center;
   border-radius: 4px;
   justify-content: center;
-`;
-
-const DevSquare = styled.span`
 `;
 
 const DevButtonContainer = styled.div`
@@ -78,7 +76,7 @@ top: 92px;
 left: 244px;
   margin: .5rem; 
   min-width: 500px;
-  width: 800px;
+  width: 804px;
   height: fit-content;
   background-color: white;
   border-radius: 4px;
@@ -160,14 +158,8 @@ export default function HomePage() {
  
   //  responsive
   const cardSectionWidth = 800;
-  const shiftRight = 104;
+  const shiftRight = 100;
 
-  useEffect(() => {
-    if (cardColumns > 4) {
-      setWhatIsShown({ ...whatIsShown, highscoreIsShown: false })
-    };
-  }, [cardColumns]);
- 
   // card rows = 4 for now,  : numbers 4 <= cardColumns <= 6 (8)
   function generateCardsArray(cardRows, cardColumns, shuffle, cardSet) {
     const numberOfSquares = cardColumns * cardRows;
@@ -334,19 +326,7 @@ export default function HomePage() {
     const chosenSet = chosenArray[0];
     setOptions({ ...options, cardSet: chosenSet, typeOfSet: chosenSet.typeOfSet, size: chosenSet.size ? chosenSet.size : options.size });
   }
-  
-
-  function calculatePoints(timespan, gameSize, rounds) {
-    const timeToBeat = gameSize === 24 ? 50000 : gameSize === 20 ? 40000 : 30000;
-    const timeBonus = timespan < timeToBeat ? Math.round((timeToBeat - timespan) / 33.3) : 0;
-    const roundsToBeat = Math.round(gameSize * 0.9);
-    const roundBonusArray = [0, 1, 2, 4, 8, 16, 32, 64]
-    const roundBonus = rounds < roundsToBeat ? roundBonusArray[(roundsToBeat - rounds)] * 100 : 0
-    const roundMalus = rounds > roundsToBeat ? (rounds - roundsToBeat) * 15 : 0;
-    const completeScore = gameSize * 15 + timeBonus + roundBonus - roundMalus;
-    return completeScore;
-}
-
+ 
   function makeHighscoreEntry(timespan) {
     const gameSize = cardColumns * cardRows;
     const timestamp = Date.now();
@@ -377,8 +357,9 @@ export default function HomePage() {
       {introIsShown && <TitleStart endOfIntro={handleEndOfIntro} />}
       {mainIsShown && <StyledMain>
         <UpperSection>
-          <SquarrelTitle>🟧 S Q U A R R E L <DevSquare onClick={()=>setDevMode(!devMode) }>🟧</DevSquare></SquarrelTitle>
-          <MessageSlot>{message}</MessageSlot>
+          <TitleContainer><DevSquare onClick={()=>setDevMode(!devMode) }>🟧</DevSquare><SquarrelTitle> SQUARREL</SquarrelTitle>
+          </TitleContainer>
+            <MessageSlot>{message}</MessageSlot>
           <Stats>
             <SmallerHeadline>Stats<br /> </SmallerHeadline>
             <StatLine>Won Cards: {points} 🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} 🟧 </StatLine>
@@ -416,7 +397,7 @@ export default function HomePage() {
             </StyledSelect>
           </StandardLabel>
        
-          <StandardLabel htmlFor="delayTime">Delay time<StyledNrInput name="delayTime" id="delayTime" type="number" min={500} max={8000} step="500"
+          <StandardLabel htmlFor="delayTime">Delay time<StyledNrInput name="delayTime" id="delayTime" type="number" min={400} max={8000} step="100"
             onChange={(event) => setOptions({ ...options, delayTime: event.target.value })} value={delayTime} /> ms</StandardLabel>
           <br/>
           <StandardLabel htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={6}

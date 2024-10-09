@@ -63,7 +63,7 @@ text-align: right;
 const SmallerButton = styled(StandardButton)`
 font-size: .8rem;
 position: relative;
-left: 594px;
+left: 592px;
 line-height: .8rem;
 margin: .3rem;
 padding: 2px;
