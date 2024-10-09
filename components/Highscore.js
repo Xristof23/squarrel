@@ -18,6 +18,7 @@ const HighscoreSection = styled.section`
 const FlexRowWrapper = styled.div`
     display: flex;
     flex-direction: row;
+    width: 100%;
 `;
 
 const Disorder = styled.ul`
@@ -27,7 +28,7 @@ padding: .1rem;
 
 const HighscoreEntry = styled.li`
     display: grid;
-    grid-template-columns: 1.2fr 5fr 5fr 7fr 3fr 3fr 4fr 7fr 1fr;
+    grid-template-columns: 1.2fr 5fr 5fr 7fr 3fr 2.7fr 4fr 7fr 1fr;
     gap: 0.5rem; 
   font-size: 1rem;
   line-height: 1rem;
@@ -61,8 +62,10 @@ text-align: right;
 
 const SmallerButton = styled(StandardButton)`
 font-size: .8rem;
+position: relative;
+left: 594px;
 line-height: .8rem;
-margin: .1rem .5rem .5rem 1rem;
+margin: .3rem;
 padding: 2px;
 font-weight: 500;
 height: 20px;
@@ -87,8 +90,10 @@ export default function Highscore({ highscore, devMode, clickedDelete, highscore
     return (
         <HighscoreSection>
             <FlexRowWrapper>
-                <SmallerHeadline>Highscore</SmallerHeadline>
-                <SmallerButton onClick={onHandleShow} >{highscoreIsShown ? "hide" : "show"}</SmallerButton>
+          <SmallerHeadline>Highscore</SmallerHeadline>
+          <SmallerButton onClick={()=>setLowToHigh(!lowToHigh)} >{lowToHigh? "▲" : "▼"}</SmallerButton>
+          <SmallerButton onClick={onHandleShow} >{highscoreIsShown ? "hide" : "show"}</SmallerButton>
+          
             </FlexRowWrapper> 
             <Disorder>
             <HighscoreEntry>
@@ -122,7 +127,7 @@ export default function Highscore({ highscore, devMode, clickedDelete, highscore
                         setSortValue("shortDate");
                         setLowToHigh(!lowToHigh);}
                       }>Date</HighscoreListButton>
-               <HighscoreListButton onClick={()=>setLowToHigh(!lowToHigh)} >{lowToHigh? "▲" : "▼"}</HighscoreListButton>
+             
                 </HighscoreEntry>
                 </Disorder>
           <Disorder>
@@ -133,7 +138,7 @@ export default function Highscore({ highscore, devMode, clickedDelete, highscore
               <HighscoreDetail>{entry.nameOfPlayer1}</HighscoreDetail>
               <HighscoreDetail>{entry.cardSet}</HighscoreDetail>
                         <HighscoreDetail>{entry.gameSize}</HighscoreDetail>
-                        <HighscoreDetail>{entry.rounds}</HighscoreDetail>
+                        <HighscoreNumber>{entry.rounds}</HighscoreNumber>
               <HighscoreNumber>{entry.completeScore}</HighscoreNumber>
               <HighscoreDetail>{entry.shortDate}</HighscoreDetail>
  

@@ -8,7 +8,6 @@ text-align: center;
   min-height: 100px;
   height: 100%;
   width: 100%;
-  // border: 2px solid orange;
   border-radius: 5px;
   background-color: black;
 `;
@@ -16,9 +15,8 @@ text-align: center;
 const LilSquareContainerWon = styled.div`
   text-align: center;  
   padding: 0.1rem;
-  min-width: 228px;
   height: 100%;
-  width: 100%;
+  width: 194px;
   border: none;
   border-radius: 4px;
 `;
@@ -28,19 +26,17 @@ color: white;
 font-weight: 700;
 font-family: times;
 font-size: ${({ $size }) => `${$size}rem`};
-// line-height: ${({ $size }) => `${$size + 1}rem`};
-line-height: 228px;
+line-height: 200px;
 text-align: center;  
 padding: auto;
 height: 100%;
 width: 100%;
-  max-width: 230px;
 `;
 
 const CardImage = styled.img`
   display: block;
-  height: 226px;
-  width: 226px;
+  height: 192px;
+  width: 192px;
 `;
 
 

@@ -44,9 +44,9 @@ const SquareSection = styled.section`
   grid-template-columns: 1fr 1fr 1fr 1fr ${({ $addColumns }) => $addColumns === 1? `1fr` : $addColumns === 2? `1fr 1fr` :null};
   grid-template-rows: 1fr 1fr 1fr 1fr;
   left: ${({ $shiftRight }) => $shiftRight ? `${$shiftRight}px` : "0px"};
-  gap: 0.12rem;
-  width: 936px;
-  height: 936px;
+  gap: 8px;
+  width: 800px;
+  height: 800px;
   margin: .5rem;
   align-items: center;
   border-radius: 4px;
@@ -74,8 +74,8 @@ const DevButtonContainer = styled.div`
 const HighScoreContainer = styled.div`
 position: absolute;
 padding: 0;
-top: 95px;
-left: 246px;
+top: 92px;
+left: 244px;
   margin: .5rem; 
   min-width: 500px;
   width: 800px;
@@ -159,8 +159,8 @@ export default function HomePage() {
 }
  
   //  responsive
-  const cardSectionWidth = 936;
-  const shiftRight = 112;
+  const cardSectionWidth = 800;
+  const shiftRight = 104;
 
   useEffect(() => {
     if (cardColumns > 4) {
