@@ -19,7 +19,7 @@ import {
   SquarrelTitle,
   LeftSide
 } from "@/styledcomponents";
-import { formatDuration } from "@/utils";
+import { formatDuration, calculatePoints} from "@/utils";
 import { v4 as uuidv4 } from 'uuid';
 
 const StyledMain = styled.main`
@@ -124,7 +124,7 @@ export default function HomePage() {
   const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
   const { cardCount, roundCount } = count;
   const [points, setPoints] = useState(0);
-  const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! New JRPG style set. Try it!");
+  const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! New dark RPG style set. May up the difficulty a bit!");
   const [clickStop, setClickStop] = useState(false);
   const [gameIsPaused, setGameIsPaused] = useState(false);
   const [highscore, setHighscore]= useLocalStorageState("highscore", {
@@ -336,17 +336,6 @@ export default function HomePage() {
   }
   
 
-  function calculatePoints(timespan, gameSize, rounds) {
-    const timeToBeat = gameSize === 24 ? 50000 : gameSize === 20 ? 40000 : 30000;
-    const timeBonus = timespan < timeToBeat ? Math.round((timeToBeat - timespan) / 33.3) : 0;
-    const roundsToBeat = Math.round(gameSize * 0.9);
-    const roundBonusArray = [0, 1, 2, 4, 8, 16, 32, 64]
-    const roundBonus = rounds < roundsToBeat ? roundBonusArray[(roundsToBeat - rounds)] * 100 : 0
-    const roundMalus = rounds > roundsToBeat ? (rounds - roundsToBeat) * 15 : 0;
-    const completeScore = gameSize * 15 + timeBonus + roundBonus - roundMalus;
-    return completeScore;
-}
-
   function makeHighscoreEntry(timespan) {
     const gameSize = cardColumns * cardRows;
     const timestamp = Date.now();
@@ -408,7 +397,7 @@ export default function HomePage() {
               <option value="wolfpack">Cult of wolves (b&w)</option>
               <option value="afrAnimals">African animals (colour)</option>
               <option value="happy">Being happy (colour)</option>
-              <option value="jrpg">JRPG party members (colour)</option>
+              <option value="darkrpg">RPG characters (colour)</option>
               <option value="ABCSet">Capital letters</option>
               <option value="abcDualSet">Two kinds of letters</option>
               <option value="smallNumbers">Small numbers</option>
