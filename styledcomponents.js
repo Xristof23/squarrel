@@ -23,6 +23,7 @@ display: flex;
 flex-direction: row; 
   margin: .5rem; 
   width: 1040px;
+  width: ${({ $upperWidth }) => $upperWidth};
   height: 100%;
   border-radius: 4px;
     background-color: lightgray;
@@ -31,7 +32,6 @@ flex-direction: row;
   align-items: center;
 `;
 
-//still needed?
 const TitleContainer = styled.div`
   display: flex;
   flex-grow: 1;
@@ -103,7 +103,7 @@ padding: .5rem;
 `;
 
 const LeftSide = styled.div`
-grid-row: 2 / span 3;   
+grid-row: 2 / span 4;   
 padding: .5rem;
   margin: .5rem; 
   min-width: 100px;

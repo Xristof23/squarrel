@@ -42,7 +42,8 @@ const StyledMain = styled.main`
 const SquareSection = styled.section`
   display: grid;
   position: relative;
-  grid-template-columns: 1fr 1fr 1fr 1fr ${({ $addColumns }) => $addColumns === 1? `1fr` : $addColumns === 2? `1fr 1fr` :null};
+  // grid-template-columns: 1fr 1fr 1fr 1fr ${({ $addColumns }) => $addColumns === 1 ? `1fr` : $addColumns === 2 ? `1fr 1fr` : $addColumns === 3 ? `1fr 1fr 1fr` : null};
+  grid-template-columns: 1fr 1fr 1fr 1fr ${({ $addColumns, $fraction }) => $addColumns >= 1? $fraction.repeat($addColumns) : null};
   grid-template-rows: 1fr 1fr 1fr 1fr;
   left: ${({ $shiftRight }) => $shiftRight ? `${$shiftRight}px` : "0px"};
   gap: 8px;
@@ -111,8 +112,8 @@ margin: .5rem .5rem .5rem 0;
 `;
 
 export default function HomePage() {
-  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: false });
-  const { introIsShown, mainIsShown, highscoreIsShown } = whatIsShown;
+  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: false, setInfoIsShown: false });
+  const { introIsShown, mainIsShown, highscoreIsShown, setInfoIsShown } = whatIsShown;
   const [devMode, setDevMode] = useState(false);
   const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
   const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
@@ -128,6 +129,7 @@ export default function HomePage() {
   const [highscore, setHighscore]= useLocalStorageState("highscore", {
     defaultValue: []
   })
+
   //timer 
   const [storedInterval, setStoredInterval] = useState(0);
   const [timespan, setTimespan] = useState(0);
@@ -157,18 +159,20 @@ export default function HomePage() {
 }
  
   //  responsive
-
-
-    const isWindowClient = typeof window === "object";
+   const isWindowClient = typeof window === "object";
   
     const [windowWidth, setWindowWidth] = useState(
       isWindowClient ? window.innerWidth : undefined
-    );
+  );
+    const [windowHeight, setWindowHeight] = useState(
+    isWindowClient ? window.innerHeight : undefined
+  );
   
     useEffect(() => {
       
       function setSize() {
         setWindowWidth(window.innerWidth);
+        setWindowHeight(window.innerHeight);
       }
       if (isWindowClient) {
         //register the window resize listener
@@ -177,16 +181,18 @@ export default function HomePage() {
         //un-register the listener
         return () => window.removeEventListener("resize", setSize);
       }
-    }, [isWindowClient, setWindowWidth]);
+    }, [isWindowClient, setWindowWidth, setWindowHeight]);
 
-  console.log(windowWidth);
+
+  // console.log("Windowheight", windowHeight);
    
+  const cardSectionHeight = windowHeight - 99;
+  const shiftRight = cardSectionHeight / 8;
+  const moreColumns = cardColumns - 4;
+  const upperWidth = `${1036 + moreColumns * shiftRight *2}px`;
 
 
-  const cardSectionWidth = 800;
-  const shiftRight = 100;
-
-  // card rows = 4 for now,  : numbers 4 <= cardColumns <= 6 (8)
+  // card rows = 4 for now,  : numbers 4 <= cardColumns <= 8 
   function generateCardsArray(cardRows, cardColumns, shuffle, cardSet) {
     const numberOfSquares = cardColumns * cardRows;
     const cardNumbers = [...Array(numberOfSquares + 1).keys()].slice(1);
@@ -258,8 +264,7 @@ export default function HomePage() {
     };
     setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
     setMessage("Game reset. Click start to begin a new game.");
-}
-
+  }
 
   function showDebugInfo() {
     console.log("Squarestate", squareState);
@@ -378,11 +383,12 @@ export default function HomePage() {
     setHighscore(newArray);
   }
 
+
   return (
     <>
       {introIsShown && <TitleStart endOfIntro={handleEndOfIntro} />}
       {mainIsShown && <StyledMain>
-        <UpperSection>
+        <UpperSection $upperWidth={upperWidth}>
           <TitleContainer><DevSquare onClick={()=>setDevMode(!devMode) }>🟧</DevSquare><SquarrelTitle> SQUARREL</SquarrelTitle>
           </TitleContainer>
             <MessageSlot>{message}</MessageSlot>
@@ -426,7 +432,7 @@ export default function HomePage() {
           <StandardLabel htmlFor="delayTime">Delay time<StyledNrInput name="delayTime" id="delayTime" type="number" min={400} max={8000} step="100"
             onChange={(event) => setOptions({ ...options, delayTime: event.target.value })} value={delayTime} /> ms</StandardLabel>
           <br/>
-          <StandardLabel htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={6}
+          <StandardLabel htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={7}
             onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
           <p>  </p>
           <SmallerHeadline>Controls </SmallerHeadline>
@@ -439,9 +445,15 @@ export default function HomePage() {
           <br></br>
           <SmallerHeadline>More Controls </SmallerHeadline>
           <HighscoreButton onClick={()=>setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} >{highscoreIsShown? "hide highscore" : "show highscore"}</HighscoreButton>
+          <br></br>
+          <HighscoreButton onClick={() => setWhatIsShown({ ...whatIsShown, setInfoIsShown: !setInfoIsShown })}>{setInfoIsShown? "hide Setinfo" : "show Setinfo"}</HighscoreButton>
+          {setInfoIsShown && 
+            <p>Length: {cardSet.setList.length}
+              <br></br>
+          Type: {typeOfSet}</p>}
         </LeftSide>
   
-        <SquareSection $addColumns={cardColumns - 4} $shiftRight={shiftRight * (cardColumns - 4)} >
+        <SquareSection $addColumns={cardColumns - 4} $fraction="1fr " $shiftRight={shiftRight * (cardColumns - 4)} >
           {running === true ? (squareState.map((square) =>
             <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id}
             front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet}
