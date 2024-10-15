@@ -80,7 +80,7 @@ top: 92px;
 left: 244px;
   margin: .5rem; 
   min-width: 500px;
-  width: 804px;
+  width: ${({ $height }) => `${$height}px`};
   height: fit-content;
   background-color: white;
   border-radius: 4px;
@@ -109,9 +109,6 @@ const StyledInput = styled.input`
 `;
 
 
-
-
-
 export default function HomePage() {
   const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: false, setInfoIsShown: false });
   const { introIsShown, mainIsShown, highscoreIsShown, setInfoIsShown } = whatIsShown;
@@ -124,7 +121,7 @@ export default function HomePage() {
   const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
   const { cardCount, roundCount } = count;
   const [points, setPoints] = useState(0);
-  const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! New JRPG style set. Try it!");
+  const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! You can nwo play with up to 32 cards. Wanna try?");
   const [clickStop, setClickStop] = useState(false);
   const [gameIsPaused, setGameIsPaused] = useState(false);
   const [highscore, setHighscore]= useLocalStorageState("highscore", {
@@ -155,22 +152,21 @@ export default function HomePage() {
     }
 }
 
- function handleEndOfIntro() {
+  function handleEndOfIntro() {
   setWhatIsShown({...whatIsShown,  introIsShown: false, mainIsShown: true })
 }
  
-  //  responsive
-   const isWindowClient = typeof window === "object";
+   //responsive
+  const isWindowClient = typeof window === "object";
   
-    const [windowWidth, setWindowWidth] = useState(
+  const [windowWidth, setWindowWidth] = useState(
       isWindowClient ? window.innerWidth : undefined
   );
-    const [windowHeight, setWindowHeight] = useState(
+  const [windowHeight, setWindowHeight] = useState(
     isWindowClient ? window.innerHeight : undefined
   );
   
-    useEffect(() => {
-      
+    useEffect(() => {  
       function setSize() {
         setWindowWidth(window.innerWidth);
         setWindowHeight(window.innerHeight);
@@ -185,12 +181,12 @@ export default function HomePage() {
    
   const cardSectionHeight = windowHeight - 99;
   const cardHeight = cardSectionHeight / 4 - 6;
-  const shiftRight = cardSectionHeight / 8;
+  const shiftRight = cardSectionHeight / 8 + 1;
   const moreColumns = cardColumns - 4;
-  const upperWidth = `${238 + cardSectionHeight + moreColumns * (shiftRight *2 +1)}px`;
+  const upperWidth = `${238 + cardSectionHeight + moreColumns * (shiftRight *2)}px`;
 
 
-  // card rows = 4 for now,  : numbers 4 <= cardColumns <= 8 
+  // card rows = 4 for now, 4 <= cardColumns <= 8 
   function generateCardsArray(cardRows, cardColumns, shuffle, cardSet) {
     const numberOfSquares = cardColumns * cardRows;
     const cardNumbers = [...Array(numberOfSquares + 1).keys()].slice(1);
@@ -362,9 +358,6 @@ export default function HomePage() {
     const highscoreDate = new Date(timestamp).toString();
     const gameTime = formatDuration(timespan, 1);
     const completeScore = calculatePoints(timespan, gameSize, roundCount);
-    //Old
-    const oldScore = Math.floor((gameSize ** 1.7 / timespan) * 200000);
-    //
     const shortDate = highscoreDate.slice(4, 21);
     const newEntry = { id: uuidv4(6), timestamp, shortDate, timespan, gameTime, gameSize, rounds: roundCount, completeScore, cardSet: cardSet.setName, nameOfPlayer1 }
     setHighscore([...highscore, newEntry]);
@@ -432,7 +425,7 @@ export default function HomePage() {
           <StandardLabel htmlFor="delayTime">Delay time<StyledNrInput name="delayTime" id="delayTime" type="number" min={400} max={8000} step="100"
             onChange={(event) => setOptions({ ...options, delayTime: event.target.value })} value={delayTime} /> ms</StandardLabel>
           <br/>
-          <StandardLabel htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={7}
+          <StandardLabel htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={8}
             onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
           <p>  </p>
           <SmallerHeadline>Controls </SmallerHeadline>
@@ -472,7 +465,7 @@ export default function HomePage() {
         </SquareSection>
         <HighScoreContainer>
        
-          {highscoreIsShown && <Highscore highscore={highscore} devMode={devMode} clickedDelete={handleDelete} highscoreIsShown={highscoreIsShown}
+          {highscoreIsShown && <Highscore cardSectionHeight={cardSectionHeight} highscore={highscore} devMode={devMode} clickedDelete={handleDelete} highscoreIsShown={highscoreIsShown}
             clickedChangeShow={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} />}
         </HighScoreContainer> 
         {devMode && <DevButtonContainer>

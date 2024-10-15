@@ -34,9 +34,10 @@ flex-direction: row;
 
 const TitleContainer = styled.div`
   display: flex;
-  flex-grow: 1;
+  flex-grow: 0;
   flex-direction: row; 
   min-width: 228px;
+  width: 228px;
   min-height: 54px;
   border-radius: 4px;
 `;
@@ -63,7 +64,6 @@ const DevSquare = styled.div`
     top: 42px;
   `;
   
-
 const MessageSlot = styled.div`
  color: black;
  flex-grow: 1;
@@ -89,7 +89,6 @@ min-width: 385px;
 height: 80%;
 border-radius: 4px;
 `;
-
 
 const ControlsContainer = styled.div`
 display: flex;
@@ -162,7 +161,7 @@ padding: .2rem;
 
 const SetInfo = styled.p`
 font-size: 0.95rem;
-width: 6rem;
+width: 97%;
 margin: .2rem;
 padding: 0.2rem;
 border-radius: 4px;

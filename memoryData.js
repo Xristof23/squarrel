@@ -44,6 +44,12 @@ const abcDualSet = { setName: "abcDualSet", typeOfSet: "ASCIIDual", size: 6, set
 //(not yet ready) has to be filled
 const htmlSpecialSet = { setName: "htmlSpecialSet", typeOfSet: "ASCIIDual", setList: [] };
 
+
+function getAltForImage() {
+
+}
+
+
 // initial states
 const initialCardState = [];
 const initialGameState = { running: false, gameWon: false, gameTime: 0, cardsShown: 0, card0: { id: "a" }, card1: { id: "b" } };

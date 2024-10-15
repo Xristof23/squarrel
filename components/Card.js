@@ -42,11 +42,8 @@ const CardImage = styled.img`
 
 export default function Card({ id, front, isShown, onTurn, noTurn, won, typeOfSet, setName, size, clickStop, cardHeight }) {
 
-  console.log("cardHeight from card", cardHeight);
   //move away
-  function getAltForImage() {
 
-  }
   
   function handleCardClick(id, clickStop) {
     clickStop? noTurn() : onTurn(id);

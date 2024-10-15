@@ -15,8 +15,6 @@ const HighscoreSection = styled.section`
   border: 1px solid black;
 `;
 
-
-
 const Disorder = styled.ul`
 margin: 0;
 padding: .1rem;
@@ -59,7 +57,7 @@ text-align: right;
 const SmallerButton = styled(StandardButton)`
 font-size: .8rem;
 position: relative;
-left: 592px;
+bottom: 2px;
 line-height: .8rem;
 margin: .3rem;
 padding: 2px;
@@ -70,12 +68,13 @@ min-width: 2.5rem;
 width: fit-content;
 `;
 
-export default function Highscore({ highscore, devMode, clickedDelete, highscoreIsShown, clickedChangeShow }) {
+export default function Highscore({ highscore, devMode, clickedDelete, highscoreIsShown, clickedChangeShow, cardSectionHeight }) {
     const [sortValue, setSortValue] = useState("gameTime");
     const [lowToHigh, setLowToHigh] = useState(true);
     
-    const shownEntries = sortEntries(highscore, sortValue, lowToHigh);
- 
+    const sortedEntries = sortEntries(highscore, sortValue, lowToHigh);
+  const shownEntries = sortedEntries.slice(0, 20);
+  
     function onDelete(id) {
         clickedDelete(id);
     }
