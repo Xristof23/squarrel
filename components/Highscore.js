@@ -1,4 +1,4 @@
-import { StandardButton, SmallerHeadline, DeleteButton } from "@/styledcomponents";
+import { StandardButton, SmallerHeadline, DeleteButton, FlexRowWrapper } from "@/styledcomponents";
 import { sortEntries} from "@/utils";
 import { useState } from "react";
 import styled from "styled-components";
@@ -15,11 +15,7 @@ const HighscoreSection = styled.section`
   border: 1px solid black;
 `;
 
-const FlexRowWrapper = styled.div`
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-`;
+
 
 const Disorder = styled.ul`
 margin: 0;

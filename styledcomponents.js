@@ -127,13 +127,14 @@ const Placeholder= styled.div`
   border-radius: 4px;
 `;
 
+//Buttons
+
 const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
-  margin: 0 0 0 -.2rem;
-  min-height: 35px;
+  min-height: 1.5rem;
   width: 15rem;
-  height: 5rem;
+  height: 3rem;
   align-content: center;
   align-items: flex-start;
   border-radius: 4px;
@@ -144,13 +145,31 @@ font-size: 0.95rem;
 font-weight: 400; 
 margin: 0.2rem;
 padding: 0.2rem;
-width: 4.1rem;
+width: 4rem;
 min-width: 3.5rem;
 min-height: 2rem;
 border-radius: 4px;
 border: 1px solid darkorange;
 background-color: white;
 `;
+
+const BiggerButton = styled(StandardButton)`
+width: 6.2rem;
+Height: 2.5rem;
+margin: .2rem;
+padding: .2rem;
+`;
+
+const SetInfo = styled.p`
+font-size: 0.95rem;
+width: 6rem;
+margin: .2rem;
+padding: 0.2rem;
+border-radius: 4px;
+border: 1px solid darkorange;
+background-color: white;
+`;
+
 
 const DebugButton = styled(StandardButton)`
 font-size: .7rem;
@@ -176,6 +195,21 @@ border: 1px solid grey;
 background-color: lightgray;
 `;
 
+
+
+//wrapper
+const FlexRowWrapper = styled.div`
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+`;
+
+
+const FlexColumnWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+`;
 
 
 const SmallerHeadline = styled.h2`
@@ -209,13 +243,15 @@ const StyledSelect = styled.select`
 `;
 
 export {
-  ButtonContainer,
-  DevSquare,
+    ButtonContainer,
+    DevSquare,
     StyledMain,
     ControlsContainer,
     TitleContainer,
     UpperSection,
-  MessageSlot,
+  FlexRowWrapper,
+    FlexColumnWrapper,
+    MessageSlot,
     Placeholder,
     SmallerHeadline,
     SquareSectionStatic,
@@ -223,8 +259,10 @@ export {
     Stats,
     StyledSelect,
     StandardButton,
-    SquarrelTitle, 
+  SquarrelTitle, 
+    BiggerButton,
     DebugButton,
-  DeleteButton,
+    DeleteButton,
   LeftSide,
-}
+    SetInfo
+  }

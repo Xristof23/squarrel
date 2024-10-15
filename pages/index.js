@@ -19,7 +19,11 @@ import {
   DebugButton,
   SquarrelTitle,
   LeftSide,
-  TitleContainer
+  TitleContainer,
+  FlexColumnWrapper,
+  FlexRowWrapper,
+  BiggerButton,
+  SetInfo
 } from "@/styledcomponents";
 import { formatDuration, calculatePoints } from "@/utils";
 import { v4 as uuidv4 } from 'uuid';
@@ -42,13 +46,12 @@ const StyledMain = styled.main`
 const SquareSection = styled.section`
   display: grid;
   position: relative;
-  // grid-template-columns: 1fr 1fr 1fr 1fr ${({ $addColumns }) => $addColumns === 1 ? `1fr` : $addColumns === 2 ? `1fr 1fr` : $addColumns === 3 ? `1fr 1fr 1fr` : null};
   grid-template-columns: 1fr 1fr 1fr 1fr ${({ $addColumns, $fraction }) => $addColumns >= 1? $fraction.repeat($addColumns) : null};
   grid-template-rows: 1fr 1fr 1fr 1fr;
   left: ${({ $shiftRight }) => $shiftRight ? `${$shiftRight}px` : "0px"};
   gap: 8px;
-  width: 800px;
-  height: 800px;
+  height: ${({ $height }) => `${$height}px`};
+  width: ${({ $height }) => `${$height}px`};
   margin: .5rem;
   align-items: center;
   border-radius: 4px;
@@ -105,11 +108,9 @@ const StyledInput = styled.input`
   padding: .2rem;
 `;
 
-const HighscoreButton = styled(StandardButton)`
-font-size: 0.95rem;
-width: 8rem;
-margin: .5rem .5rem .5rem 0;
-`;
+
+
+
 
 export default function HomePage() {
   const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: false, setInfoIsShown: false });
@@ -175,21 +176,18 @@ export default function HomePage() {
         setWindowHeight(window.innerHeight);
       }
       if (isWindowClient) {
-        //register the window resize listener
         window.addEventListener("resize", setSize);
   
-        //un-register the listener
         return () => window.removeEventListener("resize", setSize);
       }
     }, [isWindowClient, setWindowWidth, setWindowHeight]);
 
-
-  // console.log("Windowheight", windowHeight);
    
   const cardSectionHeight = windowHeight - 99;
+  const cardHeight = cardSectionHeight / 4 - 6;
   const shiftRight = cardSectionHeight / 8;
   const moreColumns = cardColumns - 4;
-  const upperWidth = `${1036 + moreColumns * shiftRight *2}px`;
+  const upperWidth = `${238 + cardSectionHeight + moreColumns * (shiftRight *2 +1)}px`;
 
 
   // card rows = 4 for now,  : numbers 4 <= cardColumns <= 8 
@@ -209,7 +207,7 @@ export default function HomePage() {
     const { setName, typeOfSet, setList } = cardSet;
     shuffleArray(setList);
     
-    //may need to made clearer and bettere expandable (react to more sets) with future update
+    //may need to made clearer and better expandable (react to more sets) with future update
     const cardsArray = cardNumbers.map((number) => {
       const ASCIIDualFront = setName === "abcDualSet" ? (number % 2 === 0 ? setList[number - 2].half2 : setList[number - 1].half1) : "not needed";
       const frontASCII = setName === "abcDualSet" ? ASCIIDualFront : setList[Math.ceil(number / 2)];
@@ -394,7 +392,9 @@ export default function HomePage() {
             <MessageSlot>{message}</MessageSlot>
           <Stats>
             <SmallerHeadline>Stats<br /> </SmallerHeadline>
-            <StatLine>Won Cards: {points} 🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} 🟧 </StatLine>
+            <StatLine>Won cards: {points} 🟧 Round: {roundCount} 🟧
+              {/* Cardcount: {cardCount} 🟧 */}
+            </StatLine>
           </Stats>
         </UpperSection>
         <LeftSide>
@@ -436,28 +436,39 @@ export default function HomePage() {
             onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
           <p>  </p>
           <SmallerHeadline>Controls </SmallerHeadline>
-          <ButtonContainer>
-            <StandardButton onClick={handleStart}>start</StandardButton>
-            <StandardButton onClick={handlePause}>{gameIsPaused ? "continue" : "pause"}</StandardButton>
-            <StandardButton onClick={handleReset}>reset</StandardButton>
-          </ButtonContainer>
-          <Timer timespan={timespan} />
-          <br></br>
-          <SmallerHeadline>More Controls </SmallerHeadline>
-          <HighscoreButton onClick={()=>setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} >{highscoreIsShown? "hide highscore" : "show highscore"}</HighscoreButton>
-          <br></br>
-          <HighscoreButton onClick={() => setWhatIsShown({ ...whatIsShown, setInfoIsShown: !setInfoIsShown })}>{setInfoIsShown? "hide Setinfo" : "show Setinfo"}</HighscoreButton>
-          {setInfoIsShown && 
-            <p>Length: {cardSet.setList.length}
+          <FlexColumnWrapper>
+            <ButtonContainer>
+              <StandardButton onClick={handleStart}>start</StandardButton>
+              <StandardButton onClick={handlePause}>{gameIsPaused ? "continue" : "pause"}</StandardButton>
+              <StandardButton onClick={handleReset}>reset</StandardButton>
+            </ButtonContainer>
+            <ButtonContainer>         
+             <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, setInfoIsShown: !setInfoIsShown })}>
+                {setInfoIsShown ? "hide Setinfo" : "show Setinfo"}
+              </BiggerButton>
+              <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} >
+                {highscoreIsShown ? "hide scores" : "show scores"}
+              </BiggerButton>
+            </ButtonContainer>
+            {setInfoIsShown && 
+            <SetInfo>
+              Cards: {cardSet.setList.length}
               <br></br>
-          Type: {typeOfSet}</p>}
+              MaxSize: {cardSet.setList.length *2}
+              <br></br>
+                  Type: {typeOfSet}</SetInfo>}
+          </FlexColumnWrapper>
+          <p>  </p>
+          <Timer timespan={timespan} />
+       
+         
         </LeftSide>
   
-        <SquareSection $addColumns={cardColumns - 4} $fraction="1fr " $shiftRight={shiftRight * (cardColumns - 4)} >
+        <SquareSection $height={cardSectionHeight} $addColumns={cardColumns - 4} $fraction="1fr " $shiftRight={shiftRight * (cardColumns - 4)} >
           {running === true ? (squareState.map((square) =>
             <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id}
-            front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet}
-            setName={cardSet.setName} clickStop={clickStop} size={size} />)) : null}
+              front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet}
+              setName={cardSet.setName} clickStop={clickStop} size={size} cardHeight={cardHeight} />)) : null}
         </SquareSection>
         <HighScoreContainer>
        

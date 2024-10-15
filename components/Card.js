@@ -6,17 +6,17 @@ position: relative;
 text-align: center;  
   padding: 0.1rem;
   min-height: 100px;
-  height: 100%;
-  width: 100%;
-  border-radius: 5px;
+  height: ${({ $height }) => `${$height}px`};
+  width: ${({ $height }) => `${$height}px`};
+  border-radius: 4px;
   background-color: black;
 `;
 
 const LilSquareContainerWon = styled.div`
   text-align: center;  
   padding: 0.1rem;
-  height: 194px;
-  width: 194px;
+  height: ${({ $height }) => `${$height}px`};
+  width: ${({ $height }) => `${$height}px`};
   border: none;
   border-radius: 4px;
 `;
@@ -26,7 +26,7 @@ color: white;
 font-weight: 700;
 font-family: times;
 font-size: ${({ $size }) => `${$size}rem`};
-line-height: 194px;
+line-height: ${({ $height }) => `${$height}px`};
 text-align: center;  
 padding: auto;
 height: 100%;
@@ -35,27 +35,34 @@ width: 100%;
 
 const CardImage = styled.img`
   display: block;
-  height: 190px;
-  width: 190px;
+  height: ${({ $height }) => `${$height}px`};
+  width: ${({ $height }) => `${$height}px`};
 `;
 
 
+export default function Card({ id, front, isShown, onTurn, noTurn, won, typeOfSet, setName, size, clickStop, cardHeight }) {
 
-export default function Card({ id, front, isShown, onTurn, noTurn, won, typeOfSet, setName, size, clickStop }) {
+  console.log("cardHeight from card", cardHeight);
+  //move away
+  function getAltForImage() {
+
+  }
   
   function handleCardClick(id, clickStop) {
     clickStop? noTurn() : onTurn(id);
   }
   if (won === true) {
-    return (<LilSquareContainerWon />)
+    return (<LilSquareContainerWon $height={cardHeight} />)
    
   } else {
     return (
-      // <LilSquareContainer onClick={() => handleCardClick(id)}>{isShown ? (typeOfSet === "img" ? <CardImage src={"public/images/eu-a-bear.jpeg"} alt={"an animal" } /> : <LilSquareFront>{front}</LilSquareFront>) : <LilSquareBack>{back}</LilSquareBack>}</LilSquareContainer>)
       <>
-        <LilSquareContainer onClick={() => handleCardClick(id, clickStop)
+        <LilSquareContainer $height={cardHeight} onClick={() => handleCardClick(id, clickStop)
         }>
-          {isShown ? (typeOfSet === "img" ? <CardImage src={`/images/${setName}/${front}`} alt="A bear in black & white" /> : <LilSquareFront $size={size}>{front}</LilSquareFront>) : <CardImage src="\images\SquarrelBackFarbe.png" />}</LilSquareContainer>
+          {isShown ? (typeOfSet === "img" ?
+            <CardImage $height={cardHeight - 4} src={`/images/${setName}/${front}`} alt="A bear in black & white" /> :
+            <LilSquareFront $height={cardHeight} $size={size}>{front}</LilSquareFront>) :
+            <CardImage $height={cardHeight} src="\images\SquarrelBackFarbe.png" />}</LilSquareContainer>
         
       </>)
   }
