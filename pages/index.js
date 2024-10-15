@@ -8,6 +8,7 @@ import Timer from "@/components/Timer";
 import Highscore from "@/components/Highscore";
 import {
   ButtonContainer,
+  DevSquare,
   UpperSection,
   MessageSlot,
   SmallerHeadline,
@@ -17,20 +18,26 @@ import {
   StandardButton,
   DebugButton,
   SquarrelTitle,
-  LeftSide
+  LeftSide,
+  TitleContainer,
+  FlexColumnWrapper,
+  StandardLabel,
+  StyledInput,
+  StyledNrInput,
+  BiggerButton,
+  SetInfo
 } from "@/styledcomponents";
-import { formatDuration, calculatePoints} from "@/utils";
+import { formatDuration, calculatePoints } from "@/utils";
 import { v4 as uuidv4 } from 'uuid';
 
 const StyledMain = styled.main`
  display: grid;
-  grid-template-columns: 228px 934px;
-  grid-template-rows: 78px 228px 228px 228px 228px;
+  grid-template-columns: 228px 800px;
+  grid-template-rows: 78px 194px 194px 194px 194px;
   width: 99.5%;
   position: absolute;
   top: -1rem;
   left: -0.5rem;
-  margin: .2rem;
   gap: 8px;
   flex-direction: row;
   padding: 0.5rem;
@@ -41,19 +48,16 @@ const StyledMain = styled.main`
 const SquareSection = styled.section`
   display: grid;
   position: relative;
-  grid-template-columns: 1fr 1fr 1fr 1fr ${({ $addColumns }) => $addColumns === 1? `1fr` : $addColumns === 2? `1fr 1fr` :null};
+  grid-template-columns: 1fr 1fr 1fr 1fr ${({ $addColumns, $fraction }) => $addColumns >= 1? $fraction.repeat($addColumns) : null};
   grid-template-rows: 1fr 1fr 1fr 1fr;
   left: ${({ $shiftRight }) => $shiftRight ? `${$shiftRight}px` : "0px"};
-  gap: 0.12rem;
-  width: 936px;
-  height: 936px;
+  gap: 8px;
+  height: ${({ $height }) => `${$height}px`};
+  width: ${({ $height }) => `${$height}px`};
   margin: .5rem;
   align-items: center;
   border-radius: 4px;
   justify-content: center;
-`;
-
-const DevSquare = styled.span`
 `;
 
 const DevButtonContainer = styled.div`
@@ -74,47 +78,20 @@ const DevButtonContainer = styled.div`
 const HighScoreContainer = styled.div`
 position: absolute;
 padding: 0;
-top: 95px;
-left: 246px;
+top: 92px;
+left: 244px;
   margin: .5rem; 
   min-width: 500px;
-  width: 800px;
+  width: ${({ $height }) => `${$height}px`};
   height: fit-content;
   background-color: white;
   border-radius: 4px;
   z-index: 2;
 `;
 
-const StandardLabel = styled.label`
-  font-size: 0.9rem;
-  width: 90%;
-  margin: .5rem .5rem 1rem 0rem;
-  padding: .2rem;
-`;
-
-const StyledNrInput = styled.input`
-  font-size: 0.8rem;
-  width: 4rem;
-  margin: 0.3rem;
-  padding: .2rem;
-`;
-
-const StyledInput = styled.input`
-  min-width: 3.5rem;
-  width: 66%;
-  margin: 0.3rem;
-  padding: .2rem;
-`;
-
-const HighscoreButton = styled(StandardButton)`
-font-size: 0.95rem;
-width: 8rem;
-margin: .5rem .5rem .5rem 0;
-`;
-
 export default function HomePage() {
-  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: false });
-  const { introIsShown, mainIsShown, highscoreIsShown } = whatIsShown;
+  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: false, setInfoIsShown: false });
+  const { introIsShown, mainIsShown, highscoreIsShown, setInfoIsShown } = whatIsShown;
   const [devMode, setDevMode] = useState(false);
   const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
   const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
@@ -124,12 +101,13 @@ export default function HomePage() {
   const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
   const { cardCount, roundCount } = count;
   const [points, setPoints] = useState(0);
-  const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! New dark RPG style set. May up the difficulty a bit!");
+  const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! You can now play with up to 32 cards. Wanna try?");
   const [clickStop, setClickStop] = useState(false);
   const [gameIsPaused, setGameIsPaused] = useState(false);
   const [highscore, setHighscore]= useLocalStorageState("highscore", {
     defaultValue: []
   })
+
   //timer 
   const [storedInterval, setStoredInterval] = useState(0);
   const [timespan, setTimespan] = useState(0);
@@ -154,21 +132,39 @@ export default function HomePage() {
     }
 }
 
- function handleEndOfIntro() {
+  function handleEndOfIntro() {
   setWhatIsShown({...whatIsShown,  introIsShown: false, mainIsShown: true })
 }
  
-  //  responsive
-  const cardSectionWidth = 936;
-  const shiftRight = 112;
+  //responsive
+  const isWindowClient = typeof window === "object";
+  
+  const [windowWidth, setWindowWidth] = useState(
+      isWindowClient ? window.innerWidth : undefined
+  );
+  const [windowHeight, setWindowHeight] = useState(
+    isWindowClient ? window.innerHeight : undefined
+  );
+  
+    useEffect(() => {  
+      function setSize() {
+        setWindowWidth(window.innerWidth);
+        setWindowHeight(window.innerHeight);
+      }
+      if (isWindowClient) {
+        window.addEventListener("resize", setSize);
+  
+        return () => window.removeEventListener("resize", setSize);
+      }
+    }, [isWindowClient, setWindowWidth, setWindowHeight]);
 
-  useEffect(() => {
-    if (cardColumns > 4) {
-      setWhatIsShown({ ...whatIsShown, highscoreIsShown: false })
-    };
-  }, [cardColumns]);
- 
-  // card rows = 4 for now,  : numbers 4 <= cardColumns <= 6 (8)
+  const cardSectionHeight = windowHeight - 99;
+  const cardHeight = cardSectionHeight / 4 - 6;
+  const shiftRight = cardSectionHeight / 8 + 1;
+  const moreColumns = cardColumns - 4;
+  const upperWidth = `${238 + cardSectionHeight + moreColumns * (shiftRight *2)}px`;
+
+  // card rows = 4 for now, 4 <= cardColumns <= 8 
   function generateCardsArray(cardRows, cardColumns, shuffle, cardSet) {
     const numberOfSquares = cardColumns * cardRows;
     const cardNumbers = [...Array(numberOfSquares + 1).keys()].slice(1);
@@ -185,13 +181,13 @@ export default function HomePage() {
     const { setName, typeOfSet, setList } = cardSet;
     shuffleArray(setList);
     
-    //may need to made clearer and bettere expandable (react to more sets) with future update
+    //may need to made clearer and better expandable (react to more sets) with future update
     const cardsArray = cardNumbers.map((number) => {
-      const ASCIIDualFront = setName === "abcDualSet" ? (number % 2 === 0 ? setList[number - 2].half2 : setList[number - 1].half1) : "not needed";
-      const frontASCII = setName === "abcDualSet" ? ASCIIDualFront : setList[Math.ceil(number / 2)];
+      const ASCIIDualFront = setName.includes("Dual")? (number % 2 === 0 ? setList[number - 2].half2 : setList[number - 1].half1) : "not needed";
+      const frontASCII = setName.includes("Dual")? ASCIIDualFront : setList[Math.ceil(number / 2)];
       const frontImage = `${setName}-${setList[Math.ceil(number / 2)]}.jpg`;
       const front = typeOfSet === "img" ? frontImage : frontASCII;
-      const pairId = setName === "abcDualSet" ? Math.ceil(number / 2) : front;
+      const pairId = setName.includes("Dual") ? Math.ceil(number / 2) : front;
       const cardObject = { id: number, front, pairId, back: "back", typeOfSet, isShown: false, won: false };
       return cardObject;
     });
@@ -240,8 +236,7 @@ export default function HomePage() {
     };
     setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
     setMessage("Game reset. Click start to begin a new game.");
-}
-
+  }
 
   function showDebugInfo() {
     console.log("Squarestate", squareState);
@@ -249,12 +244,8 @@ export default function HomePage() {
     console.log("Options", options);
   }
 
-  function noClick() {
-    const newMessage = gameIsPaused ? "Game is paused!" : message.includes("reset") ? "Click start to begin a new game." : "Sorry, only two cards can be shown at the same time!" ;
-    setMessage(newMessage);
-  }
-
   function cardClick(id) {
+    //may move this to Card component
     const cardClicked = squareState.find((card) => card.id === id).front;
     const cutLength = cardSet.setName.length + 1;
     const cardName = typeOfSet === "img" ? cardClicked.slice(cutLength, -4) : cardClicked;
@@ -290,9 +281,9 @@ export default function HomePage() {
          );
       match ? setMessage("The cards match, yeah!") : setMessage("The cards do not match!");
       match && setPoints(points + 2);  
+
       //reset CardState (squarestate) 
       const afterRoundCardState = match ? wonCardState : squareState;
-      
         const resetCardState = afterRoundCardState.map((card) => {
             const updatedCard = { ...card, isShown: false };
             return updatedCard;
@@ -329,6 +320,12 @@ export default function HomePage() {
    openCards === 2 && checkForMatchAndReset(filteredSquareState);
 }
 
+function noClick() {
+  const newMessage = gameIsPaused ? "Game is paused!" : message.includes("reset") ? "Click start to begin a new game." : "Sorry, only two cards can be shown at the same time!" ;
+  setMessage(newMessage);
+}
+  
+
   function handleSelect(optionValue) {
     const chosenArray = allSets.filter((set) => set.setName === optionValue);
     const chosenSet = chosenArray[0];
@@ -336,15 +333,23 @@ export default function HomePage() {
   }
   
 
+  function calculatePoints(timespan, gameSize, rounds) {
+    const timeToBeat = gameSize === 24 ? 50000 : gameSize === 20 ? 40000 : 30000;
+    const timeBonus = timespan < timeToBeat ? Math.round((timeToBeat - timespan) / 33.3) : 0;
+    const roundsToBeat = Math.round(gameSize * 0.9);
+    const roundBonusArray = [0, 1, 2, 4, 8, 16, 32, 64]
+    const roundBonus = rounds < roundsToBeat ? roundBonusArray[(roundsToBeat - rounds)] * 100 : 0
+    const roundMalus = rounds > roundsToBeat ? (rounds - roundsToBeat) * 15 : 0;
+    const completeScore = gameSize * 15 + timeBonus + roundBonus - roundMalus;
+    return completeScore;
+}
+
   function makeHighscoreEntry(timespan) {
     const gameSize = cardColumns * cardRows;
     const timestamp = Date.now();
     const highscoreDate = new Date(timestamp).toString();
     const gameTime = formatDuration(timespan, 1);
     const completeScore = calculatePoints(timespan, gameSize, roundCount);
-    //Old
-    const oldScore = Math.floor((gameSize ** 1.7 / timespan) * 200000);
-    //
     const shortDate = highscoreDate.slice(4, 21);
     const newEntry = { id: uuidv4(6), timestamp, shortDate, timespan, gameTime, gameSize, rounds: roundCount, completeScore, cardSet: cardSet.setName, nameOfPlayer1 }
     setHighscore([...highscore, newEntry]);
@@ -365,17 +370,18 @@ export default function HomePage() {
     <>
       {introIsShown && <TitleStart endOfIntro={handleEndOfIntro} />}
       {mainIsShown && <StyledMain>
-        <UpperSection>
-          <SquarrelTitle>🟧 S Q U A R R E L <DevSquare onClick={()=>setDevMode(!devMode) }>🟧</DevSquare></SquarrelTitle>
-          <MessageSlot>{message}</MessageSlot>
+        <UpperSection $upperWidth={upperWidth}>
+          <TitleContainer><DevSquare onClick={()=>setDevMode(!devMode) }>🟧</DevSquare><SquarrelTitle> SQUARREL</SquarrelTitle>
+          </TitleContainer>
+            <MessageSlot>{message}</MessageSlot>
           <Stats>
             <SmallerHeadline>Stats<br /> </SmallerHeadline>
-            <StatLine>Won Cards: {points} 🟧 Round: {roundCount} 🟧 Cardcount: {cardCount} 🟧 </StatLine>
+            <StatLine>Won cards: {points} 🟧 Round: {roundCount} 🟧
+            </StatLine>
           </Stats>
         </UpperSection>
         <LeftSide>
           <SmallerHeadline>  Options </SmallerHeadline>
-         
           <StandardLabel htmlFor="numberOfPlayers">Number of players: <StyledNrInput  name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={3}
             onChange={(event) => setOptions({ ...options, numberOfPlayers: event.target.value })} value={numberOfPlayers} /></StandardLabel>
    
@@ -401,37 +407,51 @@ export default function HomePage() {
               <option value="ABCSet">Capital letters</option>
               <option value="abcDualSet">Two kinds of letters</option>
               <option value="smallNumbers">Small numbers</option>
-              <option value="htmlSet">HTML Tags</option>
+              <option value="htmlSet">HTML opening tags</option>
+              <option value="htmlDualSet">HTML tag pairs</option>
             </StyledSelect>
           </StandardLabel>
        
-          <StandardLabel htmlFor="delayTime">Delay time<StyledNrInput name="delayTime" id="delayTime" type="number" min={500} max={8000} step="500"
+          <StandardLabel htmlFor="delayTime">Delay time<StyledNrInput name="delayTime" id="delayTime" type="number" min={400} max={8000} step="100"
             onChange={(event) => setOptions({ ...options, delayTime: event.target.value })} value={delayTime} /> ms</StandardLabel>
           <br/>
-          <StandardLabel htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={6}
+          <StandardLabel htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={8}
             onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
-          <p>  </p>
+          <p></p>
           <SmallerHeadline>Controls </SmallerHeadline>
-          <ButtonContainer>
-            <StandardButton onClick={handleStart}>start</StandardButton>
-            <StandardButton onClick={handlePause}>{gameIsPaused ? "continue" : "pause"}</StandardButton>
-            <StandardButton onClick={handleReset}>reset</StandardButton>
-          </ButtonContainer>
+          <FlexColumnWrapper>
+            <ButtonContainer>
+              <StandardButton onClick={handleStart}>start</StandardButton>
+              <StandardButton onClick={handlePause}>{gameIsPaused ? "continue" : "pause"}</StandardButton>
+              <StandardButton onClick={handleReset}>reset</StandardButton>
+            </ButtonContainer>
+            <ButtonContainer>         
+             <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, setInfoIsShown: !setInfoIsShown })}>
+                {setInfoIsShown ? "hide Setinfo" : "show Setinfo"}
+              </BiggerButton>
+              <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} >
+                {highscoreIsShown ? "hide scores" : "show scores"}
+              </BiggerButton>
+            </ButtonContainer>
+            {setInfoIsShown && 
+            <SetInfo>
+              Cards: {cardSet.setList.length}
+              <br></br>
+              MaxSize: {cardSet.setList.length *2}
+              <br></br>
+                  Type: {typeOfSet}</SetInfo>}
+          </FlexColumnWrapper>
+          <p>  </p>
           <Timer timespan={timespan} />
-          <br></br>
-          <SmallerHeadline>More Controls </SmallerHeadline>
-          <HighscoreButton onClick={()=>setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} >{highscoreIsShown? "hide highscore" : "show highscore"}</HighscoreButton>
         </LeftSide>
-  
-        <SquareSection $addColumns={cardColumns - 4} $shiftRight={shiftRight * (cardColumns - 4)} >
+        <SquareSection $height={cardSectionHeight} $addColumns={cardColumns - 4} $fraction="1fr " $shiftRight={shiftRight * (cardColumns - 4)} >
           {running === true ? (squareState.map((square) =>
             <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id}
-            front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet}
-            setName={cardSet.setName} clickStop={clickStop} size={size} />)) : null}
+              front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet}
+              setName={cardSet.setName} clickStop={clickStop} size={size} cardHeight={cardHeight} />)) : null}
         </SquareSection>
         <HighScoreContainer>
-       
-          {highscoreIsShown && <Highscore highscore={highscore} devMode={devMode} clickedDelete={handleDelete} highscoreIsShown={highscoreIsShown}
+          {highscoreIsShown && <Highscore cardSectionHeight={cardSectionHeight} highscore={highscore} devMode={devMode} clickedDelete={handleDelete} highscoreIsShown={highscoreIsShown}
             clickedChangeShow={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} />}
         </HighScoreContainer> 
         {devMode && <DevButtonContainer>
@@ -440,7 +460,6 @@ export default function HomePage() {
           </DevButtonContainer>}
       </StyledMain>
       }
-
     </>
   );
 }

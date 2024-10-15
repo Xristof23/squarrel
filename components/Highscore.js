@@ -1,4 +1,4 @@
-import { StandardButton, SmallerHeadline, DeleteButton } from "@/styledcomponents";
+import { StandardButton, SmallerHeadline, DeleteButton, FlexRowWrapper } from "@/styledcomponents";
 import { sortEntries} from "@/utils";
 import { useState } from "react";
 import styled from "styled-components";
@@ -15,25 +15,20 @@ const HighscoreSection = styled.section`
   border: 1px solid black;
 `;
 
-const FlexRowWrapper = styled.div`
-    display: flex;
-    flex-direction: row;
-`;
-
 const Disorder = styled.ul`
-margin: 0;
-padding: .1rem;
+  margin: 0;
+  padding: .1rem;
 `;
 
 const HighscoreEntry = styled.li`
-    display: grid;
-    grid-template-columns: 1.2fr 5fr 5fr 7fr 3fr 3fr 4fr 7fr 1fr;
-    gap: 0.5rem; 
+  display: grid;
+  grid-template-columns: 1.2fr 5fr 5fr 7fr 3fr 2.7fr 4fr 7fr 1fr;
+  gap: 0.5rem; 
   font-size: 1rem;
   line-height: 1rem;
-  width: 98%;
-  margin: .2rem;
-  padding: .5rem;
+  width: 99%;
+  margin: .25rem;
+  padding: .4rem;
   align-items: center;
   background-color: orange;
   border: 1px solid black;
@@ -41,17 +36,17 @@ const HighscoreEntry = styled.li`
 `;
 
 const HighscoreDetail = styled.div`
-text-align: left;
-width: 100%;
+  text-align: left;
+  width: 100%;
 `;
 
 const HighscoreListButton = styled.button`
-text-align: center;
-width: 4rem;
-margin: 0;
-border: 1px solid black;
-border-radius: 4px;
-padding: 2px;
+  text-align: center;
+  width: 4rem;
+  margin: 0;
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 2px;
 `;
 
 const HighscoreNumber = styled.div`
@@ -61,8 +56,10 @@ text-align: right;
 
 const SmallerButton = styled(StandardButton)`
 font-size: .8rem;
+position: relative;
+bottom: 2px;
 line-height: .8rem;
-margin: .1rem .5rem .5rem 1rem;
+margin: .3rem;
 padding: 2px;
 font-weight: 500;
 height: 20px;
@@ -71,12 +68,13 @@ min-width: 2.5rem;
 width: fit-content;
 `;
 
-export default function Highscore({ highscore, devMode, clickedDelete, highscoreIsShown, clickedChangeShow }) {
+export default function Highscore({ highscore, devMode, clickedDelete, highscoreIsShown, clickedChangeShow, cardSectionHeight }) {
     const [sortValue, setSortValue] = useState("gameTime");
     const [lowToHigh, setLowToHigh] = useState(true);
     
-    const shownEntries = sortEntries(highscore, sortValue, lowToHigh);
- 
+    const sortedEntries = sortEntries(highscore, sortValue, lowToHigh);
+  const shownEntries = sortedEntries.slice(0, 20);
+  
     function onDelete(id) {
         clickedDelete(id);
     }
@@ -87,8 +85,10 @@ export default function Highscore({ highscore, devMode, clickedDelete, highscore
     return (
         <HighscoreSection>
             <FlexRowWrapper>
-                <SmallerHeadline>Highscore</SmallerHeadline>
-                <SmallerButton onClick={onHandleShow} >{highscoreIsShown ? "hide" : "show"}</SmallerButton>
+          <SmallerHeadline>Highscore</SmallerHeadline>
+          <SmallerButton onClick={()=>setLowToHigh(!lowToHigh)} >{lowToHigh? "▲" : "▼"}</SmallerButton>
+          <SmallerButton onClick={onHandleShow} >{highscoreIsShown ? "hide" : "show"}</SmallerButton>
+          
             </FlexRowWrapper> 
             <Disorder>
             <HighscoreEntry>
@@ -122,7 +122,7 @@ export default function Highscore({ highscore, devMode, clickedDelete, highscore
                         setSortValue("shortDate");
                         setLowToHigh(!lowToHigh);}
                       }>Date</HighscoreListButton>
-               <HighscoreListButton onClick={()=>setLowToHigh(!lowToHigh)} >{lowToHigh? "▲" : "▼"}</HighscoreListButton>
+             
                 </HighscoreEntry>
                 </Disorder>
           <Disorder>
@@ -133,7 +133,7 @@ export default function Highscore({ highscore, devMode, clickedDelete, highscore
               <HighscoreDetail>{entry.nameOfPlayer1}</HighscoreDetail>
               <HighscoreDetail>{entry.cardSet}</HighscoreDetail>
                         <HighscoreDetail>{entry.gameSize}</HighscoreDetail>
-                        <HighscoreDetail>{entry.rounds}</HighscoreDetail>
+                        <HighscoreNumber>{entry.rounds}</HighscoreNumber>
               <HighscoreNumber>{entry.completeScore}</HighscoreNumber>
               <HighscoreDetail>{entry.shortDate}</HighscoreDetail>
  
