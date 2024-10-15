@@ -326,7 +326,6 @@ function noClick() {
   setMessage(newMessage);
 }
   
-
   function handleSelect(optionValue) {
     const chosenArray = allSets.filter((set) => set.setName === optionValue);
     const chosenSet = chosenArray[0];
@@ -343,6 +342,7 @@ function noClick() {
     const newEntry = { id: uuidv4(6), timestamp, shortDate, timespan, gameTime, gameSize, rounds: roundCount, completeScore, cardSet: cardSet.setName, nameOfPlayer1 }
     setHighscore([...highscore, newEntry]);
   }
+
 
   //needs confirm dialog even for devmode
   function handleHighscoreReset() {

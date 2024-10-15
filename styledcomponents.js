@@ -178,7 +178,7 @@ background-color: white;
 
 const BiggerButton = styled(StandardButton)`
 width: 6.2rem;
-Height: 2.5rem;
+min-height: 2rem;
 margin: .2rem;
 padding: .2rem;
 `;
@@ -192,7 +192,6 @@ border-radius: 4px;
 border: 1px solid darkorange;
 background-color: white;
 `;
-
 
 const DebugButton = styled(StandardButton)`
 font-size: .7rem;

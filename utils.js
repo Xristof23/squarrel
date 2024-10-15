@@ -1,11 +1,12 @@
-export   function calculatePoints(timespan, gameSize, rounds) {
+export function calculatePoints(timespan, gameSize, rounds) {
   const timeToBeat = 30000 + (gameSize - 16) * 2250;
   const timeBonus = timespan < timeToBeat ? Math.round((timeToBeat - timespan) / 33.3) : 0;
   const roundsToBeat = Math.round(gameSize * 0.9);
   const roundBonusArray = [0, 1, 2, 4, 8, 16, 32, 64]
   const roundBonus = rounds < roundsToBeat ? roundBonusArray[(roundsToBeat - rounds)] * 100 : 0
   const roundMalus = rounds > roundsToBeat ? (rounds - roundsToBeat) * 15 : 0;
-  const completeScore = gameSize * 15 + timeBonus + roundBonus - roundMalus;
+  const oldScore = 240 + (gameSize - 16) * 10 + timeBonus + roundBonus - roundMalus;
+  const completeScore = 240 + (gameSize - 16) * (13 - (gameSize - 16) / 4 + 1)  + timeBonus + roundBonus - roundMalus; 
   return completeScore;
 }
 
