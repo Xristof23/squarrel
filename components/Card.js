@@ -42,8 +42,18 @@ const CardImage = styled.img`
 
 export default function Card({ id, front, isShown, onTurn, noTurn, won, typeOfSet, setName, size, clickStop, cardHeight }) {
 
-  //move away
+  
+  function getAltForImage() {
+    const cutLength = setName.length + 1;
+    const altName = typeOfSet === "img" ? front.slice(cutLength, -4) : front;
+    const firstLetter = altName.slice(0, 1);
+    const vowels = ["a", "e", "i", "o", "u"];
+    const indefiniteArticle = vowels.includes(firstLetter) ? "an" : "a";
+    const altString = `An image of ${indefiniteArticle} ${altName}`; 
+  return altString
+}
 
+  const altString = typeOfSet === "img" ? getAltForImage() : "";
   
   function handleCardClick(id, clickStop) {
     clickStop? noTurn() : onTurn(id);
@@ -57,7 +67,7 @@ export default function Card({ id, front, isShown, onTurn, noTurn, won, typeOfSe
         <LilSquareContainer $height={cardHeight} onClick={() => handleCardClick(id, clickStop)
         }>
           {isShown ? (typeOfSet === "img" ?
-            <CardImage $height={cardHeight - 4} src={`/images/${setName}/${front}`} alt="A bear in black & white" /> :
+            <CardImage $height={cardHeight - 4} src={`/images/${setName}/${front}`} alt={altString} /> :
             <LilSquareFront $height={cardHeight} $size={size}>{front}</LilSquareFront>) :
             <CardImage $height={cardHeight} src="\images\SquarrelBackFarbe.png" />}</LilSquareContainer>
         

@@ -121,7 +121,7 @@ export default function HomePage() {
   const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
   const { cardCount, roundCount } = count;
   const [points, setPoints] = useState(0);
-  const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! You can nwo play with up to 32 cards. Wanna try?");
+  const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! You can now play with up to 32 cards. Wanna try?");
   const [clickStop, setClickStop] = useState(false);
   const [gameIsPaused, setGameIsPaused] = useState(false);
   const [highscore, setHighscore]= useLocalStorageState("highscore", {
@@ -205,11 +205,11 @@ export default function HomePage() {
     
     //may need to made clearer and better expandable (react to more sets) with future update
     const cardsArray = cardNumbers.map((number) => {
-      const ASCIIDualFront = setName === "abcDualSet" ? (number % 2 === 0 ? setList[number - 2].half2 : setList[number - 1].half1) : "not needed";
-      const frontASCII = setName === "abcDualSet" ? ASCIIDualFront : setList[Math.ceil(number / 2)];
+      const ASCIIDualFront = setName.includes("Dual")? (number % 2 === 0 ? setList[number - 2].half2 : setList[number - 1].half1) : "not needed";
+      const frontASCII = setName.includes("Dual")? ASCIIDualFront : setList[Math.ceil(number / 2)];
       const frontImage = `${setName}-${setList[Math.ceil(number / 2)]}.jpg`;
       const front = typeOfSet === "img" ? frontImage : frontASCII;
-      const pairId = setName === "abcDualSet" ? Math.ceil(number / 2) : front;
+      const pairId = setName.includes("Dual") ? Math.ceil(number / 2) : front;
       const cardObject = { id: number, front, pairId, back: "back", typeOfSet, isShown: false, won: false };
       return cardObject;
     });
@@ -272,6 +272,7 @@ export default function HomePage() {
   }
 
   function cardClick(id) {
+    //may move this to Card component
     const cardClicked = squareState.find((card) => card.id === id).front;
     const cutLength = cardSet.setName.length + 1;
     const cardName = typeOfSet === "img" ? cardClicked.slice(cutLength, -4) : cardClicked;
@@ -418,7 +419,8 @@ export default function HomePage() {
               <option value="ABCSet">Capital letters</option>
               <option value="abcDualSet">Two kinds of letters</option>
               <option value="smallNumbers">Small numbers</option>
-              <option value="htmlSet">HTML Tags</option>
+              <option value="htmlSet">HTML opening tags</option>
+              <option value="htmlDualSet">HTML tag Pairs</option>
             </StyledSelect>
           </StandardLabel>
        

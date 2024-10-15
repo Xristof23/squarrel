@@ -32,7 +32,7 @@ const jrpg = {
         "druid", "druid2", "fighter3", "fighter", "healer2", "healer4", "mage2", "mage3", "mage4", "ninja", "ninja2", "rogue", "samurai", "samurai3", "samurai4", "starfighter2", "starfighter4", "sword2", "sword4"]}
 
 // AscII sets with two different cards 
-const abcDualSetlist = ABCSet.setList.map((letter, index) => {
+const abcDualSetlist = ABCSet.setList.map((letter) => {
     const pairObject = {
         half1: letter, half2: letter.toLowerCase()};
     return pairObject;  
@@ -42,13 +42,16 @@ const abcDualSetlist = ABCSet.setList.map((letter, index) => {
 const abcDualSet = { setName: "abcDualSet", typeOfSet: "ASCIIDual", size: 6, setList: abcDualSetlist };
 
 //(not yet ready) has to be filled
-const htmlSpecialSet = { setName: "htmlSpecialSet", typeOfSet: "ASCIIDual", setList: [] };
+const htmlDualSetList = htmlSet.setList.map((tag) => {
+    const pairObject = {
+        half1: tag, half2: tag.replace("<", "</")
+    };
+    
+    return pairObject;  
+});
+ 
 
-
-function getAltForImage() {
-
-}
-
+const htmlDualSet = { setName: "htmlDualSet", typeOfSet: "ASCIIDual", size: 2.3, setList: htmlDualSetList };
 
 // initial states
 const initialCardState = [];
@@ -58,7 +61,7 @@ const initialOptions = {
     cardSet: euAnimals, typeOfSet: "img", size: 6
 };
 
-const allSets = [euAnimals, afrAnimals, happy, ABCSet, abcDualSet, htmlSet, smallNumbers, wolfpack, jrpg ]
+const allSets = [euAnimals, afrAnimals, happy, ABCSet, abcDualSet, htmlSet, htmlDualSet, smallNumbers, wolfpack, jrpg ]
 
 export {
     initialCardState, 

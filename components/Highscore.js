@@ -16,19 +16,19 @@ const HighscoreSection = styled.section`
 `;
 
 const Disorder = styled.ul`
-margin: 0;
-padding: .1rem;
+  margin: 0;
+  padding: .1rem;
 `;
 
 const HighscoreEntry = styled.li`
-    display: grid;
-    grid-template-columns: 1.2fr 5fr 5fr 7fr 3fr 2.7fr 4fr 7fr 1fr;
-    gap: 0.5rem; 
+  display: grid;
+  grid-template-columns: 1.2fr 5fr 5fr 7fr 3fr 2.7fr 4fr 7fr 1fr;
+  gap: 0.5rem; 
   font-size: 1rem;
   line-height: 1rem;
-  width: 98%;
-  margin: .2rem;
-  padding: .5rem;
+  width: 99%;
+  margin: .25rem;
+  padding: .4rem;
   align-items: center;
   background-color: orange;
   border: 1px solid black;
@@ -36,17 +36,17 @@ const HighscoreEntry = styled.li`
 `;
 
 const HighscoreDetail = styled.div`
-text-align: left;
-width: 100%;
+  text-align: left;
+  width: 100%;
 `;
 
 const HighscoreListButton = styled.button`
-text-align: center;
-width: 4rem;
-margin: 0;
-border: 1px solid black;
-border-radius: 4px;
-padding: 2px;
+  text-align: center;
+  width: 4rem;
+  margin: 0;
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 2px;
 `;
 
 const HighscoreNumber = styled.div`
