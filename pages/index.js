@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import useLocalStorageState from 'use-local-storage-state'
 import { initialCardState, initialGameState, allSets, initialOptions } from "@/memoryData";
 import Card from "@/components/Card";
-import TitleStart from "@/components/TitleStart";
+import TitleStart from "@/components/Intro";
 import Timer from "@/components/Timer";
 import Highscore from "@/components/Highscore";
 import {
@@ -29,6 +29,7 @@ import {
 } from "@/styledcomponents";
 import { formatDuration, calculatePoints } from "@/utils";
 import { v4 as uuidv4 } from 'uuid';
+import Intro from "@/components/Intro";
 
 const StyledMain = styled.main`
  display: grid;
@@ -332,18 +333,6 @@ function noClick() {
     setOptions({ ...options, cardSet: chosenSet, typeOfSet: chosenSet.typeOfSet, size: chosenSet.size ? chosenSet.size : options.size });
   }
   
-
-  function calculatePoints(timespan, gameSize, rounds) {
-    const timeToBeat = gameSize === 24 ? 50000 : gameSize === 20 ? 40000 : 30000;
-    const timeBonus = timespan < timeToBeat ? Math.round((timeToBeat - timespan) / 33.3) : 0;
-    const roundsToBeat = Math.round(gameSize * 0.9);
-    const roundBonusArray = [0, 1, 2, 4, 8, 16, 32, 64]
-    const roundBonus = rounds < roundsToBeat ? roundBonusArray[(roundsToBeat - rounds)] * 100 : 0
-    const roundMalus = rounds > roundsToBeat ? (rounds - roundsToBeat) * 15 : 0;
-    const completeScore = gameSize * 15 + timeBonus + roundBonus - roundMalus;
-    return completeScore;
-}
-
   function makeHighscoreEntry(timespan) {
     const gameSize = cardColumns * cardRows;
     const timestamp = Date.now();
@@ -368,7 +357,7 @@ function noClick() {
 
   return (
     <>
-      {introIsShown && <TitleStart endOfIntro={handleEndOfIntro} />}
+      {introIsShown && <Intro endOfIntro={handleEndOfIntro} />}
       {mainIsShown && <StyledMain>
         <UpperSection $upperWidth={upperWidth}>
           <TitleContainer><DevSquare onClick={()=>setDevMode(!devMode) }>🟧</DevSquare><SquarrelTitle> SQUARREL</SquarrelTitle>
