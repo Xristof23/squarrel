@@ -21,7 +21,9 @@ import {
   LeftSide,
   TitleContainer,
   FlexColumnWrapper,
-  FlexRowWrapper,
+  StandardLabel,
+  StyledInput,
+  StyledNrInput,
   BiggerButton,
   SetInfo
 } from "@/styledcomponents";
@@ -87,28 +89,6 @@ left: 244px;
   z-index: 2;
 `;
 
-const StandardLabel = styled.label`
-  font-size: 0.9rem;
-  width: 90%;
-  margin: .5rem .5rem 1rem 0rem;
-  padding: .2rem;
-`;
-
-const StyledNrInput = styled.input`
-  font-size: 0.8rem;
-  width: 4rem;
-  margin: 0.3rem;
-  padding: .2rem;
-`;
-
-const StyledInput = styled.input`
-  min-width: 3.5rem;
-  width: 66%;
-  margin: 0.3rem;
-  padding: .2rem;
-`;
-
-
 export default function HomePage() {
   const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: false, setInfoIsShown: false });
   const { introIsShown, mainIsShown, highscoreIsShown, setInfoIsShown } = whatIsShown;
@@ -156,7 +136,7 @@ export default function HomePage() {
   setWhatIsShown({...whatIsShown,  introIsShown: false, mainIsShown: true })
 }
  
-   //responsive
+  //responsive
   const isWindowClient = typeof window === "object";
   
   const [windowWidth, setWindowWidth] = useState(
@@ -178,13 +158,11 @@ export default function HomePage() {
       }
     }, [isWindowClient, setWindowWidth, setWindowHeight]);
 
-   
   const cardSectionHeight = windowHeight - 99;
   const cardHeight = cardSectionHeight / 4 - 6;
   const shiftRight = cardSectionHeight / 8 + 1;
   const moreColumns = cardColumns - 4;
   const upperWidth = `${238 + cardSectionHeight + moreColumns * (shiftRight *2)}px`;
-
 
   // card rows = 4 for now, 4 <= cardColumns <= 8 
   function generateCardsArray(cardRows, cardColumns, shuffle, cardSet) {
@@ -266,10 +244,7 @@ export default function HomePage() {
     console.log("Options", options);
   }
 
-  function noClick() {
-    const newMessage = gameIsPaused ? "Game is paused!" : message.includes("reset") ? "Click start to begin a new game." : "Sorry, only two cards can be shown at the same time!" ;
-    setMessage(newMessage);
-  }
+
 
   function cardClick(id) {
     //may move this to Card component
@@ -308,9 +283,9 @@ export default function HomePage() {
          );
       match ? setMessage("The cards match, yeah!") : setMessage("The cards do not match!");
       match && setPoints(points + 2);  
+
       //reset CardState (squarestate) 
       const afterRoundCardState = match ? wonCardState : squareState;
-      
         const resetCardState = afterRoundCardState.map((card) => {
             const updatedCard = { ...card, isShown: false };
             return updatedCard;
@@ -347,6 +322,12 @@ export default function HomePage() {
    openCards === 2 && checkForMatchAndReset(filteredSquareState);
 }
 
+function noClick() {
+  const newMessage = gameIsPaused ? "Game is paused!" : message.includes("reset") ? "Click start to begin a new game." : "Sorry, only two cards can be shown at the same time!" ;
+  setMessage(newMessage);
+}
+  
+
   function handleSelect(optionValue) {
     const chosenArray = allSets.filter((set) => set.setName === optionValue);
     const chosenSet = chosenArray[0];
@@ -375,7 +356,6 @@ export default function HomePage() {
     setHighscore(newArray);
   }
 
-
   return (
     <>
       {introIsShown && <TitleStart endOfIntro={handleEndOfIntro} />}
@@ -393,7 +373,6 @@ export default function HomePage() {
         </UpperSection>
         <LeftSide>
           <SmallerHeadline>  Options </SmallerHeadline>
-         
           <StandardLabel htmlFor="numberOfPlayers">Number of players: <StyledNrInput  name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={3}
             onChange={(event) => setOptions({ ...options, numberOfPlayers: event.target.value })} value={numberOfPlayers} /></StandardLabel>
    
@@ -429,7 +408,7 @@ export default function HomePage() {
           <br/>
           <StandardLabel htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={8}
             onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
-          <p>  </p>
+          <p></p>
           <SmallerHeadline>Controls </SmallerHeadline>
           <FlexColumnWrapper>
             <ButtonContainer>
@@ -455,10 +434,7 @@ export default function HomePage() {
           </FlexColumnWrapper>
           <p>  </p>
           <Timer timespan={timespan} />
-       
-         
         </LeftSide>
-  
         <SquareSection $height={cardSectionHeight} $addColumns={cardColumns - 4} $fraction="1fr " $shiftRight={shiftRight * (cardColumns - 4)} >
           {running === true ? (squareState.map((square) =>
             <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id}
@@ -466,7 +442,6 @@ export default function HomePage() {
               setName={cardSet.setName} clickStop={clickStop} size={size} cardHeight={cardHeight} />)) : null}
         </SquareSection>
         <HighScoreContainer>
-       
           {highscoreIsShown && <Highscore cardSectionHeight={cardSectionHeight} highscore={highscore} devMode={devMode} clickedDelete={handleDelete} highscoreIsShown={highscoreIsShown}
             clickedChangeShow={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} />}
         </HighScoreContainer> 
@@ -476,7 +451,6 @@ export default function HomePage() {
           </DevButtonContainer>}
       </StyledMain>
       }
-
     </>
   );
 }

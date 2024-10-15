@@ -126,8 +126,32 @@ const Placeholder= styled.div`
   border-radius: 4px;
 `;
 
-//Buttons
+//Form
+const StandardLabel = styled.label`
+  font-size: 0.9rem;
+  width: 90%;
+  margin: .5rem .5rem 1rem 0rem;
+  padding: .2rem;
+`;
 
+const StyledNrInput = styled.input`
+  font-size: 0.8rem;
+  width: 4rem;
+  margin: 0.3rem;
+  padding: .2rem;
+`;
+
+const StyledInput = styled.input`
+  min-width: 3.5rem;
+  width: 66%;
+  margin: 0.3rem;
+  padding: .2rem;
+`;
+
+
+
+
+//Buttons
 const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -194,15 +218,12 @@ border: 1px solid grey;
 background-color: lightgray;
 `;
 
-
-
 //wrapper
 const FlexRowWrapper = styled.div`
     display: flex;
     flex-direction: row;
     width: 100%;
 `;
-
 
 const FlexColumnWrapper = styled.div`
     display: flex;
@@ -255,7 +276,10 @@ export {
     SmallerHeadline,
     SquareSectionStatic,
     StatLine,
-    Stats,
+  Stats,
+  StyledInput,
+  StyledNrInput,
+    StandardLabel,
     StyledSelect,
     StandardButton,
   SquarrelTitle, 
