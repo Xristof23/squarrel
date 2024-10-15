@@ -1,4 +1,4 @@
-import { StandardButton, SmallerHeadline, DeleteButton, FlexRowWrapper } from "@/styledcomponents";
+import { StandardButton, SmallerHeadline, DeleteButton, FlexRowWrapper, StyledNrInput } from "@/styledcomponents";
 import { sortEntries} from "@/utils";
 import { useState } from "react";
 import styled from "styled-components";
@@ -68,12 +68,32 @@ min-width: 2.5rem;
 width: fit-content;
 `;
 
+const SmallerLabel = styled.label`
+  font-size: .8rem;
+  line-height: .8rem;
+  position: relative;
+  bottom: 8px;
+  margin: .3rem;
+  padding: 2px;
+  height: 1.4rem;
+`;
+
+const SmallerNrInput = styled(StyledNrInput)`
+ min-height: .8rem;
+ height: 1.2rem;
+  width: 3.3rem;
+  margin: .3rem;
+  padding: .2rem;
+  border-radius: 4px;
+`;
+
 export default function Highscore({ highscore, devMode, clickedDelete, highscoreIsShown, clickedChangeShow, cardSectionHeight }) {
     const [sortValue, setSortValue] = useState("gameTime");
-    const [lowToHigh, setLowToHigh] = useState(true);
+  const [lowToHigh, setLowToHigh] = useState(true);
+  const [numberOfEntries, setNumberOfEntries] = useState(20);
     
     const sortedEntries = sortEntries(highscore, sortValue, lowToHigh);
-  const shownEntries = sortedEntries.slice(0, 20);
+  const shownEntries = sortedEntries.slice(0, numberOfEntries);
   
     function onDelete(id) {
         clickedDelete(id);
@@ -84,13 +104,17 @@ export default function Highscore({ highscore, devMode, clickedDelete, highscore
     }
     return (
         <HighscoreSection>
-            <FlexRowWrapper>
-          <SmallerHeadline>Highscore</SmallerHeadline>
-          <SmallerButton onClick={()=>setLowToHigh(!lowToHigh)} >{lowToHigh? "▲" : "▼"}</SmallerButton>
-          <SmallerButton onClick={onHandleShow} >{highscoreIsShown ? "hide" : "show"}</SmallerButton>
-          
-            </FlexRowWrapper> 
-            <Disorder>
+          <FlexRowWrapper>
+            <SmallerHeadline>Highscore</SmallerHeadline>
+            <SmallerButton onClick={()=>setLowToHigh(!lowToHigh)} >{lowToHigh? "▲" : "▼"}</SmallerButton>
+            <SmallerButton onClick={onHandleShow} >{highscoreIsShown ? "hide" : "show"}</SmallerButton>
+            <SmallerLabel htmlFor="numberOfEntries">Top
+              <SmallerNrInput name="numberOfEntries" id="numberOfEntries" type="number"
+            min={5} max={sortedEntries.length -1} step="5"
+            onChange={(event) => setNumberOfEntries(event.target.value)} value={numberOfEntries} />
+            </SmallerLabel>
+          </FlexRowWrapper> 
+          <Disorder>
             <HighscoreEntry>
                     <HighscoreNumber>#</HighscoreNumber>
                     <HighscoreListButton onClick={() => {
@@ -124,7 +148,7 @@ export default function Highscore({ highscore, devMode, clickedDelete, highscore
                       }>Date</HighscoreListButton>
              
                 </HighscoreEntry>
-                </Disorder>
+          </Disorder>
           <Disorder>
                 {shownEntries.map((entry, index) =>
             <HighscoreEntry key={entry.id} >

@@ -139,6 +139,7 @@ const StyledNrInput = styled.input`
   width: 4rem;
   margin: 0.3rem;
   padding: .2rem;
+  border-radius: 4px;
 `;
 
 const StyledInput = styled.input`
