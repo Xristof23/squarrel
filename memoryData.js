@@ -27,9 +27,12 @@ const happy = {
     setName: "happy", typeOfSet: "img", setList: [
         "bees", "bees2", "bees3", "butterflies", "butterflies2", "butterflies3", "cars", "cats", "computer", "computer2", "dogs", "dogs2", "dogs3", "laptops", "laptops4", "owls", "owls2", "people", "people2", "phones", "phones2",  "radios", "radios2" ]}
 
-const jrpg = {
-    setName: "jrpg", typeOfSet: "img", setList: [
-        "druid", "druid2", "fighter3", "fighter", "healer2", "healer4", "mage2", "mage3", "mage4", "ninja", "ninja2", "rogue", "samurai", "samurai3", "samurai4", "starfighter2", "starfighter4", "sword2", "sword4"]}
+const darkrpg = {
+    setName: "darkrpg", typeOfSet: "img", setList: [
+        "barbarian", "barbarian2", "druid", "druid2", "fighterHood", "femalepriest", "femalepriest2", "femalepriest3", "fencerf", "greymage", "greymage2",
+        "greymage3", "greymagef", "greymagef2", "greymagef3", "greymagef4", "knight", "knight2", "knight3", "magerogue", "redmage", "redmage2", "redmage3",
+        "rogue", "rogue2", "rogue3", "rogue4", "roguef", "roguef2", "roguef3", "sellsword", "sellswordf","swordfighter"]
+}
 
 // AscII sets with two different cards 
 const abcDualSetlist = ABCSet.setList.map((letter) => {
@@ -61,7 +64,7 @@ const initialOptions = {
     cardSet: euAnimals, typeOfSet: "img", size: 6
 };
 
-const allSets = [euAnimals, afrAnimals, happy, ABCSet, abcDualSet, htmlSet, htmlDualSet, smallNumbers, wolfpack, jrpg ]
+const allSets = [euAnimals, afrAnimals, happy, ABCSet, abcDualSet, htmlSet, htmlDualSet, smallNumbers, wolfpack, darkrpg ]
 
 export {
     initialCardState, 
