@@ -5,13 +5,17 @@ import styled from "styled-components"
 const ResultMessageContainer = styled.div`
  color: black;
  font-weight: 400;
- background-color: lightgrey;
- width: 80%;
- height: 80%;
- margin: .3rem;
- padding: 0.3rem;
+ background-color: #99CCEE;
+ width: 50%;
+ height: fit-content;
+ margin: .2rem;
+ padding: .3rem;
  border-radius: 4px;
- border: 1px solid darkorange;
+ border: 1px solid black;
+`;
+
+const BoldResult = styled.span`
+font-weight: 600;
 `;
 
 
@@ -21,6 +25,7 @@ export default function ResultMessage({timespan, gameSize, roundCount}) {
     const { basePoints, timeToBeat, timeBonus, roundsToBeat, roundBonus, roundMalus, completeScore } = results;
     return (
         <ResultMessageContainer>
+            <BoldResult> You won!</BoldResult><br />
             Base points: {basePoints} <br />
             Time: {formatDuration(timespan, 1)}<br />
             Time to beat: {formatDuration(timeToBeat)}<br />
@@ -29,7 +34,7 @@ export default function ResultMessage({timespan, gameSize, roundCount}) {
             Rounds played: {roundCount} <br />
             Round bonus: {roundBonus}<br />
             Round malus: {roundMalus}<br />
-            Result: {completeScore}<br />
+            <BoldResult> Result: {completeScore}</BoldResult>
           </ResultMessageContainer>
     )
 }

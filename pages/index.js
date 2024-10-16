@@ -46,6 +46,7 @@ const StyledMain = styled.main`
   padding: 0.5rem;
   margin: .5rem auto .5rem; 
   align-content: center;
+  
 `;
 
 const SquareSection = styled.section`
@@ -86,7 +87,6 @@ const HighScoreContainer = styled.div`
   margin: .5rem; 
   width: ${({ $width }) => `${$width}px`};
   height: fit-content;
-  background-color: white;
   border-radius: 4px;
   z-index: 2;
 `;
