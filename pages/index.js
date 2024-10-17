@@ -11,6 +11,8 @@ import ResultMessage from "@/components/ResultMessage";
 import {
   StyledMain,
   ButtonContainer,
+  HighScoreContainer,
+  SmallerButton,
   DevSquare,
   UpperSection,
   MessageSlot,
@@ -65,21 +67,9 @@ const DevButtonContainer = styled.div`
   z-index: 2;
 `;
 
-const HighScoreContainer = styled.div`
-  position: absolute;
-  padding: 0;
-  top: 92px;
-  left: 210px;
-  margin: .5rem; 
-  width: ${({ $width }) => `${$width +2}px`};
-  height: fit-content;
-  border-radius: 4px;
-  z-index: 2;
-`;
-
 export default function HomePage() {
-  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: false, setInfoIsShown: false, resultIsShown: false });
-  const { introIsShown, mainIsShown, highscoreIsShown, setInfoIsShown, resultIsShown } = whatIsShown;
+  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, optionsAreShown: true, highscoreIsShown: false, setInfoIsShown: false, resultIsShown: false });
+  const { introIsShown, mainIsShown, optionsAreShown,  highscoreIsShown, setInfoIsShown, resultIsShown } = whatIsShown;
   const [devMode, setDevMode] = useState(false);
   const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
   const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
@@ -151,7 +141,7 @@ export default function HomePage() {
   const cardHeight = cardSectionHeight / 4 - 6;
   const shiftRight = cardSectionHeight / 8 + 1;
   const moreColumns = cardColumns - 4;
-  const upperWidth = `${238 + cardSectionHeight + moreColumns * (shiftRight * 2)}px`;
+  const upperWidth = `${202 + cardSectionHeight + moreColumns * (shiftRight * 2)}px`;
   const overallMaxwidth = windowWidth - 20;
 
   // card rows = 4 for now, 4 <= cardColumns <= 8 
@@ -364,70 +354,77 @@ function noClick() {
           </Stats>
         </UpperSection>
         <LeftSide>
+          <FlexRowWrapper>
           <SmallerHeadline>  Options </SmallerHeadline>
-          <StandardLabel htmlFor="numberOfPlayers">Nr. of players:
+            <SmallerButton onClick={() => setWhatIsShown({ ...whatIsShown, optionsAreShown: !optionsAreShown })} >{optionsAreShown ? "▲" : "▼"}</SmallerButton>
+           
+            </FlexRowWrapper> 
+          {optionsAreShown && <><StandardLabel htmlFor="numberOfPlayers">Nr. of players:
             <SmallerNrInput name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={3}
-            onChange={(event) => setOptions({ ...options, numberOfPlayers: event.target.value })} value={numberOfPlayers} />
+              onChange={(event) => setOptions({ ...options, numberOfPlayers: event.target.value })} value={numberOfPlayers} />
           </StandardLabel><br />
    
-          <StandardLabel htmlFor="nameOfPlayer1">Player1: <StyledInput name="nameOfPlayer1" id="nameOfPlayer1" 
-            onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer1} /></StandardLabel><br />
+            <StandardLabel htmlFor="nameOfPlayer1">Player1: <StyledInput name="nameOfPlayer1" id="nameOfPlayer1"
+              onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer1} /></StandardLabel><br />
         
-          {numberOfPlayers >= 2 && <StandardLabel htmlFor="nameOfPlayer2">Player2: <StyledInput name="nameOfPlayer2" id="nameOfPlayer2" 
-            onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer2} /></StandardLabel>
-           }
-         {numberOfPlayers >= 3 && <StandardLabel htmlFor="nameOfPlayer3">Player3: <StyledInput name="nameOfPlayer3" id="nameOfPlayer3" 
-            onChange={(event) => setOptions({ ...options, nameOfPlayer3: event.target.value })} value={nameOfPlayer3} /></StandardLabel>
-         }
-          <StandardLabel htmlFor="selectSet">
-            <StyledSelect aria-label="Choose a set of cards" id="selectSet"
-              name="selectSet" value={`${cardSet.setName}`} onChange={(event) => handleSelect(event.target.value)}
-            >
-              <option value={""}>--Please choose a card set--</option>
-              <option value="euAnimals">European animals (b&w)</option>
-              <option value="wolfpack">Cult of wolves (b&w)</option>
-              <option value="afrAnimals">African animals (colour)</option>
-              <option value="happy">Being happy (colour)</option>
-              <option value="darkrpg">RPG characters (colour)</option>
-              <option value="ABCSet">Capital letters</option>
-              <option value="abcDualSet">Two kinds of letters</option>
-              <option value="smallNumbers">Small numbers</option>
-              <option value="htmlSet">HTML opening tags</option>
-              <option value="htmlDualSet">HTML tag pairs</option>
-            </StyledSelect>
-          </StandardLabel>
+            {numberOfPlayers >= 2 && <StandardLabel htmlFor="nameOfPlayer2">Player2: <StyledInput name="nameOfPlayer2" id="nameOfPlayer2"
+              onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer2} /></StandardLabel>
+            }
+            {numberOfPlayers >= 3 && <StandardLabel htmlFor="nameOfPlayer3">Player3: <StyledInput name="nameOfPlayer3" id="nameOfPlayer3"
+              onChange={(event) => setOptions({ ...options, nameOfPlayer3: event.target.value })} value={nameOfPlayer3} /></StandardLabel>
+            }
+            <StandardLabel htmlFor="selectSet">
+              <StyledSelect aria-label="Choose a set of cards" id="selectSet"
+                name="selectSet" value={`${cardSet.setName}`} onChange={(event) => handleSelect(event.target.value)}
+              >
+                <option value={""}>--Please choose a card set--</option>
+                <option value="euAnimals">European animals (b&w)</option>
+                <option value="wolfpack">Cult of wolves (b&w)</option>
+                <option value="afrAnimals">African animals (colour)</option>
+                <option value="happy">Being happy (colour)</option>
+                <option value="darkrpg">RPG characters (colour)</option>
+                <option value="ABCSet">Capital letters</option>
+                <option value="abcDualSet">Two kinds of letters</option>
+                <option value="smallNumbers">Small numbers</option>
+                <option value="htmlSet">HTML opening tags</option>
+                <option value="htmlDualSet">HTML tag pairs</option>
+              </StyledSelect>
+            </StandardLabel>
        
-          <StandardLabel htmlFor="delayTime">Delay time<StyledNrInput name="delayTime" id="delayTime" type="number" min={400} max={8000} step="100"
-            onChange={(event) => setOptions({ ...options, delayTime: event.target.value })} value={delayTime} /> ms</StandardLabel>
-          <br/>
-          <StandardLabel htmlFor="cardColumns">Size 4 x <SmallerNrInput name="cardColumns" id="cardColumns" type="number" min={4} max={8}
-            onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
-          <p></p>
-          <SmallerHeadline>Controls </SmallerHeadline>
-          <FlexColumnWrapper>
-            <ButtonContainer>
-              <StandardButton onClick={handleStart}>start</StandardButton>
-              <StandardButton onClick={handlePause}>{gameIsPaused ? "continue" : "pause"}</StandardButton>
-              <StandardButton onClick={handleReset}>reset</StandardButton>
-            </ButtonContainer>
-            <ButtonContainer>         
-             <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, setInfoIsShown: !setInfoIsShown })}>
-                set info
-              </BiggerButton>
-              <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown, resultIsShown: false })} >
-                highscore
-              </BiggerButton>
-            </ButtonContainer>
-            {setInfoIsShown && 
-            <SetInfo>
-              Cards: {cardSet.setList.length}
-              <br></br>
-              MaxSize: {cardSet.setList.length *2}
-              <br></br>
+            <StandardLabel htmlFor="delayTime">Delay time<StyledNrInput name="delayTime" id="delayTime" type="number" min={400} max={8000} step="100"
+              onChange={(event) => setOptions({ ...options, delayTime: event.target.value })} value={delayTime} /> ms</StandardLabel>
+            <br />
+            <StandardLabel htmlFor="cardColumns">Size 4 x <SmallerNrInput name="cardColumns" id="cardColumns" type="number" min={4} max={8}
+              onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
+          <FlexRowWrapper> Timer:</FlexRowWrapper>
+          <br />
+
+            <SmallerHeadline>Controls </SmallerHeadline>
+            <FlexColumnWrapper>
+              <ButtonContainer>
+                <StandardButton onClick={handleStart}>start</StandardButton>
+                <StandardButton onClick={handlePause}>{gameIsPaused ? "continue" : "pause"}</StandardButton>
+                <StandardButton onClick={handleReset}>reset</StandardButton>
+              </ButtonContainer>
+              <ButtonContainer>
+                <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, setInfoIsShown: !setInfoIsShown })}>
+                  set info
+                </BiggerButton>
+                <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown, resultIsShown: false })} >
+                  highscore
+                </BiggerButton>
+              </ButtonContainer>
+              {setInfoIsShown &&
+                <SetInfo>
+                  Cards: {cardSet.setList.length}
+                  <br></br>
+                  MaxSize: {cardSet.setList.length * 2}
+                  <br></br>
                   Type: {typeOfSet}</SetInfo>}
-          </FlexColumnWrapper>
-          <p>  </p>
-          <Timer timespan={timespan} />
+            </FlexColumnWrapper>
+            <br />
+            <Timer timespan={timespan} />
+          </>}
         </LeftSide>
         <SquareSection $height={cardSectionHeight} $addColumns={cardColumns - 4} $fraction="1fr " $shiftRight={shiftRight * (cardColumns - 4)} >
           {running === true ? (squareState.map((square, index) =>

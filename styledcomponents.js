@@ -1,6 +1,5 @@
 import styled from "styled-components";
-
-
+ 
 const StyledMain = styled.main`
  display: grid;
   grid-template-columns: 194px 800px;
@@ -21,7 +20,6 @@ grid-column: 1 / span 3;
 display: flex;
 flex-direction: row; 
   margin: .5rem; 
-  width: 1040px;
   width: ${({ $upperWidth }) => $upperWidth};
   height: 100%;
   border-radius: 4px;
@@ -41,6 +39,18 @@ padding: .5rem;
   background-color: rgb(240 130 0 / 30%);
   border: 1px solid black;
   border-radius: 4px;
+`;
+
+const HighScoreContainer = styled.div`
+  position: absolute;
+  padding: 0;
+  top: 92px;
+  left: 210px;
+  margin: .5rem; 
+  width: ${({ $width }) => `${$width +2}px`};
+  height: fit-content;
+  border-radius: 4px;
+  z-index: 2;
 `;
 
 const TitleContainer = styled.div`
@@ -187,7 +197,7 @@ min-width: fit-content;
 min-height: 2rem;
 border-radius: 4px;
 border: 1px solid darkorange;
-background-color: white;
+background-color: #fffffc;
 `;
 
 const SmallerButton = styled(StandardButton)`
@@ -211,7 +221,6 @@ min-height: 2rem;
 margin: .2rem;
 padding: .2rem;
 background-color: white;
-
 `;
 
 const SetInfo = styled.p`
@@ -286,7 +295,8 @@ export {
     TitleContainer,
     UpperSection,
   FlexRowWrapper,
-    FlexColumnWrapper,
+  FlexColumnWrapper,
+    HighScoreContainer,
     MessageSlot,
     Placeholder,
     SmallerHeadline,
