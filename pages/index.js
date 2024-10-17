@@ -147,7 +147,7 @@ export default function HomePage() {
   // card rows = 4 for now, 4 <= cardColumns <= 8 
   function generateCardsArray(cardRows, cardColumns, shuffle, cardSet) {
     const numberOfSquares = cardColumns * cardRows;
-    console.log(numberOfSquares);
+
     const cardNumbers = [...Array(numberOfSquares).keys()];
 
     function shuffleArray(array) {
@@ -161,11 +161,10 @@ export default function HomePage() {
     }
     const { setName, typeOfSet, setList } = cardSet;
     shuffleArray(setList);
-    console.log("setList vor error", setList);
+
     //may need to made clearer and better expandable (react to more sets) with future update
     const cardsArray = cardNumbers.map((number) => {
       const ASCIIDualFront = setName.includes("Dual") ? (number % 2 === 0 ? setList[Math.floor(number / 2)].half2 : setList[Math.floor(number / 2)].half1) : "no front";
-      console.log(ASCIIDualFront);
       const frontASCII = setName.includes("Dual")? ASCIIDualFront : setList[Math.floor(number / 2)];
       const frontImage = `${setName}-${setList[Math.floor(number / 2)]}.jpg`;
       const front = typeOfSet === "img" ? frontImage : frontASCII;
