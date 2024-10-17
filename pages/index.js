@@ -68,8 +68,8 @@ const DevButtonContainer = styled.div`
 `;
 
 export default function HomePage() {
-  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, optionsAreShown: true, highscoreIsShown: false, setInfoIsShown: false, resultIsShown: false });
-  const { introIsShown, mainIsShown, optionsAreShown,  highscoreIsShown, setInfoIsShown, resultIsShown } = whatIsShown;
+  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, optionsAreShown: true, highscoreIsShown: false, setInfoIsShown: false, resultIsShown: false, timerWanted: true });
+  const { introIsShown, mainIsShown, optionsAreShown,  highscoreIsShown, setInfoIsShown, resultIsShown, timerWanted } = whatIsShown;
   const [devMode, setDevMode] = useState(false);
   const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
   const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
@@ -147,7 +147,8 @@ export default function HomePage() {
   // card rows = 4 for now, 4 <= cardColumns <= 8 
   function generateCardsArray(cardRows, cardColumns, shuffle, cardSet) {
     const numberOfSquares = cardColumns * cardRows;
-    const cardNumbers = [...Array(numberOfSquares + 1).keys()].slice(1);
+    console.log(numberOfSquares);
+    const cardNumbers = [...Array(numberOfSquares).keys()];
 
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
@@ -160,19 +161,21 @@ export default function HomePage() {
     }
     const { setName, typeOfSet, setList } = cardSet;
     shuffleArray(setList);
-    
+    console.log("setList vor error", setList);
     //may need to made clearer and better expandable (react to more sets) with future update
     const cardsArray = cardNumbers.map((number) => {
-      const ASCIIDualFront = setName.includes("Dual")? (number % 2 === 0 ? setList[number - 2].half2 : setList[number - 1].half1) : "not needed";
-      const frontASCII = setName.includes("Dual")? ASCIIDualFront : setList[Math.ceil(number / 2)];
-      const frontImage = `${setName}-${setList[Math.ceil(number / 2)]}.jpg`;
+      const ASCIIDualFront = setName.includes("Dual") ? (number % 2 === 0 ? setList[Math.floor(number / 2)].half2 : setList[Math.floor(number / 2)].half1) : "no front";
+      console.log(ASCIIDualFront);
+      const frontASCII = setName.includes("Dual")? ASCIIDualFront : setList[Math.floor(number / 2)];
+      const frontImage = `${setName}-${setList[Math.floor(number / 2)]}.jpg`;
       const front = typeOfSet === "img" ? frontImage : frontASCII;
-      const pairId = setName.includes("Dual") ? Math.ceil(number / 2) : front;
+      const pairId = setName.includes("Dual") ? Math.floor(number / 2) : front;
       const cardObject = { id: number, front, pairId, back: "back", typeOfSet, isShown: false, won: false };
       return cardObject;
     });
     
     return shuffle === true ? shuffleArray(cardsArray) : cardsArray;
+
   }
   
   function handleStart() {
@@ -396,8 +399,8 @@ function noClick() {
             <br />
             <StandardLabel htmlFor="cardColumns">Size 4 x <SmallerNrInput name="cardColumns" id="cardColumns" type="number" min={4} max={8}
               onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
-          <FlexRowWrapper> Timer:</FlexRowWrapper>
-          <br />
+          <FlexRowWrapper> Timer: <SmallerButton onClick={() => setWhatIsShown({ ...whatIsShown, timerWanted: !timerWanted })} >{timerWanted? "yes" : "no"}</SmallerButton></FlexRowWrapper>
+          <br /></>}
 
             <SmallerHeadline>Controls </SmallerHeadline>
             <FlexColumnWrapper>
@@ -423,8 +426,8 @@ function noClick() {
                   Type: {typeOfSet}</SetInfo>}
             </FlexColumnWrapper>
             <br />
-            <Timer timespan={timespan} />
-          </>}
+          {timerWanted && <Timer timespan={timespan} />}
+          
         </LeftSide>
         <SquareSection $height={cardSectionHeight} $addColumns={cardColumns - 4} $fraction="1fr " $shiftRight={shiftRight * (cardColumns - 4)} >
           {running === true ? (squareState.map((square, index) =>
