@@ -1,3 +1,4 @@
+import { FlexColumnWrapper, StandardButton } from "@/styledcomponents";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
@@ -21,7 +22,7 @@ const SquarrelIntro = styled.div`
    width: 800px;
    height: 600px;
    gap: 8px;
-   margin: .5rem auto .5rem; 
+   margin: 5rem auto .5rem; 
    align-content: center;
  `;
  
@@ -33,17 +34,27 @@ const Letter = styled.div`
     margin: .5rem;
   `;
 
-export default function TitleStart({endOfIntro}) {
 
-    const [testCount, setTestCount] = useState(0);
+  const ButtonWrapper = styled.div`
+    display: block;
+    top: 70%;
+    text-align: center;
+    padding: .5rem;  
+    margin: 5rem;
+    z-index: 2;
+  `;
+
+export default function Intro({endOfIntro}) {
+
+    const [introCount, setIntroCount] = useState(0);
 
     function countLetters(delayTime, upperLimit) {
         const numbers = [...Array(upperLimit + 1).keys()].slice(1);
-        numbers.forEach((number) => setTimeout(setTestCount, delayTime * number, number));
+        numbers.forEach((number) => setTimeout(setIntroCount, delayTime * number, number));
         //make letters disappear again
         const reverseNumbers = numbers.toReversed();
         setTimeout(()=> reverseNumbers.forEach((number, index) => 
-            setTimeout(setTestCount, delayTime*index, number)
+            setTimeout(setIntroCount, delayTime*index, number)
         ), delayTime*upperLimit + 800);
         //go to main
         setTimeout(()=>endOfIntro(), delayTime*upperLimit*2 +1100);
@@ -63,7 +74,15 @@ export default function TitleStart({endOfIntro}) {
     }, [])
 
     return (
-        <IntroContainer>
-            <SquarrelIntro>{finalTitle.map((letter, index) => <Letter key={index} $isShown={testCount >= index+1 ? true : false} >{letter}</Letter>)}</SquarrelIntro>
-        </IntroContainer>)
+        <>
+            <IntroContainer>
+                <SquarrelIntro>{finalTitle.map((letter, index) =>
+                    <Letter key={index} $isShown={introCount >= index + 1 ? true : false} >{letter}</Letter>)}
+                </SquarrelIntro>
+            </IntroContainer>
+            {introCount >= 2 && <ButtonWrapper>
+            <StandardButton onClick={() => endOfIntro()}>skip intro</StandardButton>
+            </ButtonWrapper>}
+        </>
+    )
 }

@@ -3,11 +3,16 @@ import { useEffect, useState } from "react";
 import useLocalStorageState from 'use-local-storage-state'
 import { initialCardState, initialGameState, allSets, initialOptions } from "@/memoryData";
 import Card from "@/components/Card";
-import TitleStart from "@/components/TitleStart";
+import Intro from "@/components/Intro";
 import Timer from "@/components/Timer";
 import Highscore from "@/components/Highscore";
+import ResultMessage from "@/components/ResultMessage";
+
 import {
+  StyledMain,
   ButtonContainer,
+  HighScoreContainer,
+  SmallerButton,
   DevSquare,
   UpperSection,
   MessageSlot,
@@ -21,29 +26,16 @@ import {
   LeftSide,
   TitleContainer,
   FlexColumnWrapper,
+  FlexRowWrapper,
   StandardLabel,
   StyledInput,
   StyledNrInput,
+  SmallerNrInput,
   BiggerButton,
   SetInfo
 } from "@/styledcomponents";
 import { formatDuration, calculatePoints } from "@/utils";
 import { v4 as uuidv4 } from 'uuid';
-
-const StyledMain = styled.main`
- display: grid;
-  grid-template-columns: 228px 800px;
-  grid-template-rows: 78px 194px 194px 194px 194px;
-  width: 99.5%;
-  position: absolute;
-  top: -1rem;
-  left: -0.5rem;
-  gap: 8px;
-  flex-direction: row;
-  padding: 0.5rem;
-  margin: .5rem auto .5rem; 
-  align-content: center;
-`;
 
 const SquareSection = styled.section`
   display: grid;
@@ -65,8 +57,8 @@ const DevButtonContainer = styled.div`
   position: absolute;
   flex-direction: row;
   min-height: 35px;
-  top: 80px;
-  left: 100px;
+  top: 60px;
+  left: 30px;
   width: 10rem;
   height: 5rem;
   align-content: center;
@@ -75,27 +67,14 @@ const DevButtonContainer = styled.div`
   z-index: 2;
 `;
 
-const HighScoreContainer = styled.div`
-position: absolute;
-padding: 0;
-top: 92px;
-left: 244px;
-  margin: .5rem; 
-  min-width: 500px;
-  width: ${({ $height }) => `${$height}px`};
-  height: fit-content;
-  background-color: white;
-  border-radius: 4px;
-  z-index: 2;
-`;
-
 export default function HomePage() {
-  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: false, setInfoIsShown: false });
-  const { introIsShown, mainIsShown, highscoreIsShown, setInfoIsShown } = whatIsShown;
+  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, optionsAreShown: true, highscoreIsShown: false, setInfoIsShown: false, resultIsShown: false, timerWanted: true });
+  const { introIsShown, mainIsShown, optionsAreShown,  highscoreIsShown, setInfoIsShown, resultIsShown, timerWanted } = whatIsShown;
   const [devMode, setDevMode] = useState(false);
   const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
   const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
   const [squareState, setSquareState] = useState(initialCardState);
+  const [squareCount, setSquareCount] = useState(0);
   const [gameState, setGameState] = useState(initialGameState);
   const { running, cardsShown, gameWon, card0, card1 } = gameState;
   const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
@@ -108,10 +87,10 @@ export default function HomePage() {
     defaultValue: []
   })
 
-  //timer 
+  //for timer 
   const [storedInterval, setStoredInterval] = useState(0);
   const [timespan, setTimespan] = useState(0);
-
+  
   function advancedTiming(run, lapTime) {
     let newIntervalId;
      if (run === true) {
@@ -162,12 +141,14 @@ export default function HomePage() {
   const cardHeight = cardSectionHeight / 4 - 6;
   const shiftRight = cardSectionHeight / 8 + 1;
   const moreColumns = cardColumns - 4;
-  const upperWidth = `${238 + cardSectionHeight + moreColumns * (shiftRight *2)}px`;
+  const upperWidth = `${202 + cardSectionHeight + moreColumns * (shiftRight * 2)}px`;
+  const overallMaxwidth = windowWidth - 20;
 
   // card rows = 4 for now, 4 <= cardColumns <= 8 
   function generateCardsArray(cardRows, cardColumns, shuffle, cardSet) {
     const numberOfSquares = cardColumns * cardRows;
-    const cardNumbers = [...Array(numberOfSquares + 1).keys()].slice(1);
+
+    const cardNumbers = [...Array(numberOfSquares).keys()];
 
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
@@ -180,28 +161,29 @@ export default function HomePage() {
     }
     const { setName, typeOfSet, setList } = cardSet;
     shuffleArray(setList);
-    
+
     //may need to made clearer and better expandable (react to more sets) with future update
     const cardsArray = cardNumbers.map((number) => {
-      const ASCIIDualFront = setName.includes("Dual")? (number % 2 === 0 ? setList[number - 2].half2 : setList[number - 1].half1) : "not needed";
-      const frontASCII = setName.includes("Dual")? ASCIIDualFront : setList[Math.ceil(number / 2)];
-      const frontImage = `${setName}-${setList[Math.ceil(number / 2)]}.jpg`;
+      const ASCIIDualFront = setName.includes("Dual") ? (number % 2 === 0 ? setList[Math.floor(number / 2)].half2 : setList[Math.floor(number / 2)].half1) : "no front";
+      const frontASCII = setName.includes("Dual")? ASCIIDualFront : setList[Math.floor(number / 2)];
+      const frontImage = `${setName}-${setList[Math.floor(number / 2)]}.jpg`;
       const front = typeOfSet === "img" ? frontImage : frontASCII;
-      const pairId = setName.includes("Dual") ? Math.ceil(number / 2) : front;
+      const pairId = setName.includes("Dual") ? Math.floor(number / 2) : front;
       const cardObject = { id: number, front, pairId, back: "back", typeOfSet, isShown: false, won: false };
       return cardObject;
     });
     
     return shuffle === true ? shuffleArray(cardsArray) : cardsArray;
+
   }
   
   function handleStart() {
     setClickStop(false);
     setPoints(0);
-    setWhatIsShown({ ...whatIsShown, highscoreIsShown: false });
+    setWhatIsShown({ ...whatIsShown, highscoreIsShown: false, resultIsShown: false });
     setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
     setGameState({ ...initialGameState, running: true });
-    
+    giveCards(80, cardColumns * cardRows);
     setTimespan(0);
     advancedTiming(true);
     setCount({ cardCount: 0, roundCount: 1 });
@@ -309,10 +291,10 @@ export default function HomePage() {
 
           if(newScore === (cardColumns * cardRows)) {
             setMessage(`Game won in ${roundCount} rounds.`);
-            const gameWon = true;
-            setGameState({ ...gameState, running: false, gameWon});
+            setGameState({ ...gameState, running: false, gameWon: true});
             makeHighscoreEntry(timespan);
-            setWhatIsShown({ ...whatIsShown, highscoreIsShown: true });
+            setWhatIsShown({...whatIsShown, resultIsShown: true})
+          
           };
         }, timeToSee + 300)
       }
@@ -325,31 +307,19 @@ function noClick() {
   setMessage(newMessage);
 }
   
-
   function handleSelect(optionValue) {
     const chosenArray = allSets.filter((set) => set.setName === optionValue);
     const chosenSet = chosenArray[0];
     setOptions({ ...options, cardSet: chosenSet, typeOfSet: chosenSet.typeOfSet, size: chosenSet.size ? chosenSet.size : options.size });
   }
   
-
-  function calculatePoints(timespan, gameSize, rounds) {
-    const timeToBeat = gameSize === 24 ? 50000 : gameSize === 20 ? 40000 : 30000;
-    const timeBonus = timespan < timeToBeat ? Math.round((timeToBeat - timespan) / 33.3) : 0;
-    const roundsToBeat = Math.round(gameSize * 0.9);
-    const roundBonusArray = [0, 1, 2, 4, 8, 16, 32, 64]
-    const roundBonus = rounds < roundsToBeat ? roundBonusArray[(roundsToBeat - rounds)] * 100 : 0
-    const roundMalus = rounds > roundsToBeat ? (rounds - roundsToBeat) * 15 : 0;
-    const completeScore = gameSize * 15 + timeBonus + roundBonus - roundMalus;
-    return completeScore;
-}
-
   function makeHighscoreEntry(timespan) {
     const gameSize = cardColumns * cardRows;
     const timestamp = Date.now();
     const highscoreDate = new Date(timestamp).toString();
     const gameTime = formatDuration(timespan, 1);
-    const completeScore = calculatePoints(timespan, gameSize, roundCount);
+    const results = calculatePoints(timespan, gameSize, roundCount);
+    const completeScore = results.completeScore;
     const shortDate = highscoreDate.slice(4, 21);
     const newEntry = { id: uuidv4(6), timestamp, shortDate, timespan, gameTime, gameSize, rounds: roundCount, completeScore, cardSet: cardSet.setName, nameOfPlayer1 }
     setHighscore([...highscore, newEntry]);
@@ -366,11 +336,16 @@ function noClick() {
     setHighscore(newArray);
   }
 
+  function giveCards(delayTime, upperLimit) {
+    const numbers = [...Array(upperLimit).keys()];
+    numbers.forEach((number) => setTimeout(setSquareCount, delayTime * number, number));  
+}
+
   return (
     <>
-      {introIsShown && <TitleStart endOfIntro={handleEndOfIntro} />}
+      {introIsShown && <Intro endOfIntro={handleEndOfIntro} />}
       {mainIsShown && <StyledMain>
-        <UpperSection $upperWidth={upperWidth}>
+        <UpperSection $maxwidth={overallMaxwidth} $upperWidth={upperWidth}>
           <TitleContainer><DevSquare onClick={()=>setDevMode(!devMode) }>🟧</DevSquare><SquarrelTitle> SQUARREL</SquarrelTitle>
           </TitleContainer>
             <MessageSlot>{message}</MessageSlot>
@@ -381,82 +356,96 @@ function noClick() {
           </Stats>
         </UpperSection>
         <LeftSide>
+          <FlexRowWrapper>
           <SmallerHeadline>  Options </SmallerHeadline>
-          <StandardLabel htmlFor="numberOfPlayers">Number of players: <StyledNrInput  name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={3}
-            onChange={(event) => setOptions({ ...options, numberOfPlayers: event.target.value })} value={numberOfPlayers} /></StandardLabel>
+            <SmallerButton onClick={() => setWhatIsShown({ ...whatIsShown, optionsAreShown: !optionsAreShown })} >{optionsAreShown ? "▲" : "▼"}</SmallerButton>
+           
+            </FlexRowWrapper> 
+          {optionsAreShown && <><StandardLabel htmlFor="numberOfPlayers">Nr. of players:
+            <SmallerNrInput name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={3}
+              onChange={(event) => setOptions({ ...options, numberOfPlayers: event.target.value })} value={numberOfPlayers} />
+          </StandardLabel><br />
    
-          <StandardLabel htmlFor="nameOfPlayer1">Player1: <StyledInput name="nameOfPlayer1" id="nameOfPlayer1" 
-            onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer1} /></StandardLabel>
+            <StandardLabel htmlFor="nameOfPlayer1">Player1: <StyledInput name="nameOfPlayer1" id="nameOfPlayer1"
+              onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer1} /></StandardLabel><br />
         
-          {numberOfPlayers >= 2 && <StandardLabel htmlFor="nameOfPlayer2">Player2: <StyledInput name="nameOfPlayer2" id="nameOfPlayer2" 
-            onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer2} /></StandardLabel>
-           }
-         {numberOfPlayers >= 3 && <StandardLabel htmlFor="nameOfPlayer3">Player3: <StyledInput name="nameOfPlayer3" id="nameOfPlayer3" 
-            onChange={(event) => setOptions({ ...options, nameOfPlayer3: event.target.value })} value={nameOfPlayer3} /></StandardLabel>
-         }
-          <StandardLabel htmlFor="selectSet"  >Set:
-            <StyledSelect aria-label="Choose a set of cards" id="selectSet"
-              name="selectSet" value={`${cardSet.setName}`} onChange={(event) => handleSelect(event.target.value)}
-            >
-              <option value={""}>--Please choose a card set--</option>
-              <option value="euAnimals">European animals (b&w)</option>
-              <option value="wolfpack">Cult of wolves (b&w)</option>
-              <option value="afrAnimals">African animals (colour)</option>
-              <option value="happy">Being happy (colour)</option>
-              <option value="darkrpg">RPG characters (colour)</option>
-              <option value="ABCSet">Capital letters</option>
-              <option value="abcDualSet">Two kinds of letters</option>
-              <option value="smallNumbers">Small numbers</option>
-              <option value="htmlSet">HTML opening tags</option>
-              <option value="htmlDualSet">HTML tag pairs</option>
-            </StyledSelect>
-          </StandardLabel>
+            {numberOfPlayers >= 2 && <StandardLabel htmlFor="nameOfPlayer2">Player2: <StyledInput name="nameOfPlayer2" id="nameOfPlayer2"
+              onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer2} /></StandardLabel>
+            }
+            {numberOfPlayers >= 3 && <StandardLabel htmlFor="nameOfPlayer3">Player3: <StyledInput name="nameOfPlayer3" id="nameOfPlayer3"
+              onChange={(event) => setOptions({ ...options, nameOfPlayer3: event.target.value })} value={nameOfPlayer3} /></StandardLabel>
+            }
+            <StandardLabel htmlFor="selectSet">
+              <StyledSelect aria-label="Choose a set of cards" id="selectSet"
+                name="selectSet" value={`${cardSet.setName}`} onChange={(event) => handleSelect(event.target.value)}
+              >
+                <option value={""}>--Please choose a card set--</option>
+                <option value="euAnimals">European animals (b&w)</option>
+                <option value="wolfpack">Cult of wolves (b&w)</option>
+                <option value="afrAnimals">African animals (colour)</option>
+                <option value="happy">Being happy (colour)</option>
+                <option value="darkrpg">RPG characters (colour)</option>
+                <option value="ABCSet">Capital letters</option>
+                <option value="abcDualSet">Two kinds of letters</option>
+                <option value="smallNumbers">Small numbers</option>
+                <option value="htmlSet">HTML opening tags</option>
+                <option value="htmlDualSet">HTML tag pairs</option>
+              </StyledSelect>
+            </StandardLabel>
        
-          <StandardLabel htmlFor="delayTime">Delay time<StyledNrInput name="delayTime" id="delayTime" type="number" min={400} max={8000} step="100"
-            onChange={(event) => setOptions({ ...options, delayTime: event.target.value })} value={delayTime} /> ms</StandardLabel>
-          <br/>
-          <StandardLabel htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={8}
-            onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
-          <p></p>
-          <SmallerHeadline>Controls </SmallerHeadline>
-          <FlexColumnWrapper>
-            <ButtonContainer>
-              <StandardButton onClick={handleStart}>start</StandardButton>
-              <StandardButton onClick={handlePause}>{gameIsPaused ? "continue" : "pause"}</StandardButton>
-              <StandardButton onClick={handleReset}>reset</StandardButton>
-            </ButtonContainer>
-            <ButtonContainer>         
-             <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, setInfoIsShown: !setInfoIsShown })}>
-                {setInfoIsShown ? "hide Setinfo" : "show Setinfo"}
-              </BiggerButton>
-              <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} >
-                {highscoreIsShown ? "hide scores" : "show scores"}
-              </BiggerButton>
-            </ButtonContainer>
-            {setInfoIsShown && 
-            <SetInfo>
-              Cards: {cardSet.setList.length}
-              <br></br>
-              MaxSize: {cardSet.setList.length *2}
-              <br></br>
+            <StandardLabel htmlFor="delayTime">Delay time<StyledNrInput name="delayTime" id="delayTime" type="number" min={400} max={8000} step="100"
+              onChange={(event) => setOptions({ ...options, delayTime: event.target.value })} value={delayTime} /> ms</StandardLabel>
+            <br />
+            <StandardLabel htmlFor="cardColumns">Size 4 x <SmallerNrInput name="cardColumns" id="cardColumns" type="number" min={4} max={8}
+              onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
+          <FlexRowWrapper> Timer: <SmallerButton onClick={() => setWhatIsShown({ ...whatIsShown, timerWanted: !timerWanted })} >{timerWanted? "yes" : "no"}</SmallerButton></FlexRowWrapper>
+          <br /></>}
+
+            <SmallerHeadline>Controls </SmallerHeadline>
+            <FlexColumnWrapper>
+              <ButtonContainer>
+                <StandardButton onClick={handleStart}>start</StandardButton>
+                <StandardButton onClick={handlePause}>{gameIsPaused ? "continue" : "pause"}</StandardButton>
+                <StandardButton onClick={handleReset}>reset</StandardButton>
+              </ButtonContainer>
+              <ButtonContainer>
+                <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, setInfoIsShown: !setInfoIsShown })}>
+                  set info
+                </BiggerButton>
+                <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown, resultIsShown: false })} >
+                  highscore
+                </BiggerButton>
+              </ButtonContainer>
+              {setInfoIsShown &&
+                <SetInfo>
+                  Cards: {cardSet.setList.length}
+                  <br></br>
+                  MaxSize: {cardSet.setList.length * 2}
+                  <br></br>
                   Type: {typeOfSet}</SetInfo>}
-          </FlexColumnWrapper>
-          <p>  </p>
-          <Timer timespan={timespan} />
+            </FlexColumnWrapper>
+            <br />
+          {timerWanted && <Timer timespan={timespan} />}
+          
         </LeftSide>
         <SquareSection $height={cardSectionHeight} $addColumns={cardColumns - 4} $fraction="1fr " $shiftRight={shiftRight * (cardColumns - 4)} >
-          {running === true ? (squareState.map((square) =>
-            <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id}
+          {running === true ? (squareState.map((square, index) =>
+            <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id} isVisible={squareCount >= index ? true : false}
               front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet}
               setName={cardSet.setName} clickStop={clickStop} size={size} cardHeight={cardHeight} />)) : null}
         </SquareSection>
-        <HighScoreContainer>
-          {highscoreIsShown && <Highscore cardSectionHeight={cardSectionHeight} highscore={highscore} devMode={devMode} clickedDelete={handleDelete} highscoreIsShown={highscoreIsShown}
+        <HighScoreContainer $width={cardSectionHeight}>
+          {resultIsShown &&
+            <ResultMessage closeResult={() => setWhatIsShown({ ...whatIsShown, resultIsShown: false })} roundCount={roundCount} timespan={timespan} gameSize={cardColumns * cardRows} />
+          }
+          {highscoreIsShown &&
+            <Highscore cardSectionHeight={cardSectionHeight} highscore={highscore} devMode={devMode} clickedDelete={handleDelete} highscoreIsShown={highscoreIsShown}
             clickedChangeShow={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} />}
         </HighScoreContainer> 
         {devMode && <DevButtonContainer>
             <DebugButton onClick={showDebugInfo}>log</DebugButton>
             <DebugButton onClick={handleHighscoreReset}>resetHs</DebugButton>
+            <DebugButton onClick={()=>setWhatIsShown({...whatIsShown, resultIsShown: !resultIsShown})}>result</DebugButton>
           </DevButtonContainer>}
       </StyledMain>
       }
