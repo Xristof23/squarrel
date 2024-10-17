@@ -1,4 +1,4 @@
-import { StandardButton, SmallerHeadline, DeleteButton, FlexRowWrapper, StyledNrInput } from "@/styledcomponents";
+import { SmallerButton, SmallerHeadline, SmallerNrInput, DeleteButton, FlexRowWrapper, StyledNrInput } from "@/styledcomponents";
 import { sortEntries} from "@/utils";
 import { useState } from "react";
 import styled from "styled-components";
@@ -12,6 +12,7 @@ const HighscoreSection = styled.section`
   align-items: center;
   border-radius: 4px;
   justify-content: center;
+  background-color: rgb(240 130 0 / 30%);
   border: 1px solid black;
 `;
 
@@ -54,19 +55,6 @@ width: 100%;
 text-align: right;
 `;
 
-const SmallerButton = styled(StandardButton)`
-font-size: .8rem;
-position: relative;
-bottom: 2px;
-line-height: .8rem;
-margin: .3rem;
-padding: 2px;
-font-weight: 500;
-height: 20px;
-min-height: .9rem;
-min-width: 2.5rem;
-width: fit-content;
-`;
 
 const SmallerLabel = styled.label`
   font-size: .8rem;
@@ -78,14 +66,7 @@ const SmallerLabel = styled.label`
   height: 1.4rem;
 `;
 
-const SmallerNrInput = styled(StyledNrInput)`
- min-height: .8rem;
- height: 1.2rem;
-  width: 3.3rem;
-  margin: .3rem;
-  padding: .2rem;
-  border-radius: 4px;
-`;
+
 
 export default function Highscore({ highscore, devMode, clickedDelete, highscoreIsShown, clickedChangeShow, cardSectionHeight }) {
     const [sortValue, setSortValue] = useState("gameTime");

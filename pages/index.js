@@ -9,6 +9,7 @@ import Highscore from "@/components/Highscore";
 import ResultMessage from "@/components/ResultMessage";
 
 import {
+  StyledMain,
   ButtonContainer,
   DevSquare,
   UpperSection,
@@ -27,27 +28,12 @@ import {
   StandardLabel,
   StyledInput,
   StyledNrInput,
+  SmallerNrInput,
   BiggerButton,
   SetInfo
 } from "@/styledcomponents";
 import { formatDuration, calculatePoints } from "@/utils";
 import { v4 as uuidv4 } from 'uuid';
-
-const StyledMain = styled.main`
- display: grid;
-  grid-template-columns: 228px 800px;
-  grid-template-rows: 78px 194px 194px 194px 194px;
-  width: 99.5%;
-  position: absolute;
-  top: -1rem;
-  left: -0.5rem;
-  gap: 8px;
-  flex-direction: row;
-  padding: 0.5rem;
-  margin: .5rem auto .5rem; 
-  align-content: center;
-  
-`;
 
 const SquareSection = styled.section`
   display: grid;
@@ -83,15 +69,13 @@ const HighScoreContainer = styled.div`
   position: absolute;
   padding: 0;
   top: 92px;
-  left: 244px;
+  left: 210px;
   margin: .5rem; 
-  width: ${({ $width }) => `${$width}px`};
+  width: ${({ $width }) => `${$width +2}px`};
   height: fit-content;
   border-radius: 4px;
   z-index: 2;
 `;
-
-
 
 export default function HomePage() {
   const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: false, setInfoIsShown: false, resultIsShown: false });
@@ -167,7 +151,8 @@ export default function HomePage() {
   const cardHeight = cardSectionHeight / 4 - 6;
   const shiftRight = cardSectionHeight / 8 + 1;
   const moreColumns = cardColumns - 4;
-  const upperWidth = `${238 + cardSectionHeight + moreColumns * (shiftRight *2)}px`;
+  const upperWidth = `${238 + cardSectionHeight + moreColumns * (shiftRight * 2)}px`;
+  const overallMaxwidth = windowWidth - 20;
 
   // card rows = 4 for now, 4 <= cardColumns <= 8 
   function generateCardsArray(cardRows, cardColumns, shuffle, cardSet) {
@@ -317,7 +302,7 @@ export default function HomePage() {
             setGameState({ ...gameState, running: false, gameWon: true});
             makeHighscoreEntry(timespan);
             setWhatIsShown({...whatIsShown, resultIsShown: true})
-            // setWhatIsShown({ ...whatIsShown, highscoreIsShown: true });
+          
           };
         }, timeToSee + 300)
       }
@@ -336,7 +321,6 @@ function noClick() {
     setOptions({ ...options, cardSet: chosenSet, typeOfSet: chosenSet.typeOfSet, size: chosenSet.size ? chosenSet.size : options.size });
   }
   
-
   function makeHighscoreEntry(timespan) {
     const gameSize = cardColumns * cardRows;
     const timestamp = Date.now();
@@ -365,12 +349,11 @@ function noClick() {
     numbers.forEach((number) => setTimeout(setSquareCount, delayTime * number, number));  
 }
 
-
   return (
     <>
       {introIsShown && <Intro endOfIntro={handleEndOfIntro} />}
       {mainIsShown && <StyledMain>
-        <UpperSection $upperWidth={upperWidth}>
+        <UpperSection $maxwidth={overallMaxwidth} $upperWidth={upperWidth}>
           <TitleContainer><DevSquare onClick={()=>setDevMode(!devMode) }>🟧</DevSquare><SquarrelTitle> SQUARREL</SquarrelTitle>
           </TitleContainer>
             <MessageSlot>{message}</MessageSlot>
@@ -382,11 +365,13 @@ function noClick() {
         </UpperSection>
         <LeftSide>
           <SmallerHeadline>  Options </SmallerHeadline>
-          <StandardLabel htmlFor="numberOfPlayers">Number of players: <StyledNrInput  name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={3}
-            onChange={(event) => setOptions({ ...options, numberOfPlayers: event.target.value })} value={numberOfPlayers} /></StandardLabel>
+          <StandardLabel htmlFor="numberOfPlayers">Nr. of players:
+            <SmallerNrInput name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={3}
+            onChange={(event) => setOptions({ ...options, numberOfPlayers: event.target.value })} value={numberOfPlayers} />
+          </StandardLabel><br />
    
           <StandardLabel htmlFor="nameOfPlayer1">Player1: <StyledInput name="nameOfPlayer1" id="nameOfPlayer1" 
-            onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer1} /></StandardLabel>
+            onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer1} /></StandardLabel><br />
         
           {numberOfPlayers >= 2 && <StandardLabel htmlFor="nameOfPlayer2">Player2: <StyledInput name="nameOfPlayer2" id="nameOfPlayer2" 
             onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer2} /></StandardLabel>
@@ -394,7 +379,7 @@ function noClick() {
          {numberOfPlayers >= 3 && <StandardLabel htmlFor="nameOfPlayer3">Player3: <StyledInput name="nameOfPlayer3" id="nameOfPlayer3" 
             onChange={(event) => setOptions({ ...options, nameOfPlayer3: event.target.value })} value={nameOfPlayer3} /></StandardLabel>
          }
-          <StandardLabel htmlFor="selectSet"  >Set:
+          <StandardLabel htmlFor="selectSet">
             <StyledSelect aria-label="Choose a set of cards" id="selectSet"
               name="selectSet" value={`${cardSet.setName}`} onChange={(event) => handleSelect(event.target.value)}
             >
@@ -415,7 +400,7 @@ function noClick() {
           <StandardLabel htmlFor="delayTime">Delay time<StyledNrInput name="delayTime" id="delayTime" type="number" min={400} max={8000} step="100"
             onChange={(event) => setOptions({ ...options, delayTime: event.target.value })} value={delayTime} /> ms</StandardLabel>
           <br/>
-          <StandardLabel htmlFor="cardColumns">Size 4 x <input name="cardColumns" id="cardColumns" type="number" min={4} max={8}
+          <StandardLabel htmlFor="cardColumns">Size 4 x <SmallerNrInput name="cardColumns" id="cardColumns" type="number" min={4} max={8}
             onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
           <p></p>
           <SmallerHeadline>Controls </SmallerHeadline>
@@ -427,10 +412,10 @@ function noClick() {
             </ButtonContainer>
             <ButtonContainer>         
              <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, setInfoIsShown: !setInfoIsShown })}>
-                {setInfoIsShown ? "hide Setinfo" : "show Setinfo"}
+                set info
               </BiggerButton>
-              <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} >
-                {highscoreIsShown ? "hide scores" : "show scores"}
+              <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown, resultIsShown: false })} >
+                highscore
               </BiggerButton>
             </ButtonContainer>
             {setInfoIsShown && 
@@ -452,13 +437,10 @@ function noClick() {
         </SquareSection>
         <HighScoreContainer $width={cardSectionHeight}>
           {resultIsShown &&
-            <><ResultMessage roundCount={roundCount} timespan={timespan} gameSize={cardColumns * cardRows} />
-            <FlexRowWrapper>
-              <BiggerButton onClick={handleStart}>start new game</BiggerButton>
-              <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: true, resultIsShown: false })}>show highscores</BiggerButton>
-             </FlexRowWrapper></>}
-  
-          {highscoreIsShown && <Highscore cardSectionHeight={cardSectionHeight} highscore={highscore} devMode={devMode} clickedDelete={handleDelete} highscoreIsShown={highscoreIsShown}
+            <ResultMessage closeResult={() => setWhatIsShown({ ...whatIsShown, resultIsShown: false })} roundCount={roundCount} timespan={timespan} gameSize={cardColumns * cardRows} />
+          }
+          {highscoreIsShown &&
+            <Highscore cardSectionHeight={cardSectionHeight} highscore={highscore} devMode={devMode} clickedDelete={handleDelete} highscoreIsShown={highscoreIsShown}
             clickedChangeShow={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} />}
         </HighScoreContainer> 
         {devMode && <DevButtonContainer>

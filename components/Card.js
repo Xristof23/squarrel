@@ -67,7 +67,7 @@ export default function Card({ id, front, isVisible, isShown, onTurn, noTurn, wo
           {isShown ? (typeOfSet === "img" ?
             <CardImage $height={cardHeight - 4} src={`/images/${setName}/${front}`} alt={altString} /> :
             <LilSquareFront $height={cardHeight} $size={size}>{front}</LilSquareFront>) :
-            <CardImage $height={cardHeight} src="\images\SquarrelBackFarbe.png" />}</LilSquareContainer>   
+            <CardImage $height={cardHeight -4 } src="\images\SquarrelBackFarbe.png" />}</LilSquareContainer>   
       </>)
   }
 }

@@ -3,18 +3,17 @@ import styled from "styled-components";
 
 const StyledMain = styled.main`
  display: grid;
-  grid-template-columns: 200px 800px;
-  grid-template-rows: 120px 200px 200px 200px 200px
-  gap: 8px;
-  min-width: 1008px;
-  max-width: 1008px;
+  grid-template-columns: 194px 800px;
+  grid-template-rows: 78px 194px 194px 194px 194px;
+  width: 99.5%;
   position: absolute;
-  top: 0;
-  left: 0.5rem;
+  top: -1rem;
+  left: -0.5rem;
+  gap: 8px;
   flex-direction: row;
   padding: 0.5rem;
   margin: .5rem auto .5rem; 
-  align-content: center;
+  align-content: center;  
 `;
 
 const UpperSection = styled.section`
@@ -26,28 +25,40 @@ flex-direction: row;
   width: ${({ $upperWidth }) => $upperWidth};
   height: 100%;
   border-radius: 4px;
-    background-color: #99CCEE;
+    background-color: rgb(240 130 0 / 30%);
   border: 1px solid black;
   border-radius: 4px;
   align-items: center;
+`;
+
+const LeftSide = styled.div`
+grid-row: 2 / span 4;   
+padding: .5rem;
+  margin: .5rem; 
+  // min-width: 50px;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(240 130 0 / 30%);
+  border: 1px solid black;
+  border-radius: 4px;
 `;
 
 const TitleContainer = styled.div`
   display: flex;
   flex-grow: 0;
   flex-direction: row; 
-  min-width: 228px;
-  width: 228px;
+  min-width: 194px;
+  width: 194px;
   min-height: 54px;
   border-radius: 4px;
 `;
 
 const SquarrelTitle = styled.div`
-    font-size: 1.9rem;    
+    font-size: 1.5rem;    
     text-align: right;
     font-weight: 800;
     flex-grow: 1;
-    line-height: 54px;
+    line-height: 48px;
     padding-right: .5rem;  
     margin: .5rem;
     border-radius: 4px;
@@ -68,14 +79,14 @@ const MessageSlot = styled.div`
  color: black;
  flex-grow: 1;
  font-weight: 400;
- background-color: orange;
+ background-color: rgb(240 130 0 / 70%);
  min-width: 400px;
  width: 40%;
  height: 80%;
  margin: .5rem;
  padding: 0.3rem;
  border-radius: 4px;
- border: 2px solid darkorange;
+ border: 1px solid rgb(240 130 0 / 100%);
 `;
 
 const Stats = styled.div`
@@ -101,18 +112,6 @@ padding: .5rem;
   border-radius: 4px;
 `;
 
-const LeftSide = styled.div`
-grid-row: 2 / span 4;   
-padding: .5rem;
-  margin: .5rem; 
-  min-width: 100px;
-  width: 100%;
-  height: 100%;
-  background-color: #99CCEE;
-  border: 1px solid black;
-  border-radius: 4px;
-`;
-
 const Placeholder= styled.div`
   display: flex;
   flex-direction: row;
@@ -128,10 +127,16 @@ const Placeholder= styled.div`
 
 //Form
 const StandardLabel = styled.label`
-  font-size: 0.9rem;
-  width: 90%;
+  font-size: 0.95rem;
+  width: 95%;
   margin: .5rem .5rem 1rem 0rem;
   padding: .2rem;
+`;
+
+const StyledSelect = styled.select`
+ padding: .3rem;
+ width: 95%;
+margin: 0.3rem .3rem .3rem 0; 
 `;
 
 const StyledNrInput = styled.input`
@@ -142,22 +147,28 @@ const StyledNrInput = styled.input`
   border-radius: 4px;
 `;
 
-const StyledInput = styled.input`
-  min-width: 3.5rem;
-  width: 66%;
-  margin: 0.3rem;
+const SmallerNrInput = styled(StyledNrInput)`
+ min-height: .8rem;
+ height: 1.2rem;
+  width: 3.3rem;
+  margin: .3rem;
   padding: .2rem;
+  border-radius: 4px;
 `;
 
-
-
+const StyledInput = styled.input`
+  min-width: 3rem;
+  width: 60%;
+  margin: .2rem;
+  padding: .2rem;
+`;
 
 //Buttons
 const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
-  min-height: 1.5rem;
-  width: 15rem;
+  min-height: fit-content;
+  width: 100%;
   height: 3rem;
   align-content: center;
   align-items: flex-start;
@@ -165,23 +176,42 @@ const ButtonContainer = styled.div`
 `;
 
 const StandardButton = styled.button`
-font-size: 0.95rem;
+text-align: center;
+font-size: 1rem;
 font-weight: 400; 
+flex-grow: 1;
 margin: 0.2rem;
-padding: 0.2rem;
-width: 4rem;
-min-width: 3.5rem;
+padding: 0.4rem;
+width: 2.5rem;
+min-width: fit-content;
 min-height: 2rem;
 border-radius: 4px;
 border: 1px solid darkorange;
 background-color: white;
 `;
 
+const SmallerButton = styled(StandardButton)`
+font-size: .8rem;
+flex-grow: 0;
+position: relative;
+bottom: 2px;
+line-height: .8rem;
+margin: .3rem;
+padding: 2px;
+min-height: .9rem;
+min-width: fit-content;
+width: 30px;
+`;
+
 const BiggerButton = styled(StandardButton)`
-width: 6.2rem;
+width: 4rem;
+flex-grow: 1; 
+min-width: fit-content;
 min-height: 2rem;
 margin: .2rem;
 padding: .2rem;
+background-color: white;
+
 `;
 
 const SetInfo = styled.p`
@@ -218,6 +248,10 @@ border: 1px solid grey;
 background-color: lightgray;
 `;
 
+
+
+
+
 //wrapper
 const FlexRowWrapper = styled.div`
     display: flex;
@@ -244,24 +278,6 @@ text-align: left;
 `;
 
 
-const SquareSectionStatic = styled.section`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr 1fr;
-  gap: 0.12rem;
-  width: 936px;
-  height: 936px;
-  margin: .5rem;
-  align-items: center;
-  border-radius: 4px;
-  justify-content: center;
-`;
-
-const StyledSelect = styled.select`
- padding: .3rem;
-  margin: .3rem; 
-`;
-
 export {
     ButtonContainer,
     DevSquare,
@@ -274,14 +290,15 @@ export {
     MessageSlot,
     Placeholder,
     SmallerHeadline,
-    SquareSectionStatic,
     StatLine,
   Stats,
   StyledInput,
   StyledNrInput,
+  SmallerNrInput,
     StandardLabel,
     StyledSelect,
-    StandardButton,
+  StandardButton,
+    SmallerButton,
   SquarrelTitle, 
     BiggerButton,
     DebugButton,
