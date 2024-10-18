@@ -56,7 +56,7 @@ export default function Card({ id, front, isVisible, isShown, onTurn, noTurn, wo
         <LilSquareContainer $isVisible={isVisible} $height={cardHeight} onClick={() => handleCardClick(id, clickStop)
         }>
           {isShown ? (typeOfSet === "img" ?
-            <CardImage $height={cardHeight - 4} src={`/images/${setName}/${front}`} alt={altString} /> :
+            <CardImage $height={cardHeight - 4} src={`/images/${setName}/${front}.jpg`} alt={altString} /> :
             <LilSquareFront $height={cardHeight} $size={size}>{front}</LilSquareFront>) :
             <CardImage $height={cardHeight -4 } src="\images\SquarrelBackFarbe.png" />}</LilSquareContainer>   
       </>)

@@ -160,7 +160,7 @@ const StandardLabel = styled.label`
 
 const StyledSelect = styled.select`
  padding: .3rem;
- width: 95%;
+ width: 98.5%;
 margin: 0.3rem .3rem .3rem 0; 
 `;
 

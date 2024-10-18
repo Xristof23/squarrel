@@ -26,7 +26,8 @@ import {
   TitleContainer,
   FlexColumnWrapper,
   BiggerButton,
-  SetInfo
+  SetInfo,
+  FlexRowWrapper
 } from "@/styledcomponents";
 import { formatDuration, calculatePoints } from "@/utils";
 import { v4 as uuidv4 } from 'uuid';
@@ -40,20 +41,20 @@ const ControlsSection = styled.section`
 `;
 
 export default function HomePage() {
-  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: false, setInfoIsShown: false, resultIsShown: false});
-  const { introIsShown, mainIsShown, optionsAreShown,  highscoreIsShown, setInfoIsShown, resultIsShown} = whatIsShown;
+  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: false, setInfoIsShown: false, resultIsShown: false });
+  const { introIsShown, mainIsShown, optionsAreShown, highscoreIsShown, setInfoIsShown, resultIsShown } = whatIsShown;
   const [devMode, setDevMode] = useState(false);
   const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
   const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, cardSet, shuffle, delayTime, typeOfSet, size, timerWanted } = options;
-  //only temp try this
-  // const cardSet = allSets[0];
+  const [activePlayer, setActivePlayer] = useState(nameOfPlayer1);
   const [squareState, setSquareState] = useState(initialCardState);
   const [squareCount, setSquareCount] = useState(0);
   const [gameState, setGameState] = useState(initialGameState);
   const { running, cardsShown, gameWon, card0, card1 } = gameState;
   const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
   const { cardCount, roundCount } = count;
-  const [points, setPoints] = useState(0);
+  const [points, setPoints] = useState({ pointsPlayer1: 0 });
+  const { pointsPlayer1, pointsPlayer2, pointsPlayer3 } = points;
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! You can now play with up to 32 cards. Wanna try?");
   const [clickStop, setClickStop] = useState(false);
   const [gameIsPaused, setGameIsPaused] = useState(false);
@@ -140,7 +141,7 @@ export default function HomePage() {
     const cardsArray = cardNumbers.map((number) => {
       const ASCIIDualFront = setName.includes("Dual") ? (number % 2 === 0 ? setList[Math.floor(number / 2)].half2 : setList[Math.floor(number / 2)].half1) : "no front";
       const frontASCII = setName.includes("Dual")? ASCIIDualFront : setList[Math.floor(number / 2)];
-      const frontImage = `${setList[Math.floor(number / 2)]}.jpg`;
+      const frontImage = setList[Math.floor(number / 2)];
       const front = typeOfSet === "img" ? frontImage : frontASCII;
       const pairId = setName.includes("Dual") ? Math.floor(number / 2) : front;
       const cardObject = { id: number, front, pairId, back: "back", typeOfSet, isShown: false, won: false };
@@ -200,11 +201,8 @@ export default function HomePage() {
     setHighscore(newArray);
   }
 
-  function cardClick(id) {
-    //may move this to Card component
-    const cardClicked = squareState.find((card) => card.id === id).front;
-    const cutLength = cardSet.setName.length + 1;
-    const cardName = typeOfSet === "img" ? cardClicked.slice(cutLength, -4) : cardClicked;
+  function cardClick(id, activeplayer) {
+    const cardName = squareState.find((card) => card.id === id).front;
 
     //counting cards and rounds etc
     if (cardsShown === 1 && card0.id === id) {
@@ -235,7 +233,7 @@ export default function HomePage() {
       const wonCardState = squareState.map((card) => 
           card.pairId === card0.pairId ? {...card, won: true} : card
          );
-      match ? setMessage("The cards match, yeah!") : setMessage("The cards do not match!");
+      match ? setMessage(`You turned card "${cardName}". The cards match, yeah!`) : setMessage(`You turned card "${cardName}". The cards do not match!`);
       match && setPoints(points + 2);  
 
       //reset CardState (squarestate) 
@@ -316,8 +314,9 @@ function noClick() {
           </TitleContainer>
             <MessageSlot>{message}</MessageSlot>
           <Stats>
-            <SmallerHeadline>Stats<br /> </SmallerHeadline>
-            <StatLine>Won cards: {points} 🟧 Round: {roundCount} 🟧
+              <SmallerHeadline>Stats</SmallerHeadline>
+           
+            <StatLine>Round: {roundCount} 🟧 Won cards: {pointsPlayer1} 🟧 {numberOfPlayers > 1 && <> Won cards: {pointsPlayer2} 🟧</>}
             </StatLine>
           </Stats>
         </UpperSection>
