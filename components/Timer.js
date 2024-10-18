@@ -1,5 +1,6 @@
-import { SmallerHeadline } from "@/styledcomponents";
+import { FlexRowWrapper, SmallerHeadline, SmallerButton } from "@/styledcomponents";
 import { formatDuration } from "@/utils";
+import { useState } from "react";
 import styled from "styled-components";
 
 const TimerSection = styled.section`
@@ -18,12 +19,18 @@ const TimeDisplay = styled.div`
     border: 1px solid darkorange;
     background-color: white;
 `;
-export default function Timer({timespan}) {
+export default function Timer({ timespan }) {
+    const [timerIsShown, setTimerIsShown] = useState(true);
+
     return(
         <TimerSection>
+            <FlexRowWrapper>
             <SmallerHeadline> Time</SmallerHeadline>
-            <TimeDisplay> {formatDuration(timespan, 1)}
-            </TimeDisplay> 
+                <SmallerButton onClick={() => setTimerIsShown(!timerIsShown)} >{timerIsShown ? "▲" : "▼"}</SmallerButton>
+                </FlexRowWrapper>
+            {timerIsShown &&
+                <TimeDisplay> {formatDuration(timespan, 1)}
+                </TimeDisplay>}
         </TimerSection>
     )
 }

@@ -10,7 +10,18 @@ margin: .5rem;
   border-radius: 5px;
 `;
 
+const CardImage = styled.img`
+  display: block;
+  height: ${({ $height }) => `${$height}px`};
+  width: ${({ $height }) => `${$height}px`};
+`;
+
+
+
 
 export default function Cardfront() {
-return <ImageContainer/>
+  return <ImageContainer>
+  
+    <CardImage />
+</ImageContainer>
 };

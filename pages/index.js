@@ -1,7 +1,8 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import useLocalStorageState from 'use-local-storage-state'
-import { initialCardState, initialGameState, allSets, initialOptions } from "@/memoryData";
+import {  allSets } from "@/memoryData";
+import { initialCardState, initialGameState, initialOptions } from "@/initialStatesAndPresets";
 import Card from "@/components/Card";
 import Intro from "@/components/Intro";
 import Timer from "@/components/Timer";
@@ -12,14 +13,12 @@ import {
   StyledMain,
   ButtonContainer,
   HighScoreContainer,
-  SmallerButton,
   DevSquare,
   UpperSection,
   MessageSlot,
   SmallerHeadline,
   StatLine,
   Stats,
-  StyledSelect,
   StandardButton,
   DebugButton,
   SquarrelTitle,
@@ -30,12 +29,15 @@ import {
   StandardLabel,
   StyledInput,
   StyledNrInput,
+  StyledSelect,
+  SmallerButton,
   SmallerNrInput,
   BiggerButton,
   SetInfo
 } from "@/styledcomponents";
 import { formatDuration, calculatePoints } from "@/utils";
 import { v4 as uuidv4 } from 'uuid';
+import GameOptions from "@/components/GameOptions";
 
 const SquareSection = styled.section`
   display: grid;
@@ -68,11 +70,13 @@ const DevButtonContainer = styled.div`
 `;
 
 export default function HomePage() {
-  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, optionsAreShown: true, highscoreIsShown: false, setInfoIsShown: false, resultIsShown: false, timerWanted: true });
-  const { introIsShown, mainIsShown, optionsAreShown,  highscoreIsShown, setInfoIsShown, resultIsShown, timerWanted } = whatIsShown;
+  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: false, setInfoIsShown: false, resultIsShown: false});
+  const { introIsShown, mainIsShown, optionsAreShown,  highscoreIsShown, setInfoIsShown, resultIsShown} = whatIsShown;
   const [devMode, setDevMode] = useState(false);
   const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
-  const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
+  const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, cardSet, shuffle, delayTime, typeOfSet, size, timerWanted } = options;
+  //only temp try this
+  // const cardSet = allSets[0];
   const [squareState, setSquareState] = useState(initialCardState);
   const [squareCount, setSquareCount] = useState(0);
   const [gameState, setGameState] = useState(initialGameState);
@@ -220,6 +224,7 @@ export default function HomePage() {
     setMessage("Game reset. Click start to begin a new game.");
   }
 
+  //umbauen auf ohne console.log evtl auslagern
   function showDebugInfo() {
     console.log("Squarestate", squareState);
     console.log("Gamestate", gameState);
@@ -341,6 +346,12 @@ function noClick() {
     numbers.forEach((number) => setTimeout(setSquareCount, delayTime * number, number));  
 }
 
+  function updateOptions(updatedOptions) {
+    
+    console.log(updatedOptions);
+    setOptions({ ...options, ...updatedOptions });
+  }
+  
   return (
     <>
       {introIsShown && <Intro endOfIntro={handleEndOfIntro} />}
@@ -356,12 +367,10 @@ function noClick() {
           </Stats>
         </UpperSection>
         <LeftSide>
-          <FlexRowWrapper>
-          <SmallerHeadline>  Options </SmallerHeadline>
-            <SmallerButton onClick={() => setWhatIsShown({ ...whatIsShown, optionsAreShown: !optionsAreShown })} >{optionsAreShown ? "▲" : "▼"}</SmallerButton>
-           
-            </FlexRowWrapper> 
-          {optionsAreShown && <><StandardLabel htmlFor="numberOfPlayers">Nr. of players:
+          <GameOptions options={options} onUpdateOptions={updateOptions}/>
+        
+          {/* <SmallerHeadline>  Options </SmallerHeadline> 
+         <StandardLabel htmlFor="numberOfPlayers">Nr. of players:
             <SmallerNrInput name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={3}
               onChange={(event) => setOptions({ ...options, numberOfPlayers: event.target.value })} value={numberOfPlayers} />
           </StandardLabel><br />
@@ -399,7 +408,7 @@ function noClick() {
             <StandardLabel htmlFor="cardColumns">Size 4 x <SmallerNrInput name="cardColumns" id="cardColumns" type="number" min={4} max={8}
               onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
           <FlexRowWrapper> Timer: <SmallerButton onClick={() => setWhatIsShown({ ...whatIsShown, timerWanted: !timerWanted })} >{timerWanted? "yes" : "no"}</SmallerButton></FlexRowWrapper>
-          <br /></>}
+          <br /> */}
 
             <SmallerHeadline>Controls </SmallerHeadline>
             <FlexColumnWrapper>
@@ -426,7 +435,6 @@ function noClick() {
             </FlexColumnWrapper>
             <br />
           {timerWanted && <Timer timespan={timespan} />}
-          
         </LeftSide>
         <SquareSection $height={cardSectionHeight} $addColumns={cardColumns - 4} $fraction="1fr " $shiftRight={shiftRight * (cardColumns - 4)} >
           {running === true ? (squareState.map((square, index) =>
