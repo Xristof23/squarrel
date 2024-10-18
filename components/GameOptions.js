@@ -21,12 +21,11 @@ export default function GameOptions({options, onUpdateOptions}) {
     onUpdateOptions(optionsObject);
   }
 
-  //eher obsolet
+
 function handleSelect(optionValue) {
   const chosenArray = allSets.filter((set) => set.setName === optionValue);
   const chosenSet = chosenArray[0];
-  console.log(optionValue);
-  // setOptions({ ...options, cardSet: chosenSet, typeOfSet: chosenSet.typeOfSet, size: chosenSet.size ? chosenSet.size : options.size });
+  handleOptions({cardSet: chosenSet, typeOfSet: chosenSet.typeOfSet, size: chosenSet.size ? chosenSet.size : options.size });
 }
 
     
@@ -38,7 +37,7 @@ function handleSelect(optionValue) {
        
         </FlexRowWrapper> 
       {optionsAreShown && <>
-        <StandardLabel htmlFor="numberOfPlayers">Nr. of players:
+        <StandardLabel htmlFor="numberOfPlayers">Players:
           <SmallerNrInput name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={3}
             onChange={(event) => handleOptions({ numberOfPlayers: event.target.value })} value={numberOfPlayers} />
         </StandardLabel>
@@ -58,10 +57,8 @@ function handleSelect(optionValue) {
             onChange={(event) => handleOptions({nameOfPlayer3: event.target.value })} value={nameOfPlayer3} />
           </StandardLabel>
         }
-
-        <SmallerHeadline>{setName}</SmallerHeadline>
         <CardSetPreview previewHeight={160} cardSet={cardSet}  /> 
-        {/* <StandardLabel htmlFor="selectSet">
+        <StandardLabel htmlFor="selectSet">
           <StyledSelect aria-label="Choose a set of cards" id="selectSet"
             name="selectSet" value={`${cardSet.setName}`} onChange={(event) => handleSelect(event.target.value)}
           >
@@ -77,7 +74,7 @@ function handleSelect(optionValue) {
             <option value="htmlSet">HTML opening tags</option>
             <option value="htmlDualSet">HTML tag pairs</option>
           </StyledSelect>
-        </StandardLabel> */}
+        </StandardLabel>
    
         <StandardLabel htmlFor="delayTime">Delay time
           <StyledNrInput aria-label="Choose the delay time" name="delayTime" id="delayTime" type="number" min={400} max={8000} step="100"

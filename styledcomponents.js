@@ -53,6 +53,21 @@ const HighScoreContainer = styled.div`
   z-index: 2;
 `;
 
+const SquareSection = styled.section`
+  display: grid;
+  position: relative;
+  grid-template-columns: 1fr 1fr 1fr 1fr ${({ $addColumns, $fraction }) => $addColumns >= 1? $fraction.repeat($addColumns) : null};
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  left: ${({ $shiftRight }) => $shiftRight ? `${$shiftRight}px` : "0px"};
+  gap: 8px;
+  height: ${({ $height }) => `${$height}px`};
+  width: ${({ $height }) => `${$height}px`};
+  margin: .5rem;
+  align-items: center;
+  border-radius: 4px;
+  justify-content: center;
+`;
+
 const TitleContainer = styled.div`
   display: flex;
   flex-grow: 0;
@@ -230,18 +245,6 @@ border: 1px solid darkorange;
 background-color: white;
 `;
 
-const DebugButton = styled(StandardButton)`
-font-size: .7rem;
-color: grey;
-padding: 0.1rem;
-width: 3rem;
-min-width: 2rem;
-min-height: 1rem;
-border-radius: 4px;
-border: 1px solid grey; 
-background-color: lightgray;
-`;
-
 const DeleteButton = styled(StandardButton)`
 color: red;
 margin: 0.2rem;
@@ -253,10 +256,6 @@ min-height: 1.5rem;
 border: 1px solid grey; 
 background-color: lightgray;
 `;
-
-
-
-
 
 //wrapper
 const FlexRowWrapper = styled.div`
@@ -296,7 +295,8 @@ export {
     HighScoreContainer,
     MessageSlot,
     Placeholder,
-    SmallerHeadline,
+  SmallerHeadline,
+    SquareSection,
     StatLine,
   Stats,
   StyledInput,
@@ -308,7 +308,6 @@ export {
     SmallerButton,
   SquarrelTitle, 
     BiggerButton,
-    DebugButton,
     DeleteButton,
   LeftSide,
     SetInfo

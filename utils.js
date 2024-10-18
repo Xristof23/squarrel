@@ -9,10 +9,18 @@ export function calculatePoints(timespan, gameSize, rounds) {
   const basePoints = 240;
   const completeScore = basePoints + timeBonus + roundBonus + roundMalus; 
   const results = {basePoints, timeToBeat, timeBonus, roundsToBeat, roundBonus, roundMalus, completeScore
-  };
-  
+  }; 
   return results;
 }
+
+export function getAltForImage(cardName) {
+  const firstLetter = cardName.slice(0, 1);
+  const vowels = ["a", "e", "i", "o", "u"];
+  const indefiniteArticle = vowels.includes(firstLetter) ? "an" : "a";
+  const altString = `An image of ${indefiniteArticle} ${cardName}`; 
+  return altString;
+}
+
 
 export function formatTo2digits(number) {
     const formattedNumber = number.toLocaleString('en-US', {

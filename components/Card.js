@@ -1,3 +1,4 @@
+import { getAltForImage } from "@/utils";
 import styled from "styled-components";
 
 const LilSquareContainer = styled.div`
@@ -41,17 +42,7 @@ const CardImage = styled.img`
 
 export default function Card({ id, front, isVisible, isShown, onTurn, noTurn, won, typeOfSet, setName, size, clickStop, cardHeight }) {
  
-  function getAltForImage() {
-    const cutLength = setName.length + 1;
-    const altName = typeOfSet === "img" ? front.slice(cutLength, -4) : front;
-    const firstLetter = altName.slice(0, 1);
-    const vowels = ["a", "e", "i", "o", "u"];
-    const indefiniteArticle = vowels.includes(firstLetter) ? "an" : "a";
-    const altString = `An image of ${indefiniteArticle} ${altName}`; 
-  return altString
-}
-
-  const altString = typeOfSet === "img" ? getAltForImage() : "";
+  const altString = typeOfSet === "img" ? getAltForImage(front) : "";
   
   function handleCardClick(id, clickStop) {
     clickStop? noTurn() : onTurn(id);
