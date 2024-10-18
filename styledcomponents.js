@@ -140,7 +140,7 @@ const StandardLabel = styled.label`
   font-size: 0.95rem;
   width: 95%;
   margin: .5rem .5rem 1rem 0rem;
-  padding: .2rem;
+  padding: 0rem;
 `;
 
 const StyledSelect = styled.select`
@@ -176,6 +176,7 @@ const StyledInput = styled.input`
 //Buttons
 const ButtonContainer = styled.div`
   display: flex;
+  gap: .4rem;
   flex-direction: row;
   min-height: fit-content;
   width: 100%;
@@ -190,11 +191,11 @@ text-align: center;
 font-size: 1rem;
 font-weight: 400; 
 flex-grow: 1;
-margin: 0.2rem;
-padding: 0.4rem;
+margin: .1rem 0 .1rem 0;
+padding: 0.3rem;
 width: 2.5rem;
 min-width: fit-content;
-min-height: 2rem;
+min-height: 1.8rem;
 border-radius: 4px;
 border: 1px solid darkorange;
 background-color: #fffffc;
@@ -215,11 +216,7 @@ width: 30px;
 
 const BiggerButton = styled(StandardButton)`
 width: 4rem;
-flex-grow: 1; 
 min-width: fit-content;
-min-height: 2rem;
-margin: .2rem;
-padding: .2rem;
 background-color: white;
 `;
 

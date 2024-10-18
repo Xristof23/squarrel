@@ -69,6 +69,13 @@ const DevButtonContainer = styled.div`
   z-index: 2;
 `;
 
+const ControlsSection = styled.section`
+  width: 100%;
+  height: fit-content;
+  border-radius: 4px;
+  margin-bottom: .5rem;
+`;
+
 export default function HomePage() {
   const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: false, setInfoIsShown: false, resultIsShown: false});
   const { introIsShown, mainIsShown, optionsAreShown,  highscoreIsShown, setInfoIsShown, resultIsShown} = whatIsShown;
@@ -312,12 +319,6 @@ function noClick() {
   setMessage(newMessage);
 }
   
-  function handleSelect(optionValue) {
-    const chosenArray = allSets.filter((set) => set.setName === optionValue);
-    const chosenSet = chosenArray[0];
-    setOptions({ ...options, cardSet: chosenSet, typeOfSet: chosenSet.typeOfSet, size: chosenSet.size ? chosenSet.size : options.size });
-  }
-  
   function makeHighscoreEntry(timespan) {
     const gameSize = cardColumns * cardRows;
     const timestamp = Date.now();
@@ -369,21 +370,7 @@ function noClick() {
         <LeftSide>
           <GameOptions options={options} onUpdateOptions={updateOptions}/>
         
-          {/* <SmallerHeadline>  Options </SmallerHeadline> 
-         <StandardLabel htmlFor="numberOfPlayers">Nr. of players:
-            <SmallerNrInput name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={3}
-              onChange={(event) => setOptions({ ...options, numberOfPlayers: event.target.value })} value={numberOfPlayers} />
-          </StandardLabel><br />
-   
-            <StandardLabel htmlFor="nameOfPlayer1">Player1: <StyledInput name="nameOfPlayer1" id="nameOfPlayer1"
-              onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer1} /></StandardLabel><br />
-        
-            {numberOfPlayers >= 2 && <StandardLabel htmlFor="nameOfPlayer2">Player2: <StyledInput name="nameOfPlayer2" id="nameOfPlayer2"
-              onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer2} /></StandardLabel>
-            }
-            {numberOfPlayers >= 3 && <StandardLabel htmlFor="nameOfPlayer3">Player3: <StyledInput name="nameOfPlayer3" id="nameOfPlayer3"
-              onChange={(event) => setOptions({ ...options, nameOfPlayer3: event.target.value })} value={nameOfPlayer3} /></StandardLabel>
-            }
+          {/* 
             <StandardLabel htmlFor="selectSet">
               <StyledSelect aria-label="Choose a set of cards" id="selectSet"
                 name="selectSet" value={`${cardSet.setName}`} onChange={(event) => handleSelect(event.target.value)}
@@ -410,6 +397,7 @@ function noClick() {
           <FlexRowWrapper> Timer: <SmallerButton onClick={() => setWhatIsShown({ ...whatIsShown, timerWanted: !timerWanted })} >{timerWanted? "yes" : "no"}</SmallerButton></FlexRowWrapper>
           <br /> */}
 
+          <ControlsSection>
             <SmallerHeadline>Controls </SmallerHeadline>
             <FlexColumnWrapper>
               <ButtonContainer>
@@ -433,7 +421,7 @@ function noClick() {
                   <br></br>
                   Type: {typeOfSet}</SetInfo>}
             </FlexColumnWrapper>
-            <br />
+            </ControlsSection>
           {timerWanted && <Timer timespan={timespan} />}
         </LeftSide>
         <SquareSection $height={cardSectionHeight} $addColumns={cardColumns - 4} $fraction="1fr " $shiftRight={shiftRight * (cardColumns - 4)} >

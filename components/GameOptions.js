@@ -2,27 +2,26 @@ import { allSets } from "@/memoryData";
 import { FlexRowWrapper, SmallerButton, SmallerNrInput, SmallerInput, StandardLabel, SmallerHeadline, StyledSelect, StyledInput, StyledNrInput } from "@/styledcomponents";
 import { useState } from "react";
 import styled from "styled-components"
-
+import CardSetPreview from "./CardSetPreview";
 
 const OptionsSection = styled.section`
   width: 100%;
   height: fit-content;
-  background-color: lightgray;
-  border: 1px solid black;
   border-radius: 4px;
   margin-bottom: .5rem;
 `;
 
-
 export default function GameOptions({options, onUpdateOptions}) {
   const [optionsAreShown, setOptionsareShown] = useState(true);
   
-  const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size, timerWanted, testNumber } = options;
-  
+  const { numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardColumns, delayTime, cardSet, typeOfSet, size, timerWanted} = options;
+  const { setName, setList } = cardSet;
+
   function handleOptions(optionsObject) {
     onUpdateOptions(optionsObject);
   }
 
+  //eher obsolet
 function handleSelect(optionValue) {
   const chosenArray = allSets.filter((set) => set.setName === optionValue);
   const chosenSet = chosenArray[0];
@@ -59,6 +58,9 @@ function handleSelect(optionValue) {
             onChange={(event) => handleOptions({nameOfPlayer3: event.target.value })} value={nameOfPlayer3} />
           </StandardLabel>
         }
+
+        <SmallerHeadline>{setName}</SmallerHeadline>
+        <CardSetPreview previewHeight={160} cardSet={cardSet}  /> 
         {/* <StandardLabel htmlFor="selectSet">
           <StyledSelect aria-label="Choose a set of cards" id="selectSet"
             name="selectSet" value={`${cardSet.setName}`} onChange={(event) => handleSelect(event.target.value)}
