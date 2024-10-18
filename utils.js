@@ -1,12 +1,17 @@
-export   function calculatePoints(timespan, gameSize, rounds) {
-  const timeToBeat = 30000 + (gameSize - 16) * 2250;
-  const timeBonus = timespan < timeToBeat ? Math.round((timeToBeat - timespan) / 33.3) : 0;
-  const roundsToBeat = Math.round(gameSize * 0.9);
-  const roundBonusArray = [0, 1, 2, 4, 8, 16, 32, 64]
-  const roundBonus = rounds < roundsToBeat ? roundBonusArray[(roundsToBeat - rounds)] * 100 : 0
-  const roundMalus = rounds > roundsToBeat ? (rounds - roundsToBeat) * 15 : 0;
-  const completeScore = gameSize * 15 + timeBonus + roundBonus - roundMalus;
-  return completeScore;
+export function calculatePoints(timespan, gameSize, rounds) {
+  const timeToBeat = 30000 + (gameSize - 16) * 2500;
+  const timeBonus = timespan < timeToBeat ? Math.round((timeToBeat - timespan) / 33.33) : 0;
+  const oldRoundsToBeat = Math.round(gameSize * 0.9);
+  const roundsToBeat = gameSize - 2;
+  const roundBonus = rounds < roundsToBeat ? (2**(roundsToBeat - rounds - 1) * 100) : 0;
+  const roundMalus = rounds > gameSize ? (gameSize - rounds) * 10 : 0;
+  const oldBasePoints = 240 + (gameSize - 16) * (13 - (gameSize - 16) / 4 + 1)
+  const basePoints = 240;
+  const completeScore = basePoints + timeBonus + roundBonus + roundMalus; 
+  const results = {basePoints, timeToBeat, timeBonus, roundsToBeat, roundBonus, roundMalus, completeScore
+  };
+  
+  return results;
 }
 
 export function formatTo2digits(number) {
