@@ -115,15 +115,19 @@ const MessageSlot = styled.div`
 `;
 
 const Stats = styled.div`
-  display: flex;
-  flex-grow: 1;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 1fr 2fr 2fr;  
 text-align: left; 
  margin: .5rem;
 padding: 0.3rem;
 min-width: 385px;
 height: 80%;
 border-radius: 4px;
+`;
+
+const StatLine = styled.span`
+margin: .5rem;
+text-align: left; 
 `;
 
 const ControlsContainer = styled.div`
@@ -277,10 +281,7 @@ font-weight: 600;
 margin: 0 0 0.4rem;
 `;
 
-const StatLine = styled.p`
-margin: 1.5rem 0 0 -2.2rem;
-text-align: left; 
-`;
+
 
 
 export {

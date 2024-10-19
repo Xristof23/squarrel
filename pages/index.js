@@ -46,15 +46,19 @@ export default function HomePage() {
   const [devMode, setDevMode] = useState(false);
   const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
   const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, cardSet, shuffle, delayTime, typeOfSet, size, timerWanted } = options;
-  const [activePlayer, setActivePlayer] = useState(nameOfPlayer1);
+  const [activePlayer, setActivePlayer] = useState("player1");
+  //test next
+  // const [activePlayer, setActivePlayer] = useState(1);
   const [squareState, setSquareState] = useState(initialCardState);
   const [squareCount, setSquareCount] = useState(0);
   const [gameState, setGameState] = useState(initialGameState);
   const { running, cardsShown, gameWon, card0, card1 } = gameState;
   const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
   const { cardCount, roundCount } = count;
-  const [points, setPoints] = useState({ pointsPlayer1: 0 });
-  const { pointsPlayer1, pointsPlayer2, pointsPlayer3 } = points;
+  const zeroPoints = [[{ player1: 0 }, { player2: 0 }, { player3: 0 }]]
+  // const [points, setPoints] = useState(zeroPoints);
+  const [points, setPoints] = useState({ player1: 0, player2: 0, player3: 0 });
+  const { player1, player2, player3 } = points;
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! You can now play with up to 32 cards. Wanna try?");
   const [clickStop, setClickStop] = useState(false);
   const [gameIsPaused, setGameIsPaused] = useState(false);
@@ -154,7 +158,7 @@ export default function HomePage() {
   
   function handleStart() {
     setClickStop(false);
-    setPoints(0);
+    setPoints({ player1: 0, player2: 0, player3: 0 });
     setWhatIsShown({ ...whatIsShown, highscoreIsShown: false, resultIsShown: false });
     setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
     setGameState({ ...initialGameState, running: true });
@@ -186,7 +190,7 @@ export default function HomePage() {
     setTimespan(0);
     setClickStop(true);
     setGameIsPaused(false);
-    setPoints(0);
+    setPoints({ player1: 0, player2: 0, player3: 0 });
     setCount({ cardCount: 0, roundCount: 1 });
     if (cardColumns > 4) {
       setWhatIsShown({ ...whatIsShown, highscoreIsShown: false })
@@ -195,13 +199,20 @@ export default function HomePage() {
     setMessage("Game reset. Click start to begin a new game.");
   }
 
- 
+
   function handleDelete(id) {
     const newArray = highscore.filter((element) => element.id != id);
     setHighscore(newArray);
   }
 
-  function cardClick(id, activeplayer) {
+  function switchPlayer() {
+    const players = ["player1", "player2", "player3"];
+    const chosenPlayers = players.slice(0, numberOfPlayers);
+    const nextPlayer = activePlayer.slice(-1) === numberOfPlayers ? "player1" : chosenPlayers[Number(activePlayer.slice(-1))];
+    setActivePlayer(nextPlayer);
+}
+  
+  function cardClick(id) {
     const cardName = squareState.find((card) => card.id === id).front;
 
     //counting cards and rounds etc
@@ -230,12 +241,22 @@ export default function HomePage() {
       const card1 = filteredState[1];
       setGameState({ ...gameState, card1: card1 });
       const match = card0.pairId === card1.pairId ? true : false;
-      const wonCardState = squareState.map((card) => 
-          card.pairId === card0.pairId ? {...card, won: true} : card
-         );
-      match ? setMessage(`You turned card "${cardName}". The cards match, yeah!`) : setMessage(`You turned card "${cardName}". The cards do not match!`);
-      match && setPoints(points + 2);  
+      const wonCardState = squareState.map((card) =>
+        card.pairId === card0.pairId ? { ...card, won: true } : card
+      );
+    //set speed
+      const timeToSee = match ? delayTime / 4 : delayTime;
 
+      if (match === true) {
+        setMessage(`You turned card "${cardName}". The cards match, yeah!`);
+        const newPoints = { ...points, [activePlayer]: points[activePlayer] + 2 };
+        setPoints(newPoints);
+        
+      } else {
+        setMessage(`You turned card "${cardName}". The cards do not match!`);
+        numberOfPlayers >1 && setTimeout(switchPlayer, timeToSee);
+      }
+    
       //reset CardState (squarestate) 
       const afterRoundCardState = match ? wonCardState : squareState;
         const resetCardState = afterRoundCardState.map((card) => {
@@ -243,15 +264,12 @@ export default function HomePage() {
             return updatedCard;
         });
         
-      //set speed
-      const timeToSee = match ? delayTime / 4 : delayTime;
-   
       //reset 1
       setTimeout(setClickStop, timeToSee, false);
       setTimeout(setSquareState, timeToSee, resetCardState);
       newSquareState = resetCardState;
       
-      //needed for check for game end (change for new points State?)
+      //needed check for game end (works for siungle and multi)
       const arrayOfWonCards = wonCardState.filter((card) => card.won === true);
       const newScore = arrayOfWonCards.length; 
       newScore === (cardColumns * cardRows) && advancedTiming(false);
@@ -261,11 +279,15 @@ export default function HomePage() {
           setGameState(afterRoundGameState);
           setMessage(match ? "You scored!" : "You may score next round!");
 
-          if(newScore === (cardColumns * cardRows)) {
-            setMessage(`Game won in ${roundCount} rounds.`);
+        if (newScore === (cardColumns * cardRows)) {
+            
+          const pointsArray = Object.values(points);
+        
+          // const winnerPlayer =
+            setMessage(`Game won after ${roundCount} rounds. Congratulations.`);
             setGameState({ ...gameState, running: false, gameWon: true});
             makeHighscoreEntry(timespan);
-            setWhatIsShown({...whatIsShown, resultIsShown: true})
+            numberOfPlayers <=1 && setWhatIsShown({...whatIsShown, resultIsShown: true})
           
           };
         }, timeToSee + 300)
@@ -314,9 +336,13 @@ function noClick() {
           </TitleContainer>
             <MessageSlot>{message}</MessageSlot>
           <Stats>
-              <SmallerHeadline>Stats</SmallerHeadline>
-           
-            <StatLine>Round: {roundCount} 🟧 Won cards: {pointsPlayer1} 🟧 {numberOfPlayers > 1 && <> Won cards: {pointsPlayer2} 🟧</>}
+            {/* <SmallerHeadline>Stats</SmallerHeadline> */}
+          
+            <StatLine>Round: <br /> {roundCount} </StatLine>
+            <StatLine>{nameOfPlayer1} {activePlayer === "player1" && "(active)" }<br />
+                      Won cards: {player1} 🟧 </StatLine>
+            <StatLine>{numberOfPlayers > 1 && <> {nameOfPlayer2}  {activePlayer === "player2" && "(active)" }<br />
+                                                  Won cards: {player2} 🟧</>}
             </StatLine>
           </Stats>
         </UpperSection>
@@ -337,7 +363,15 @@ function noClick() {
                 <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown, resultIsShown: false })} >
                   highscore
                 </BiggerButton>
+              
               </ButtonContainer>
+
+                {/* delete after testing */}
+                <br />
+                <BiggerButton onClick={switchPlayer} >
+                 (test)
+                </BiggerButton><div>{activePlayer}</div>
+
               {setInfoIsShown &&
                 <SetInfo>
                   Cards: {cardSet.setList.length}

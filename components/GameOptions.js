@@ -49,7 +49,7 @@ function handleSelect(optionValue) {
     
         {numberOfPlayers >= 2 &&
           <StandardLabel htmlFor="nameOfPlayer2">Player2: <StyledInput name="nameOfPlayer2" id="nameOfPlayer2"
-            onChange={(event) => handleOptions({nameOfPlayer1: event.target.value})} value={nameOfPlayer2} />
+            onChange={(event) => handleOptions({nameOfPlayer2: event.target.value})} value={nameOfPlayer2} />
           </StandardLabel>
         }
         {numberOfPlayers >= 3 &&
