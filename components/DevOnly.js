@@ -68,9 +68,9 @@ export default function DevOnly({ gameState,  options, highscoreReset, squareSta
 
     const optionKeys = Object.keys(options);
     const optionValues = Object.values(options);
-    const gameStateKeys = Object.keys(gameState);
+    // const gameStateKeys = Object.keys(gameState);
 
-    const squareStateKeys = Object.keys(squareState);
+    // const squareStateKeys = Object.keys(squareState);
   
   function toggleShowLogs() {
       setLogsAreShown(!logsAreShown);

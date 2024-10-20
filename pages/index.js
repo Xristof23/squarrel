@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import useLocalStorageState from 'use-local-storage-state'
-import {  allSets } from "@/memoryData";
 import { initialCardState, initialGameState, initialOptions } from "@/initialStatesAndPresets";
 import Card from "@/components/Card";
 import DevOnly from "@/components/DevOnly";
@@ -27,9 +26,8 @@ import {
   FlexColumnWrapper,
   BiggerButton,
   SetInfo,
-  FlexRowWrapper
 } from "@/styledcomponents";
-import { formatDuration, calculatePoints } from "@/utils";
+import { formatDuration, calculatePoints, sortEntries } from "@/utils";
 import { v4 as uuidv4 } from 'uuid';
 import GameOptions from "@/components/GameOptions";
 
@@ -46,19 +44,15 @@ export default function HomePage() {
   const [devMode, setDevMode] = useState(false);
   const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
   const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, cardSet, shuffle, delayTime, typeOfSet, size, timerWanted } = options;
-  const [activePlayer, setActivePlayer] = useState("player1");
-  //test next
-  // const [activePlayer, setActivePlayer] = useState(1);
+  const [activePlayer, setActivePlayer] = useState(nameOfPlayer1);
+  const zeroPoints = [{ name: nameOfPlayer1, points: 0 }, { name: nameOfPlayer2, points: 0 }, { name: nameOfPlayer3, points: 0 }]
+  const [scores, setScores] = useState(zeroPoints);
   const [squareState, setSquareState] = useState(initialCardState);
   const [squareCount, setSquareCount] = useState(0);
   const [gameState, setGameState] = useState(initialGameState);
   const { running, cardsShown, gameWon, card0, card1 } = gameState;
   const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
   const { cardCount, roundCount } = count;
-  const zeroPoints = [[{ player1: 0 }, { player2: 0 }, { player3: 0 }]]
-  // const [points, setPoints] = useState(zeroPoints);
-  const [points, setPoints] = useState({ player1: 0, player2: 0, player3: 0 });
-  const { player1, player2, player3 } = points;
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! You can now play with up to 32 cards. Wanna try?");
   const [clickStop, setClickStop] = useState(false);
   const [gameIsPaused, setGameIsPaused] = useState(false);
@@ -158,7 +152,7 @@ export default function HomePage() {
   
   function handleStart() {
     setClickStop(false);
-    setPoints({ player1: 0, player2: 0, player3: 0 });
+    setScores(zeroPoints);
     setWhatIsShown({ ...whatIsShown, highscoreIsShown: false, resultIsShown: false });
     setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
     setGameState({ ...initialGameState, running: true });
@@ -190,7 +184,7 @@ export default function HomePage() {
     setTimespan(0);
     setClickStop(true);
     setGameIsPaused(false);
-    setPoints({ player1: 0, player2: 0, player3: 0 });
+    setScores(zeroPoints);
     setCount({ cardCount: 0, roundCount: 1 });
     if (cardColumns > 4) {
       setWhatIsShown({ ...whatIsShown, highscoreIsShown: false })
@@ -199,16 +193,16 @@ export default function HomePage() {
     setMessage("Game reset. Click start to begin a new game.");
   }
 
-
   function handleDelete(id) {
     const newArray = highscore.filter((element) => element.id != id);
     setHighscore(newArray);
   }
 
   function switchPlayer() {
-    const players = ["player1", "player2", "player3"];
+    const players = [nameOfPlayer1, nameOfPlayer2, nameOfPlayer3];
     const chosenPlayers = players.slice(0, numberOfPlayers);
-    const nextPlayer = activePlayer.slice(-1) === numberOfPlayers ? "player1" : chosenPlayers[Number(activePlayer.slice(-1))];
+    const activeIndex = chosenPlayers.indexOf(activePlayer);
+    const nextPlayer = activeIndex === numberOfPlayers - 1 ? nameOfPlayer1 : chosenPlayers[activeIndex + 1];
     setActivePlayer(nextPlayer);
 }
   
@@ -249,8 +243,8 @@ export default function HomePage() {
 
       if (match === true) {
         setMessage(`You turned card "${cardName}". The cards match, yeah!`);
-        const newPoints = { ...points, [activePlayer]: points[activePlayer] + 2 };
-        setPoints(newPoints);
+        const newScores = scores.map((item) => item.name === activePlayer ? {...item, points: item.points + 2} : item);
+        setScores(newScores);
         
       } else {
         setMessage(`You turned card "${cardName}". The cards do not match!`);
@@ -269,7 +263,7 @@ export default function HomePage() {
       setTimeout(setSquareState, timeToSee, resetCardState);
       newSquareState = resetCardState;
       
-      //needed check for game end (works for siungle and multi)
+      //check for game end (works for single and multiplayer)
       const arrayOfWonCards = wonCardState.filter((card) => card.won === true);
       const newScore = arrayOfWonCards.length; 
       newScore === (cardColumns * cardRows) && advancedTiming(false);
@@ -279,12 +273,10 @@ export default function HomePage() {
           setGameState(afterRoundGameState);
           setMessage(match ? "You scored!" : "You may score next round!");
 
-        if (newScore === (cardColumns * cardRows)) {
-            
-          const pointsArray = Object.values(points);
-        
-          // const winnerPlayer =
-            setMessage(`Game won after ${roundCount} rounds. Congratulations.`);
+        if (newScore === (cardColumns * cardRows)) { 
+          const sortedPoints = sortEntries(scores, "points", false);
+          const winner = sortedPoints[0].points === sortedPoints[1].points? `${sortedPoints[0].name} and ${sortedPoints[1].name}` : sortedPoints[0].name;
+            setMessage(`Game won after ${roundCount} rounds. Congratulations, ${winner}!`);
             setGameState({ ...gameState, running: false, gameWon: true});
             makeHighscoreEntry(timespan);
             numberOfPlayers <=1 && setWhatIsShown({...whatIsShown, resultIsShown: true})
@@ -336,13 +328,12 @@ function noClick() {
           </TitleContainer>
             <MessageSlot>{message}</MessageSlot>
           <Stats>
-            {/* <SmallerHeadline>Stats</SmallerHeadline> */}
           
             <StatLine>Round: <br /> {roundCount} </StatLine>
-            <StatLine>{nameOfPlayer1} {activePlayer === "player1" && "(active)" }<br />
-                      Won cards: {player1} 🟧 </StatLine>
-            <StatLine>{numberOfPlayers > 1 && <> {nameOfPlayer2}  {activePlayer === "player2" && "(active)" }<br />
-                                                  Won cards: {player2} 🟧</>}
+            <StatLine>{nameOfPlayer1} {activePlayer === nameOfPlayer1 && "(active)" }<br />
+              Won cards: {scores[0].points} 🟧 </StatLine>
+            <StatLine>{numberOfPlayers > 1 && <> {nameOfPlayer2}  {activePlayer === nameOfPlayer2 && "(active)" }<br />
+                                                  Won cards: {scores[1].points} 🟧</>}
             </StatLine>
           </Stats>
         </UpperSection>
@@ -365,13 +356,6 @@ function noClick() {
                 </BiggerButton>
               
               </ButtonContainer>
-
-                {/* delete after testing */}
-                <br />
-                <BiggerButton onClick={switchPlayer} >
-                 (test)
-                </BiggerButton><div>{activePlayer}</div>
-
               {setInfoIsShown &&
                 <SetInfo>
                   Cards: {cardSet.setList.length}
