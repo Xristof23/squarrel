@@ -14,7 +14,7 @@ const OptionsSection = styled.section`
 export default function GameOptions({options, onUpdateOptions}) {
   const [optionsAreShown, setOptionsareShown] = useState(true);
   
-  const { numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardColumns, delayTime, cardSet, typeOfSet, size, timerWanted} = options;
+  const { numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, numberDealt, cardColumns, delayTime, cardSet, typeOfSet, size, timerWanted} = options;
   const { setName, setList } = cardSet;
 
   function handleOptions(optionsObject) {
@@ -80,8 +80,10 @@ function handleSelect(optionValue) {
           <StyledNrInput aria-label="Choose the delay time" name="delayTime" id="delayTime" type="number" min={400} max={8000} step="100"
           onChange={(event) => handleOptions({ delayTime: event.target.value })} value={delayTime} /> ms</StandardLabel>
         <br />
-        <StandardLabel htmlFor="cardColumns">Size 4 x <SmallerNrInput name="cardColumns" id="cardColumns" type="number" min={4} max={8}
-          onChange={(event) => handleOptions({ cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
+        {/* <StandardLabel htmlFor="cardColumns">Size 4 x <SmallerNrInput name="cardColumns" id="cardColumns" type="number" min={4} max={8}
+          onChange={(event) => handleOptions({ cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel> */}
+         <StandardLabel htmlFor="numberDealt">Size: <SmallerNrInput name="numberDealt" id="numberDealt" type="number" min={14} max={30} step={4}
+          onChange={(event) => handleOptions({ numberDealt: Number(event.target.value), cardColumns: Math.ceil(event.target.value / 4) })} value={numberDealt} /></StandardLabel>
         <FlexRowWrapper> Timer:
           <SmallerButton onClick={() => handleOptions({ timerWanted:!timerWanted })} >{timerWanted ? "yes" : "no"}</SmallerButton>
         </FlexRowWrapper>

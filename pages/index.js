@@ -11,7 +11,12 @@ import ResultMessage from "@/components/ResultMessage";
 import {
   StyledMain,
   ButtonContainer,
+  FirstSquare,
+  FlexColumnWrapper,
+  FlexRowWrapper,
   HighScoreContainer,
+  NewSquareSection,
+  NewOptionsContainer,
   DevSquare,
   UpperSection,
   MessageSlot,
@@ -19,11 +24,11 @@ import {
   SquareSection,
   StatLine,
   Stats,
+  SmallerButton,
   StandardButton,
   SquarrelTitle,
   LeftSide,
   TitleContainer,
-  FlexColumnWrapper,
   BiggerButton,
   SetInfo,
 } from "@/styledcomponents";
@@ -38,12 +43,19 @@ const ControlsSection = styled.section`
   margin-bottom: .5rem;
 `;
 
+const TestButton = styled(StandardButton)`
+flex-grow: 0;
+background-color: red;
+`;
+
 export default function HomePage() {
-  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: false, setInfoIsShown: false, resultIsShown: false });
-  const { introIsShown, mainIsShown, optionsAreShown, highscoreIsShown, setInfoIsShown, resultIsShown } = whatIsShown;
+  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, newDesign: false, newOptions: false , highscoreIsShown: false, setInfoIsShown: false, resultIsShown: false });
+  const { introIsShown, mainIsShown, highscoreIsShown, setInfoIsShown, resultIsShown, newDesign, newOptions  } = whatIsShown;
   const [devMode, setDevMode] = useState(false);
   const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
-  const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, cardSet, shuffle, delayTime, typeOfSet, size, timerWanted } = options;
+  const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, numberDealt, cardSet, shuffle, delayTime, typeOfSet, size, timerWanted } = options;
+  console.log("Number of cards dealt", numberDealt);
+  console.log("cardColumns", cardColumns);
   const [activePlayer, setActivePlayer] = useState(nameOfPlayer1);
   const zeroPoints = [{ name: nameOfPlayer1, points: 0 }, { name: nameOfPlayer2, points: 0 }, { name: nameOfPlayer3, points: 0 }]
   const [scores, setScores] = useState(zeroPoints);
@@ -110,18 +122,20 @@ export default function HomePage() {
       }
     }, [isWindowClient, setWindowWidth, setWindowHeight]);
 
-  const cardSectionHeight = windowHeight - 99;
+  //old
+  // const cardSectionHeight = windowHeight - 99;
+  const cardSectionHeight = windowHeight - 20;
   const cardHeight = cardSectionHeight / 4 - 6;
   const shiftRight = cardSectionHeight / 8 + 1;
   const moreColumns = cardColumns - 4;
   const upperWidth = `${202 + cardSectionHeight + moreColumns * (shiftRight * 2)}px`;
   const overallMaxwidth = windowWidth - 20;
 
-  // card rows = 4 for now, 4 <= cardColumns <= 8 
-  function generateCardsArray(cardRows, cardColumns, shuffle, cardSet) {
-    const numberOfSquares = cardColumns * cardRows;
+  //old: card rows = 4 for now, 4 <= cardColumns <= 8 changing!!
+  function generateCardsArray(numberOfCards, shuffle, cardSet) {
+    // const numberOfSquares = cardColumns * cardRows;
 
-    const cardNumbers = [...Array(numberOfSquares).keys()];
+    const cardNumbers = [...Array(numberOfCards).keys()];
 
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
@@ -154,7 +168,7 @@ export default function HomePage() {
     setClickStop(false);
     setScores(zeroPoints);
     setWhatIsShown({ ...whatIsShown, highscoreIsShown: false, resultIsShown: false });
-    setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
+    setSquareState(generateCardsArray(numberDealt, shuffle, cardSet));
     setGameState({ ...initialGameState, running: true });
     giveCards(80, cardColumns * cardRows);
     setTimespan(0);
@@ -188,7 +202,7 @@ export default function HomePage() {
     setActivePlayer(nameOfPlayer1);
     setCount({ cardCount: 0, roundCount: 1 });
     setWhatIsShown({ ...whatIsShown, highscoreIsShown: false });
-    setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
+    setSquareState(generateCardsArray(numberDealt, shuffle, cardSet));
     setMessage("Game reset. Click start to begin a new game.");
   }
 
@@ -265,14 +279,14 @@ export default function HomePage() {
       //check for game end (works for single and multiplayer)
       const arrayOfWonCards = wonCardState.filter((card) => card.won === true);
       const newScore = arrayOfWonCards.length; 
-      newScore === (cardColumns * cardRows) && advancedTiming(false);
+      newScore === numberDealt && advancedTiming(false);
       //reset 2
       const afterRoundGameState = { ...gameState, cardsShown: 0, card0: { id: "a" }, card1: { id: "b" } };
       setTimeout(() => {
           setGameState(afterRoundGameState);
           setMessage(match ? "You scored!" : "You may score next round!");
 
-        if (newScore === (cardColumns * cardRows)) { 
+        if (newScore === numberDealt) { 
           const sortedPoints = sortEntries(scores, "points", false);
           const winner = sortedPoints[0].points === sortedPoints[1].points? `${sortedPoints[0].name} and ${sortedPoints[1].name}` : sortedPoints[0].name;
             setMessage(`Game won after ${roundCount} rounds. Congratulations, ${winner}!`);
@@ -293,7 +307,8 @@ function noClick() {
 }
   
   function makeHighscoreEntry(timespan) {
-    const gameSize = cardColumns * cardRows;
+    // const gameSize = cardColumns * cardRows;
+    const gameSize = numberDealt;
     const timestamp = Date.now();
     const highscoreDate = new Date(timestamp).toString();
     const gameTime = formatDuration(timespan, 1);
@@ -321,9 +336,12 @@ function noClick() {
   return (
     <>
       {introIsShown && <Intro overallMaxwidth={overallMaxwidth} endOfIntro={handleEndOfIntro} />}
-      {mainIsShown && <StyledMain>
+
+      {mainIsShown && !newDesign ?
+        <StyledMain>
         <UpperSection $maxwidth={overallMaxwidth} $upperWidth={upperWidth}>
-          <TitleContainer><DevSquare onClick={()=>setDevMode(!devMode) }>🟧</DevSquare><SquarrelTitle> SQUARREL</SquarrelTitle>
+          <TitleContainer><DevSquare onClick={() => setDevMode(!devMode)}>🟧</DevSquare><SquarrelTitle> SQUARREL</SquarrelTitle>
+           
           </TitleContainer>
             <MessageSlot>{message}</MessageSlot>
           <Stats>
@@ -353,7 +371,9 @@ function noClick() {
                 <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown, resultIsShown: false })} >
                   highscore
                 </BiggerButton>
-              
+                  <TestButton onClick={() => setWhatIsShown({ ...whatIsShown, newDesign: !newDesign })}>
+                    {newDesign ? "new" : "old"}
+                  </TestButton>
               </ButtonContainer>
               {setInfoIsShown &&
                 <SetInfo>
@@ -381,8 +401,43 @@ function noClick() {
             clickedChangeShow={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} />}
         </HighScoreContainer> 
         {devMode && <DevOnly options={options} gameState={gameState} highscoreReset={doHighscoreReset} />}
-      </StyledMain>
+      </StyledMain> : null
       }
+      {newDesign && <NewSquareSection $height={cardSectionHeight} $addColumns={cardColumns - 4} $fraction="1fr " $shiftRight={shiftRight * (cardColumns - 4)}>
+        <FirstSquare $height={cardHeight}>
+        <ControlsSection>
+            <FlexRowWrapper> <SmallerHeadline>Controls</SmallerHeadline>
+              <TestButton onClick={() => setWhatIsShown({ ...whatIsShown, newDesign: !newDesign })}>
+                    {newDesign ? "new" : "old"}
+                </TestButton>
+        </FlexRowWrapper>
+         
+            <FlexRowWrapper>
+              <StandardButton $width={cardHeight / 5} onClick={handleStart}>►</StandardButton>
+                <StandardButton onClick={handlePause}>{gameIsPaused ? "continue" : "pause"}</StandardButton>
+              <StandardButton onClick={handleReset}>reset</StandardButton>
+            </FlexRowWrapper>
+                <FlexRowWrapper>
+                <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown, resultIsShown: false })}>
+                  highscore
+                </BiggerButton>
+               
+              <StandardButton onClick={() => setWhatIsShown({ ...whatIsShown, newOptions: !newOptions })}>
+               {newOptions ? "hide" : "show"}options</StandardButton>
+                </FlexRowWrapper>
+          </ControlsSection>
+          
+          
+        </FirstSquare>
+        {newOptions && <NewOptionsContainer>
+          <GameOptions options={options} onUpdateOptions={updateOptions} />
+        </NewOptionsContainer>}
+        {running === true ? (squareState.map((square, index) =>
+          <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id} isVisible={squareCount >= index ? true : false}
+            front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet}
+            setName={cardSet.setName} clickStop={clickStop} size={size} cardHeight={cardHeight} />)) : null}
+        <FirstSquare $height={cardHeight}></FirstSquare>
+      </NewSquareSection>}
     </>
   );
 }

@@ -1,5 +1,44 @@
 import styled from "styled-components";
- 
+
+const FirstSquare = styled.div`
+  display: block;  
+  position: relative;  
+  text-align: center;  
+  padding: 0.5rem;
+  min-height: 100px;
+  height: ${({ $height }) => `${$height}px`};
+  width: ${({ $height }) => `${$height}px`};
+  border-radius: 4px;
+    border: 1px solid black;
+  background-color: rgb(240 130 0 / 30%);`
+  ;
+
+const NewOptionsContainer = styled.div`
+ grid-row: 2 / span 3;
+ padding: 0.5rem;
+position: relative;
+margin-top: -172px;
+ border-radius: 4px;
+   border: 1px solid black;
+  background-color: rgb(240 130 0 / 30%);
+`;
+
+  const NewSquareSection = styled.section`
+  display: grid;
+  position: relative;
+  grid-template-columns: 1fr 1fr 1fr 1fr ${({ $addColumns, $fraction }) => $addColumns >= 1? $fraction.repeat($addColumns) : null};
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  left: ${({ $shiftRight }) => $shiftRight ? `${$shiftRight}px` : "0px"};
+  gap: 8px;
+  height: ${({ $height }) => `${$height}px`};
+  width: ${({ $height }) => `${$height}px`};
+  margin: .5rem;
+  align-items: center;
+  border-radius: 4px;
+  justify-content: center;
+`;
+
+
 const StyledMain = styled.main`
  display: grid;
   grid-template-columns: 194px 800px;
@@ -212,7 +251,7 @@ font-weight: 400;
 flex-grow: 1;
 margin: .1rem 0 .1rem 0;
 padding: 0.3rem;
-width: 2.5rem;
+width: ${({ $width }) => $width? `${$width}px` : "2.5rem"};
 min-width: fit-content;
 min-height: 1.8rem;
 border-radius: 4px;
@@ -282,19 +321,20 @@ margin: 0 0 0.4rem;
 `;
 
 
-
-
 export {
     ButtonContainer,
     DevSquare,
     StyledMain,
     ControlsContainer,
     TitleContainer,
-    UpperSection,
+  UpperSection,
+    FirstSquare,
   FlexRowWrapper,
   FlexColumnWrapper,
     HighScoreContainer,
-    MessageSlot,
+  MessageSlot,
+  NewSquareSection,
+    NewOptionsContainer,
     Placeholder,
   SmallerHeadline,
     SquareSection,
