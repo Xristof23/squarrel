@@ -1,4 +1,4 @@
-import { FlexColumnWrapper, StandardButton } from "@/styledcomponents";
+import { StandardButton } from "@/styledcomponents";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
@@ -18,8 +18,9 @@ const SquarrelIntro = styled.div`
   `;
   
   const IntroContainer = styled.section`
-   display: block:
-   width: 800px;
+   display: block;
+   width: ${({ $width }) => `${$width}px`}; 
+//    width: 800px;
    height: 600px;
    gap: 8px;
    margin: 5rem auto .5rem; 
@@ -44,7 +45,7 @@ const Letter = styled.div`
     z-index: 2;
   `;
 
-export default function Intro({endOfIntro}) {
+export default function Intro({endOfIntro, overallMaxWidth}) {
 
     const [introCount, setIntroCount] = useState(0);
 
@@ -75,13 +76,14 @@ export default function Intro({endOfIntro}) {
 
     return (
         <>
-            <IntroContainer>
+            <IntroContainer $width={overallMaxWidth -200}>
                 <SquarrelIntro>{finalTitle.map((letter, index) =>
                     <Letter key={index} $isShown={introCount >= index + 1 ? true : false} >{letter}</Letter>)}
                 </SquarrelIntro>
             </IntroContainer>
-            {introCount >= 2 && <ButtonWrapper>
-            <StandardButton onClick={() => endOfIntro()}>skip intro</StandardButton>
+            {introCount >= 2 &&
+            <ButtonWrapper>
+                <StandardButton onClick={() => endOfIntro()}>skip intro</StandardButton>
             </ButtonWrapper>}
         </>
     )

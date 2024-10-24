@@ -53,6 +53,21 @@ const HighScoreContainer = styled.div`
   z-index: 2;
 `;
 
+const SquareSection = styled.section`
+  display: grid;
+  position: relative;
+  grid-template-columns: 1fr 1fr 1fr 1fr ${({ $addColumns, $fraction }) => $addColumns >= 1? $fraction.repeat($addColumns) : null};
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  left: ${({ $shiftRight }) => $shiftRight ? `${$shiftRight}px` : "0px"};
+  gap: 8px;
+  height: ${({ $height }) => `${$height}px`};
+  width: ${({ $height }) => `${$height}px`};
+  margin: .5rem;
+  align-items: center;
+  border-radius: 4px;
+  justify-content: center;
+`;
+
 const TitleContainer = styled.div`
   display: flex;
   flex-grow: 0;
@@ -100,15 +115,19 @@ const MessageSlot = styled.div`
 `;
 
 const Stats = styled.div`
-  display: flex;
-  flex-grow: 1;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 1fr 2fr 2fr;  
 text-align: left; 
  margin: .5rem;
 padding: 0.3rem;
 min-width: 385px;
 height: 80%;
 border-radius: 4px;
+`;
+
+const StatLine = styled.span`
+margin: .5rem;
+text-align: left; 
 `;
 
 const ControlsContainer = styled.div`
@@ -140,12 +159,12 @@ const StandardLabel = styled.label`
   font-size: 0.95rem;
   width: 95%;
   margin: .5rem .5rem 1rem 0rem;
-  padding: .2rem;
+  padding: 0rem;
 `;
 
 const StyledSelect = styled.select`
  padding: .3rem;
- width: 95%;
+ width: 98.5%;
 margin: 0.3rem .3rem .3rem 0; 
 `;
 
@@ -176,6 +195,7 @@ const StyledInput = styled.input`
 //Buttons
 const ButtonContainer = styled.div`
   display: flex;
+  gap: .4rem;
   flex-direction: row;
   min-height: fit-content;
   width: 100%;
@@ -190,11 +210,11 @@ text-align: center;
 font-size: 1rem;
 font-weight: 400; 
 flex-grow: 1;
-margin: 0.2rem;
-padding: 0.4rem;
+margin: .1rem 0 .1rem 0;
+padding: 0.3rem;
 width: 2.5rem;
 min-width: fit-content;
-min-height: 2rem;
+min-height: 1.8rem;
 border-radius: 4px;
 border: 1px solid darkorange;
 background-color: #fffffc;
@@ -215,11 +235,7 @@ width: 30px;
 
 const BiggerButton = styled(StandardButton)`
 width: 4rem;
-flex-grow: 1; 
 min-width: fit-content;
-min-height: 2rem;
-margin: .2rem;
-padding: .2rem;
 background-color: white;
 `;
 
@@ -233,18 +249,6 @@ border: 1px solid darkorange;
 background-color: white;
 `;
 
-const DebugButton = styled(StandardButton)`
-font-size: .7rem;
-color: grey;
-padding: 0.1rem;
-width: 3rem;
-min-width: 2rem;
-min-height: 1rem;
-border-radius: 4px;
-border: 1px solid grey; 
-background-color: lightgray;
-`;
-
 const DeleteButton = styled(StandardButton)`
 color: red;
 margin: 0.2rem;
@@ -256,10 +260,6 @@ min-height: 1.5rem;
 border: 1px solid grey; 
 background-color: lightgray;
 `;
-
-
-
-
 
 //wrapper
 const FlexRowWrapper = styled.div`
@@ -281,10 +281,7 @@ font-weight: 600;
 margin: 0 0 0.4rem;
 `;
 
-const StatLine = styled.p`
-margin: 1.5rem 0 0 -2.2rem;
-text-align: left; 
-`;
+
 
 
 export {
@@ -299,7 +296,8 @@ export {
     HighScoreContainer,
     MessageSlot,
     Placeholder,
-    SmallerHeadline,
+  SmallerHeadline,
+    SquareSection,
     StatLine,
   Stats,
   StyledInput,
@@ -311,7 +309,6 @@ export {
     SmallerButton,
   SquarrelTitle, 
     BiggerButton,
-    DebugButton,
     DeleteButton,
   LeftSide,
     SetInfo

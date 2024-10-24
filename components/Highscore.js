@@ -55,7 +55,6 @@ width: 100%;
 text-align: right;
 `;
 
-
 const SmallerLabel = styled.label`
   font-size: .8rem;
   line-height: .8rem;
@@ -65,8 +64,6 @@ const SmallerLabel = styled.label`
   padding: 2px;
   height: 1.4rem;
 `;
-
-
 
 export default function Highscore({ highscore, devMode, clickedDelete, highscoreIsShown, clickedChangeShow, cardSectionHeight }) {
     const [sortValue, setSortValue] = useState("gameTime");

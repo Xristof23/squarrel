@@ -56,22 +56,9 @@ const htmlDualSetList = htmlSet.setList.map((tag) => {
 
 const htmlDualSet = { setName: "htmlDualSet", typeOfSet: "ASCIIDual", size: 2.3, setList: htmlDualSetList };
 
-// initial states
-const initialCardState = [];
-const initialGameState = { running: false, gameWon: false, gameTime: 0, cardsShown: 0, card0: { id: "a" }, card1: { id: "b" } };
-const initialOptions = {
-    gameMode: "memory", numberOfPlayers: 1, nameOfPlayer1: "Squarrel", nameOfPlayer2: "Squirrel", nameOfPlayer3: "Square", cardRows: 4, cardColumns: 4, delayTime: 2000, shuffle: true,
-    cardSet: euAnimals, typeOfSet: "img", size: 6
-};
-
-const allSets = [euAnimals, afrAnimals, happy, ABCSet, abcDualSet, htmlSet, htmlDualSet, smallNumbers, wolfpack, darkrpg ]
+const allSets = [euAnimals, afrAnimals, happy, ABCSet, abcDualSet, htmlSet, htmlDualSet, smallNumbers, wolfpack, darkrpg];
 
 export {
-    initialCardState, 
-    initialGameState,
-    initialOptions,
-   ABCSet, 
-    htmlSet,
+    allSets, 
     euAnimals,
-    allSets
 }

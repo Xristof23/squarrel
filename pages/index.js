@@ -1,85 +1,58 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import useLocalStorageState from 'use-local-storage-state'
-import { initialCardState, initialGameState, allSets, initialOptions } from "@/memoryData";
+import { initialCardState, initialGameState, initialOptions } from "@/initialStatesAndPresets";
 import Card from "@/components/Card";
+import DevOnly from "@/components/DevOnly";
 import Intro from "@/components/Intro";
 import Timer from "@/components/Timer";
 import Highscore from "@/components/Highscore";
 import ResultMessage from "@/components/ResultMessage";
-
 import {
   StyledMain,
   ButtonContainer,
   HighScoreContainer,
-  SmallerButton,
   DevSquare,
   UpperSection,
   MessageSlot,
   SmallerHeadline,
+  SquareSection,
   StatLine,
   Stats,
-  StyledSelect,
   StandardButton,
-  DebugButton,
   SquarrelTitle,
   LeftSide,
   TitleContainer,
   FlexColumnWrapper,
-  FlexRowWrapper,
-  StandardLabel,
-  StyledInput,
-  StyledNrInput,
-  SmallerNrInput,
   BiggerButton,
-  SetInfo
+  SetInfo,
 } from "@/styledcomponents";
-import { formatDuration, calculatePoints } from "@/utils";
+import { formatDuration, calculatePoints, sortEntries } from "@/utils";
 import { v4 as uuidv4 } from 'uuid';
+import GameOptions from "@/components/GameOptions";
 
-const SquareSection = styled.section`
-  display: grid;
-  position: relative;
-  grid-template-columns: 1fr 1fr 1fr 1fr ${({ $addColumns, $fraction }) => $addColumns >= 1? $fraction.repeat($addColumns) : null};
-  grid-template-rows: 1fr 1fr 1fr 1fr;
-  left: ${({ $shiftRight }) => $shiftRight ? `${$shiftRight}px` : "0px"};
-  gap: 8px;
-  height: ${({ $height }) => `${$height}px`};
-  width: ${({ $height }) => `${$height}px`};
-  margin: .5rem;
-  align-items: center;
+const ControlsSection = styled.section`
+  width: 100%;
+  height: fit-content;
   border-radius: 4px;
-  justify-content: center;
-`;
-
-const DevButtonContainer = styled.div`
-  display: flex;
-  position: absolute;
-  flex-direction: row;
-  min-height: 35px;
-  top: 60px;
-  left: 30px;
-  width: 10rem;
-  height: 5rem;
-  align-content: center;
-  align-items: center;
-  border-radius: 4px;
-  z-index: 2;
+  margin-bottom: .5rem;
 `;
 
 export default function HomePage() {
-  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, optionsAreShown: true, highscoreIsShown: false, setInfoIsShown: false, resultIsShown: false, timerWanted: true });
-  const { introIsShown, mainIsShown, optionsAreShown,  highscoreIsShown, setInfoIsShown, resultIsShown, timerWanted } = whatIsShown;
+  const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, highscoreIsShown: false, setInfoIsShown: false, resultIsShown: false });
+  const { introIsShown, mainIsShown, optionsAreShown, highscoreIsShown, setInfoIsShown, resultIsShown } = whatIsShown;
   const [devMode, setDevMode] = useState(false);
   const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
-  const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, shuffle, delayTime, cardSet, typeOfSet, size } = options;
+  const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, cardSet, shuffle, delayTime, typeOfSet, size, timerWanted } = options;
+  const [activePlayer, setActivePlayer] = useState(nameOfPlayer1);
+  const zeroPoints = [{ name: nameOfPlayer1, points: 0 }, { name: nameOfPlayer2, points: 0 }, { name: nameOfPlayer3, points: 0 }]
+  const [scores, setScores] = useState(zeroPoints);
   const [squareState, setSquareState] = useState(initialCardState);
   const [squareCount, setSquareCount] = useState(0);
   const [gameState, setGameState] = useState(initialGameState);
   const { running, cardsShown, gameWon, card0, card1 } = gameState;
   const [count, setCount] = useState({ cardCount: 0, roundCount: 1 });
   const { cardCount, roundCount } = count;
-  const [points, setPoints] = useState(0);
   const [message, setMessage] = useState("Welcome to  S Q U A R R E L ! You can now play with up to 32 cards. Wanna try?");
   const [clickStop, setClickStop] = useState(false);
   const [gameIsPaused, setGameIsPaused] = useState(false);
@@ -166,7 +139,7 @@ export default function HomePage() {
     const cardsArray = cardNumbers.map((number) => {
       const ASCIIDualFront = setName.includes("Dual") ? (number % 2 === 0 ? setList[Math.floor(number / 2)].half2 : setList[Math.floor(number / 2)].half1) : "no front";
       const frontASCII = setName.includes("Dual")? ASCIIDualFront : setList[Math.floor(number / 2)];
-      const frontImage = `${setName}-${setList[Math.floor(number / 2)]}.jpg`;
+      const frontImage = setList[Math.floor(number / 2)];
       const front = typeOfSet === "img" ? frontImage : frontASCII;
       const pairId = setName.includes("Dual") ? Math.floor(number / 2) : front;
       const cardObject = { id: number, front, pairId, back: "back", typeOfSet, isShown: false, won: false };
@@ -179,7 +152,7 @@ export default function HomePage() {
   
   function handleStart() {
     setClickStop(false);
-    setPoints(0);
+    setScores(zeroPoints);
     setWhatIsShown({ ...whatIsShown, highscoreIsShown: false, resultIsShown: false });
     setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
     setGameState({ ...initialGameState, running: true });
@@ -211,26 +184,29 @@ export default function HomePage() {
     setTimespan(0);
     setClickStop(true);
     setGameIsPaused(false);
-    setPoints(0);
+    setScores(zeroPoints);
+    setActivePlayer(nameOfPlayer1);
     setCount({ cardCount: 0, roundCount: 1 });
-    if (cardColumns > 4) {
-      setWhatIsShown({ ...whatIsShown, highscoreIsShown: false })
-    };
+    setWhatIsShown({ ...whatIsShown, highscoreIsShown: false });
     setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
     setMessage("Game reset. Click start to begin a new game.");
   }
 
-  function showDebugInfo() {
-    console.log("Squarestate", squareState);
-    console.log("Gamestate", gameState);
-    console.log("Options", options);
+  function handleDelete(id) {
+    const newArray = highscore.filter((element) => element.id != id);
+    setHighscore(newArray);
   }
 
+  function switchPlayer() {
+    const players = [nameOfPlayer1, nameOfPlayer2, nameOfPlayer3];
+    const chosenPlayers = players.slice(0, numberOfPlayers);
+    const activeIndex = chosenPlayers.indexOf(activePlayer);
+    const nextPlayer = activeIndex === numberOfPlayers - 1 ? nameOfPlayer1 : chosenPlayers[activeIndex + 1];
+    setActivePlayer(nextPlayer);
+}
+  
   function cardClick(id) {
-    //may move this to Card component
-    const cardClicked = squareState.find((card) => card.id === id).front;
-    const cutLength = cardSet.setName.length + 1;
-    const cardName = typeOfSet === "img" ? cardClicked.slice(cutLength, -4) : cardClicked;
+    const cardName = squareState.find((card) => card.id === id).front;
 
     //counting cards and rounds etc
     if (cardsShown === 1 && card0.id === id) {
@@ -258,12 +234,22 @@ export default function HomePage() {
       const card1 = filteredState[1];
       setGameState({ ...gameState, card1: card1 });
       const match = card0.pairId === card1.pairId ? true : false;
-      const wonCardState = squareState.map((card) => 
-          card.pairId === card0.pairId ? {...card, won: true} : card
-         );
-      match ? setMessage("The cards match, yeah!") : setMessage("The cards do not match!");
-      match && setPoints(points + 2);  
+      const wonCardState = squareState.map((card) =>
+        card.pairId === card0.pairId ? { ...card, won: true } : card
+      );
+    //set speed
+      const timeToSee = match ? delayTime / 4 : delayTime;
 
+      if (match === true) {
+        setMessage(`You turned card "${cardName}". The cards match, yeah!`);
+        const newScores = scores.map((item) => item.name === activePlayer ? {...item, points: item.points + 2} : item);
+        setScores(newScores);
+        
+      } else {
+        setMessage(`You turned card "${cardName}". The cards do not match!`);
+        numberOfPlayers >1 && setTimeout(switchPlayer, timeToSee);
+      }
+    
       //reset CardState (squarestate) 
       const afterRoundCardState = match ? wonCardState : squareState;
         const resetCardState = afterRoundCardState.map((card) => {
@@ -271,15 +257,12 @@ export default function HomePage() {
             return updatedCard;
         });
         
-      //set speed
-      const timeToSee = match ? delayTime / 4 : delayTime;
-   
       //reset 1
       setTimeout(setClickStop, timeToSee, false);
       setTimeout(setSquareState, timeToSee, resetCardState);
       newSquareState = resetCardState;
       
-      //needed for check for game end (change for new points State?)
+      //check for game end (works for single and multiplayer)
       const arrayOfWonCards = wonCardState.filter((card) => card.won === true);
       const newScore = arrayOfWonCards.length; 
       newScore === (cardColumns * cardRows) && advancedTiming(false);
@@ -289,11 +272,13 @@ export default function HomePage() {
           setGameState(afterRoundGameState);
           setMessage(match ? "You scored!" : "You may score next round!");
 
-          if(newScore === (cardColumns * cardRows)) {
-            setMessage(`Game won in ${roundCount} rounds.`);
+        if (newScore === (cardColumns * cardRows)) { 
+          const sortedPoints = sortEntries(scores, "points", false);
+          const winner = sortedPoints[0].points === sortedPoints[1].points? `${sortedPoints[0].name} and ${sortedPoints[1].name}` : sortedPoints[0].name;
+            setMessage(`Game won after ${roundCount} rounds. Congratulations, ${winner}!`);
             setGameState({ ...gameState, running: false, gameWon: true});
-            makeHighscoreEntry(timespan);
-            setWhatIsShown({...whatIsShown, resultIsShown: true})
+            numberOfPlayers <=1 && makeHighscoreEntry(timespan);
+            numberOfPlayers <=1 && setWhatIsShown({...whatIsShown, resultIsShown: true})
           
           };
         }, timeToSee + 300)
@@ -307,12 +292,6 @@ function noClick() {
   setMessage(newMessage);
 }
   
-  function handleSelect(optionValue) {
-    const chosenArray = allSets.filter((set) => set.setName === optionValue);
-    const chosenSet = chosenArray[0];
-    setOptions({ ...options, cardSet: chosenSet, typeOfSet: chosenSet.typeOfSet, size: chosenSet.size ? chosenSet.size : options.size });
-  }
-  
   function makeHighscoreEntry(timespan) {
     const gameSize = cardColumns * cardRows;
     const timestamp = Date.now();
@@ -325,15 +304,9 @@ function noClick() {
     setHighscore([...highscore, newEntry]);
   }
 
-  //needs confirm dialog even for devmode
-  function handleHighscoreReset() {
-    setMessage("Do you really want to reset the complete highscore?")
-    // setHighscore([]);
-}
+  function doHighscoreReset() {
+    setMessage("Do you really want to reset the complete highscore? This is non reversible!");
 
-  function handleDelete(id) {
-    const newArray = highscore.filter((element) => element.id != id);
-    setHighscore(newArray);
   }
 
   function giveCards(delayTime, upperLimit) {
@@ -341,67 +314,32 @@ function noClick() {
     numbers.forEach((number) => setTimeout(setSquareCount, delayTime * number, number));  
 }
 
+  function updateOptions(updatedOptions) {
+    setOptions({ ...options, ...updatedOptions });
+  }
+  
   return (
     <>
-      {introIsShown && <Intro endOfIntro={handleEndOfIntro} />}
+      {introIsShown && <Intro overallMaxwidth={overallMaxwidth} endOfIntro={handleEndOfIntro} />}
       {mainIsShown && <StyledMain>
         <UpperSection $maxwidth={overallMaxwidth} $upperWidth={upperWidth}>
           <TitleContainer><DevSquare onClick={()=>setDevMode(!devMode) }>🟧</DevSquare><SquarrelTitle> SQUARREL</SquarrelTitle>
           </TitleContainer>
             <MessageSlot>{message}</MessageSlot>
           <Stats>
-            <SmallerHeadline>Stats<br /> </SmallerHeadline>
-            <StatLine>Won cards: {points} 🟧 Round: {roundCount} 🟧
+          
+            <StatLine>Round: <br /> {roundCount} </StatLine>
+            <StatLine>{nameOfPlayer1} {activePlayer === nameOfPlayer1 && "(active)" }<br />
+              Won cards: {scores[0].points} 🟧 </StatLine>
+            <StatLine>{numberOfPlayers > 1 && <> {nameOfPlayer2}  {activePlayer === nameOfPlayer2 && "(active)" }<br />
+                                                  Won cards: {scores[1].points} 🟧</>}
             </StatLine>
           </Stats>
         </UpperSection>
         <LeftSide>
-          <FlexRowWrapper>
-          <SmallerHeadline>  Options </SmallerHeadline>
-            <SmallerButton onClick={() => setWhatIsShown({ ...whatIsShown, optionsAreShown: !optionsAreShown })} >{optionsAreShown ? "▲" : "▼"}</SmallerButton>
-           
-            </FlexRowWrapper> 
-          {optionsAreShown && <><StandardLabel htmlFor="numberOfPlayers">Nr. of players:
-            <SmallerNrInput name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={3}
-              onChange={(event) => setOptions({ ...options, numberOfPlayers: event.target.value })} value={numberOfPlayers} />
-          </StandardLabel><br />
-   
-            <StandardLabel htmlFor="nameOfPlayer1">Player1: <StyledInput name="nameOfPlayer1" id="nameOfPlayer1"
-              onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer1} /></StandardLabel><br />
-        
-            {numberOfPlayers >= 2 && <StandardLabel htmlFor="nameOfPlayer2">Player2: <StyledInput name="nameOfPlayer2" id="nameOfPlayer2"
-              onChange={(event) => setOptions({ ...options, nameOfPlayer1: event.target.value })} value={nameOfPlayer2} /></StandardLabel>
-            }
-            {numberOfPlayers >= 3 && <StandardLabel htmlFor="nameOfPlayer3">Player3: <StyledInput name="nameOfPlayer3" id="nameOfPlayer3"
-              onChange={(event) => setOptions({ ...options, nameOfPlayer3: event.target.value })} value={nameOfPlayer3} /></StandardLabel>
-            }
-            <StandardLabel htmlFor="selectSet">
-              <StyledSelect aria-label="Choose a set of cards" id="selectSet"
-                name="selectSet" value={`${cardSet.setName}`} onChange={(event) => handleSelect(event.target.value)}
-              >
-                <option value={""}>--Please choose a card set--</option>
-                <option value="euAnimals">European animals (b&w)</option>
-                <option value="wolfpack">Cult of wolves (b&w)</option>
-                <option value="afrAnimals">African animals (colour)</option>
-                <option value="happy">Being happy (colour)</option>
-                <option value="darkrpg">RPG characters (colour)</option>
-                <option value="ABCSet">Capital letters</option>
-                <option value="abcDualSet">Two kinds of letters</option>
-                <option value="smallNumbers">Small numbers</option>
-                <option value="htmlSet">HTML opening tags</option>
-                <option value="htmlDualSet">HTML tag pairs</option>
-              </StyledSelect>
-            </StandardLabel>
-       
-            <StandardLabel htmlFor="delayTime">Delay time<StyledNrInput name="delayTime" id="delayTime" type="number" min={400} max={8000} step="100"
-              onChange={(event) => setOptions({ ...options, delayTime: event.target.value })} value={delayTime} /> ms</StandardLabel>
-            <br />
-            <StandardLabel htmlFor="cardColumns">Size 4 x <SmallerNrInput name="cardColumns" id="cardColumns" type="number" min={4} max={8}
-              onChange={(event) => setOptions({ ...options, cardColumns: Number(event.target.value) })} value={cardColumns} /></StandardLabel>
-          <FlexRowWrapper> Timer: <SmallerButton onClick={() => setWhatIsShown({ ...whatIsShown, timerWanted: !timerWanted })} >{timerWanted? "yes" : "no"}</SmallerButton></FlexRowWrapper>
-          <br /></>}
-
-            <SmallerHeadline>Controls </SmallerHeadline>
+          <GameOptions options={options} onUpdateOptions={updateOptions}/>
+          <ControlsSection>
+            <SmallerHeadline>Controls</SmallerHeadline>
             <FlexColumnWrapper>
               <ButtonContainer>
                 <StandardButton onClick={handleStart}>start</StandardButton>
@@ -415,6 +353,7 @@ function noClick() {
                 <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown, resultIsShown: false })} >
                   highscore
                 </BiggerButton>
+              
               </ButtonContainer>
               {setInfoIsShown &&
                 <SetInfo>
@@ -424,9 +363,8 @@ function noClick() {
                   <br></br>
                   Type: {typeOfSet}</SetInfo>}
             </FlexColumnWrapper>
-            <br />
+            </ControlsSection>
           {timerWanted && <Timer timespan={timespan} />}
-          
         </LeftSide>
         <SquareSection $height={cardSectionHeight} $addColumns={cardColumns - 4} $fraction="1fr " $shiftRight={shiftRight * (cardColumns - 4)} >
           {running === true ? (squareState.map((square, index) =>
@@ -442,11 +380,7 @@ function noClick() {
             <Highscore cardSectionHeight={cardSectionHeight} highscore={highscore} devMode={devMode} clickedDelete={handleDelete} highscoreIsShown={highscoreIsShown}
             clickedChangeShow={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} />}
         </HighScoreContainer> 
-        {devMode && <DevButtonContainer>
-            <DebugButton onClick={showDebugInfo}>log</DebugButton>
-            <DebugButton onClick={handleHighscoreReset}>resetHs</DebugButton>
-            <DebugButton onClick={()=>setWhatIsShown({...whatIsShown, resultIsShown: !resultIsShown})}>result</DebugButton>
-          </DevButtonContainer>}
+        {devMode && <DevOnly options={options} gameState={gameState} highscoreReset={doHighscoreReset} />}
       </StyledMain>
       }
     </>
