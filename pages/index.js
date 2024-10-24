@@ -185,10 +185,9 @@ export default function HomePage() {
     setClickStop(true);
     setGameIsPaused(false);
     setScores(zeroPoints);
+    setActivePlayer(nameOfPlayer1);
     setCount({ cardCount: 0, roundCount: 1 });
-    if (cardColumns > 4) {
-      setWhatIsShown({ ...whatIsShown, highscoreIsShown: false })
-    };
+    setWhatIsShown({ ...whatIsShown, highscoreIsShown: false });
     setSquareState(generateCardsArray(cardRows, cardColumns, shuffle, cardSet));
     setMessage("Game reset. Click start to begin a new game.");
   }
@@ -278,7 +277,7 @@ export default function HomePage() {
           const winner = sortedPoints[0].points === sortedPoints[1].points? `${sortedPoints[0].name} and ${sortedPoints[1].name}` : sortedPoints[0].name;
             setMessage(`Game won after ${roundCount} rounds. Congratulations, ${winner}!`);
             setGameState({ ...gameState, running: false, gameWon: true});
-            makeHighscoreEntry(timespan);
+            numberOfPlayers <=1 && makeHighscoreEntry(timespan);
             numberOfPlayers <=1 && setWhatIsShown({...whatIsShown, resultIsShown: true})
           
           };
