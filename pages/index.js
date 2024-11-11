@@ -298,7 +298,6 @@ export default function HomePage() {
           const winner = sortedPoints[0].name;
           setMessage(`Game won after ${roundCount} rounds. Congratulations, ${winner}!`);
           setGameState({ ...gameState, running: false, gameWon: true });
-          console.log("players", numberOfPlayers);
           numberOfPlayers <=1 && makeHighscoreEntry(timespan);
           numberOfPlayers <=1 && setWhatIsShown({ ...whatIsShown, resultIsShown: true });
           };
@@ -324,7 +323,6 @@ function noClick() {
     const shortDate = highscoreDate.slice(4, 21);
     const newEntry = { id: uuidv4(6), timestamp, shortDate, timespan, gameTime, gameSize, rounds: roundCount, completeScore, cardSet: cardSet.setName, nameOfPlayer1 }
     setHighscore([...highscore, newEntry]);
-    console.log("made HS entry");
   }
 
   // delete or make work

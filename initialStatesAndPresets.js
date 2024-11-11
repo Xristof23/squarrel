@@ -1,6 +1,8 @@
 import {  allSets } from "@/memoryData";
 
-const { euAnimals, afrAnimals, happy, ABCSet, abcDualSet, htmlSet, htmlDualSet, smallNumbers, wolfpack, darkrpg } = allSets;
+
+const euAnimals = allSets.filter((set) => set.setName === "euAnimals");
+const afrAnimals = allSets.filter((set) => set.setName === "afrAnimals");
 
 //presets
 const beginner = { name: "beginner", numberOfPlayers: 1, numberdealt: 14, cardSet: euAnimals, delayTime: 2000 };
@@ -12,9 +14,10 @@ const allPresets = [beginner, advanced, twoPlayers ];
 const initialCardState = [];
 const initialGameState = { running: false, gameWon: false, gameTime: 0, cardsShown: 0, card0: { id: "a" }, card1: { id: "b" } };
 const initialOptions = {
-    gameMode: "memory", numberOfPlayers: 1, nameOfPlayer1: "Squarrel", nameOfPlayer2: "Squirrel", nameOfPlayer3: "Square", numberDealt: 14, cardRows: 4, cardColumns: 4, delayTime: 2000, shuffle: true,
+    gameMode: "memory", numberOfPlayers: 1, nameOfPlayer1: "Simone", nameOfPlayer2: "Jean-Paul", numberDealt: 14, cardRows: 4, cardColumns: 4, delayTime: 2000, shuffle: true,
     cardSet: euAnimals, typeOfSet: "img", size: 6, timerWanted: true
 }
+console.log("inintialopt", initialOptions);
 
 export {
     initialCardState, 
