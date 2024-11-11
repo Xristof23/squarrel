@@ -22,15 +22,16 @@ const TimeDisplay = styled.div`
     border: 1px solid darkorange;
     background-color: white;
 `;
-export default function Timer({ timespan }) {
+export default function Timer({ timespan, minimalTimer }) {
     const [timerIsShown, setTimerIsShown] = useState(true);
-
     return(
         <TimerSection>
-            <FlexRowWrapper>
+            {!minimalTimer && <>
+                <FlexRowWrapper>
             <SmallerHeadline> Time</SmallerHeadline>
                 <SmallerButton onClick={() => setTimerIsShown(!timerIsShown)} >{timerIsShown ? "▲" : "▼"}</SmallerButton>
                 </FlexRowWrapper>
+            </>}
             {timerIsShown &&
                 <TimeDisplay> {formatDuration(timespan, 1)}
                 </TimeDisplay>}

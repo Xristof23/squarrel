@@ -1,4 +1,12 @@
-import {  euAnimals } from "@/memoryData";
+import {  allSets } from "@/memoryData";
+
+const { euAnimals, afrAnimals, happy, ABCSet, abcDualSet, htmlSet, htmlDualSet, smallNumbers, wolfpack, darkrpg } = allSets;
+
+//presets
+const beginner = { name: "beginner", numberOfPlayers: 1, numberdealt: 14, cardSet: euAnimals, delayTime: 2000 };
+const advanced = { name: "advanced", numberOfPlayers: 1, numberdealt: 22, cardSet: afrAnimals, delayTime: 1500 };
+const twoPlayers = { name: "twoPlayers", numberOfPlayers: 2, numberdealt: 22, cardSet: euAnimals, delayTime: 1800 };
+const allPresets = [beginner, advanced, twoPlayers ];
 
 // initial states
 const initialCardState = [];
@@ -12,4 +20,5 @@ export {
     initialCardState, 
     initialGameState,
     initialOptions,
+    allPresets
 }

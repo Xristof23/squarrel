@@ -38,7 +38,7 @@ function handleSelect(optionValue) {
         </FlexRowWrapper> 
       {optionsAreShown && <>
         <StandardLabel htmlFor="numberOfPlayers">Players:
-          <SmallerNrInput name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={3}
+          <SmallerNrInput name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={2}
             onChange={(event) => handleOptions({ numberOfPlayers: event.target.value })} value={numberOfPlayers} />
         </StandardLabel>
         <br />
@@ -50,11 +50,6 @@ function handleSelect(optionValue) {
         {numberOfPlayers >= 2 &&
           <StandardLabel htmlFor="nameOfPlayer2">Player2: <StyledInput name="nameOfPlayer2" id="nameOfPlayer2"
             onChange={(event) => handleOptions({nameOfPlayer2: event.target.value})} value={nameOfPlayer2} />
-          </StandardLabel>
-        }
-        {numberOfPlayers >= 3 &&
-          <StandardLabel htmlFor="nameOfPlayer3">Player3: <StyledInput name="nameOfPlayer3" id="nameOfPlayer3"
-            onChange={(event) => handleOptions({nameOfPlayer3: event.target.value })} value={nameOfPlayer3} />
           </StandardLabel>
         }
         <CardSetPreview previewHeight={160} cardSet={cardSet}  /> 

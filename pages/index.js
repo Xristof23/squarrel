@@ -35,6 +35,7 @@ import {
 import { formatDuration, calculatePoints, sortEntries } from "@/utils";
 import { v4 as uuidv4 } from 'uuid';
 import GameOptions from "@/components/GameOptions";
+import GameOptionsV2 from "@/components/GameOptionsV2";
 
 const ControlsSection = styled.section`
   width: 100%;
@@ -48,14 +49,24 @@ flex-grow: 0;
 background-color: red;
 `;
 
+const CardPlaceholder = styled.div`
+  display: block;  
+  position: relative;  
+  text-align: center;  
+  padding: 0.1rem;
+  min-height: 100px;
+  height: ${({ $height }) => `${$height}px`};
+  width: ${({ $height }) => `${$height}px`};
+  border-radius: 4px;
+  border: 1px solid black;
+`;
+
 export default function HomePage() {
   const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, newDesign: false, newOptions: false , highscoreIsShown: false, setInfoIsShown: false, resultIsShown: false });
   const { introIsShown, mainIsShown, highscoreIsShown, setInfoIsShown, resultIsShown, newDesign, newOptions  } = whatIsShown;
   const [devMode, setDevMode] = useState(false);
   const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
   const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, numberDealt, cardSet, shuffle, delayTime, typeOfSet, size, timerWanted } = options;
-  console.log("Number of cards dealt", numberDealt);
-  console.log("cardColumns", cardColumns);
   const [activePlayer, setActivePlayer] = useState(nameOfPlayer1);
   const zeroPoints = [{ name: nameOfPlayer1, points: 0 }, { name: nameOfPlayer2, points: 0 }, { name: nameOfPlayer3, points: 0 }]
   const [scores, setScores] = useState(zeroPoints);
@@ -122,8 +133,6 @@ export default function HomePage() {
       }
     }, [isWindowClient, setWindowWidth, setWindowHeight]);
 
-  //old
-  // const cardSectionHeight = windowHeight - 99;
   const cardSectionHeight = windowHeight - 20;
   const cardHeight = cardSectionHeight / 4 - 6;
   const shiftRight = cardSectionHeight / 8 + 1;
@@ -133,8 +142,6 @@ export default function HomePage() {
 
   //old: card rows = 4 for now, 4 <= cardColumns <= 8 changing!!
   function generateCardsArray(numberOfCards, shuffle, cardSet) {
-    // const numberOfSquares = cardColumns * cardRows;
-
     const cardNumbers = [...Array(numberOfCards).keys()];
 
     function shuffleArray(array) {
@@ -285,15 +292,15 @@ export default function HomePage() {
       setTimeout(() => {
           setGameState(afterRoundGameState);
           setMessage(match ? "You scored!" : "You may score next round!");
-
+  
         if (newScore === numberDealt) { 
           const sortedPoints = sortEntries(scores, "points", false);
-          const winner = sortedPoints[0].points === sortedPoints[1].points? `${sortedPoints[0].name} and ${sortedPoints[1].name}` : sortedPoints[0].name;
-            setMessage(`Game won after ${roundCount} rounds. Congratulations, ${winner}!`);
-            setGameState({ ...gameState, running: false, gameWon: true});
-            numberOfPlayers <=1 && makeHighscoreEntry(timespan);
-            numberOfPlayers <=1 && setWhatIsShown({...whatIsShown, resultIsShown: true})
-          
+          const winner = sortedPoints[0].name;
+          setMessage(`Game won after ${roundCount} rounds. Congratulations, ${winner}!`);
+          setGameState({ ...gameState, running: false, gameWon: true });
+          console.log("players", numberOfPlayers);
+          numberOfPlayers <=1 && makeHighscoreEntry(timespan);
+          numberOfPlayers <=1 && setWhatIsShown({ ...whatIsShown, resultIsShown: true });
           };
         }, timeToSee + 300)
       }
@@ -307,8 +314,8 @@ function noClick() {
 }
   
   function makeHighscoreEntry(timespan) {
-    // const gameSize = cardColumns * cardRows;
     const gameSize = numberDealt;
+    
     const timestamp = Date.now();
     const highscoreDate = new Date(timestamp).toString();
     const gameTime = formatDuration(timespan, 1);
@@ -317,11 +324,12 @@ function noClick() {
     const shortDate = highscoreDate.slice(4, 21);
     const newEntry = { id: uuidv4(6), timestamp, shortDate, timespan, gameTime, gameSize, rounds: roundCount, completeScore, cardSet: cardSet.setName, nameOfPlayer1 }
     setHighscore([...highscore, newEntry]);
+    console.log("made HS entry");
   }
 
+  // delete or make work
   function doHighscoreReset() {
-    setMessage("Do you really want to reset the complete highscore? This is non reversible!");
-
+    setMessage("Do you really want to reset the complete highscore? This is not reversible!");
   }
 
   function giveCards(delayTime, upperLimit) {
@@ -332,7 +340,11 @@ function noClick() {
   function updateOptions(updatedOptions) {
     setOptions({ ...options, ...updatedOptions });
   }
-  
+
+
+const arrayForEmpty = [...Array(numberDealt).keys()];
+
+
   return (
     <>
       {introIsShown && <Intro overallMaxwidth={overallMaxwidth} endOfIntro={handleEndOfIntro} />}
@@ -384,7 +396,7 @@ function noClick() {
                   Type: {typeOfSet}</SetInfo>}
             </FlexColumnWrapper>
             </ControlsSection>
-          {timerWanted && <Timer timespan={timespan} />}
+          {timerWanted && <Timer timespan={timespan} minimalTimer={false} />}
         </LeftSide>
         <SquareSection $height={cardSectionHeight} $addColumns={cardColumns - 4} $fraction="1fr " $shiftRight={shiftRight * (cardColumns - 4)} >
           {running === true ? (squareState.map((square, index) =>
@@ -406,37 +418,39 @@ function noClick() {
       {newDesign && <NewSquareSection $height={cardSectionHeight} $addColumns={cardColumns - 4} $fraction="1fr " $shiftRight={shiftRight * (cardColumns - 4)}>
         <FirstSquare $height={cardHeight}>
         <ControlsSection>
-            <FlexRowWrapper> <SmallerHeadline>Controls</SmallerHeadline>
-              <TestButton onClick={() => setWhatIsShown({ ...whatIsShown, newDesign: !newDesign })}>
-                    {newDesign ? "new" : "old"}
-                </TestButton>
-        </FlexRowWrapper>
-         
             <FlexRowWrapper>
               <StandardButton $width={cardHeight / 5} onClick={handleStart}>►</StandardButton>
-                <StandardButton onClick={handlePause}>{gameIsPaused ? "continue" : "pause"}</StandardButton>
+                {/* <StandardButton onClick={handlePause}>{gameIsPaused ? "continue" : "pause"}</StandardButton> */}
               <StandardButton onClick={handleReset}>reset</StandardButton>
+              <StandardButton onClick={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown, resultIsShown: false })}>
+                  highscore
+                </StandardButton>
             </FlexRowWrapper>
                 <FlexRowWrapper>
-                <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown, resultIsShown: false })}>
-                  highscore
-                </BiggerButton>
-               
-              <StandardButton onClick={() => setWhatIsShown({ ...whatIsShown, newOptions: !newOptions })}>
-               {newOptions ? "hide" : "show"}options</StandardButton>
+              
                 </FlexRowWrapper>
           </ControlsSection>
-          
-          
+          <StatLine> Won cards: {scores[0].points} 🟧
+          </StatLine>
+          <GameOptionsV2 options={options} onUpdateOptions={updateOptions} />
+          {timerWanted && <Timer timespan={timespan} minimalTimer={true} />}
         </FirstSquare>
-        {newOptions && <NewOptionsContainer>
-          <GameOptions options={options} onUpdateOptions={updateOptions} />
-        </NewOptionsContainer>}
+       
         {running === true ? (squareState.map((square, index) =>
           <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id} isVisible={squareCount >= index ? true : false}
             front={square.front} frontImage={square.frontImage} back={square.back} isShown={square.isShown} won={square.won} typeOfSet={square.typeOfSet}
-            setName={cardSet.setName} clickStop={clickStop} size={size} cardHeight={cardHeight} />)) : null}
-        <FirstSquare $height={cardHeight}></FirstSquare>
+            setName={cardSet.setName} clickStop={clickStop} size={size} cardHeight={cardHeight} />)) :
+          (arrayForEmpty.map((item, index) =>
+            <CardPlaceholder key={index}  $height={cardHeight} />))}
+        <FirstSquare $height={cardHeight}>
+        <TestButton onClick={() => setWhatIsShown({ ...whatIsShown, newDesign: !newDesign })}>
+                    {newDesign ? "to  old" : "to new"}
+                </TestButton>
+          <TitleContainer>
+            <DevSquare onClick={() => setDevMode(!devMode)}>🟧</DevSquare><SquarrelTitle> SQUARREL</SquarrelTitle>
+           
+           </TitleContainer>
+        </FirstSquare>
       </NewSquareSection>}
     </>
   );
