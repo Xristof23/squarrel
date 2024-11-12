@@ -49,6 +49,14 @@ flex-grow: 0;
 background-color: red;
 `;
 
+const MinimalDisplay = styled.p`
+text-align: left;  
+ font-size: 0.95rem;
+  width: 95%;
+  margin: .5rem .5rem 1rem 0rem;
+  padding: 0rem;
+`;
+
 const CardPlaceholder = styled.div`
   display: block;  
   position: relative;  
@@ -65,9 +73,11 @@ export default function HomePage() {
   const [whatIsShown, setWhatIsShown] = useState({ introIsShown: true, mainIsShown: false, newDesign: false, newOptions: false , highscoreIsShown: false, setInfoIsShown: false, resultIsShown: false });
   const { introIsShown, mainIsShown, highscoreIsShown, setInfoIsShown, resultIsShown, newDesign, newOptions  } = whatIsShown;
   const [devMode, setDevMode] = useState(false);
-  const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
+  // const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
+  //use this alt as long as working on GameOptionsV2
+  const [options, setOptions] = useState(initialOptions);
   const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, numberDealt, cardSet, shuffle, delayTime, typeOfSet, size, timerWanted } = options;
-  const[activePlayer, setActivePlayer] = useState(nameOfPlayer1);
+  const [activePlayer, setActivePlayer] = useState(nameOfPlayer1);
   const zeroPoints = [{ name: nameOfPlayer1, points: 0 }, { name: nameOfPlayer2, points: 0 }, { name: nameOfPlayer3, points: 0 }]
   const [scores, setScores] = useState(zeroPoints);
   const [squareState, setSquareState] = useState(initialCardState);
@@ -425,15 +435,25 @@ const arrayForEmpty = [...Array(numberDealt).keys()];
                   highscore
                 </StandardButton>
             </FlexRowWrapper>
-                <FlexRowWrapper>
-              
-                </FlexRowWrapper>
+             
           </ControlsSection>
-          <StatLine> Won cards: {scores[0].points} 🟧
-          </StatLine>
+         
           <GameOptionsV2 options={options} onUpdateOptions={updateOptions} />
-          {timerWanted && <Timer timespan={timespan} minimalTimer={true} />}
+        
+          <FlexRowWrapper>
+            {timerWanted && <Timer timespan={timespan} minimalTimer={true} />}
+            <MinimalDisplay> Points: {scores[0].points} 🟧
+            </MinimalDisplay>
+            </FlexRowWrapper>
         </FirstSquare>
+        <HighScoreContainer $width={cardSectionHeight}>
+          {resultIsShown &&
+            <ResultMessage closeResult={() => setWhatIsShown({ ...whatIsShown, resultIsShown: false })} roundCount={roundCount} timespan={timespan} gameSize={cardColumns * cardRows} />
+          }
+          {highscoreIsShown &&
+            <Highscore cardSectionHeight={cardSectionHeight} highscore={highscore} devMode={devMode} clickedDelete={handleDelete} highscoreIsShown={highscoreIsShown}
+            clickedChangeShow={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} />}
+        </HighScoreContainer> 
        
         {running === true ? (squareState.map((square, index) =>
           <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id} isVisible={squareCount >= index ? true : false}

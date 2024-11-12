@@ -3,9 +3,9 @@ import {  allSets } from "@/memoryData";
 const [euAnimals, afrAnimals, ...rest] = allSets;
 
 //presets
-const beginner = { name: "beginner", numberOfPlayers: 1, numberdealt: 14, cardSet: euAnimals, delayTime: 2000 };
-const advanced = { name: "advanced", numberOfPlayers: 1, numberdealt: 22, cardSet: afrAnimals, delayTime: 1500 };
-const twoPlayers = { name: "twoPlayers", numberOfPlayers: 2, numberdealt: 22, cardSet: euAnimals, delayTime: 1800 };
+const beginner = { name: "beginner", numberOfPlayers: 1, numberDealt: 14, cardSet: euAnimals, delayTime: 2000 };
+const advanced = { name: "advanced", numberOfPlayers: 1, numberDealt: 22, cardSet: afrAnimals, delayTime: 1500 };
+const twoPlayers = { name: "twoPlayers", numberOfPlayers: 2, numberDealt: 22, cardSet: euAnimals, delayTime: 1800 };
 const allPresets = [beginner, advanced, twoPlayers ];
 
 // initial states

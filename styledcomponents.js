@@ -196,7 +196,7 @@ const Placeholder= styled.div`
 //Form
 const StandardLabel = styled.label`
   font-size: 0.95rem;
-  width: 95%;
+  width: 98%;
   margin: .5rem .5rem 1rem 0rem;
   padding: 0rem;
 `;
@@ -225,10 +225,13 @@ const SmallerNrInput = styled(StyledNrInput)`
 `;
 
 const StyledInput = styled.input`
+flex-grow: 1;
   min-width: 3rem;
-  width: 60%;
+  width: 65%;
+  height: 1.8rem;
   margin: .2rem;
   padding: .2rem;
+  border-radius: 4px;
 `;
 
 //Buttons

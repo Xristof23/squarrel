@@ -10,16 +10,16 @@ const MinimalOptionsSection = styled.section`
   width: 95%;
   height: 50px;
   border-radius: 4px;
-  margin-bottom: .5rem;
+  margin-bottom: 1.5rem;
 `;
 
-export default function GameOptionsV2 ({options, onUpdateOptions}) {
+export default function GameOptionsV2({ options, onUpdateOptions }) {
   const [minimal, setMinimal] = useState(true);
   const [preset, setPreset] = useState("beginner");
-  const { numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, numberDealt, cardColumns, delayTime, cardSet, typeOfSet, size, timerWanted} = options;
+  const { numberOfPlayers, nameOfPlayer1, nameOfPlayer2, numberDealt, cardColumns, delayTime, cardSet, typeOfSet, size, timerWanted } = options;
   // const { setName, setList } = cardSet;
 
-  const { beginner, advanced, twoPlayers } = allPresets;
+  const [beginner, advanced, twoPlayers ] = allPresets;
 
   function handleOptions(optionsObject) {
     onUpdateOptions(optionsObject);
@@ -27,12 +27,13 @@ export default function GameOptionsV2 ({options, onUpdateOptions}) {
 
 
 function handleSelectPreset(optionValue) {
-  const chosenPreset = allPresets.filter((preset) => preset.name === optionValue);
+  const chosenArray = allPresets.filter((preset) => preset.name === optionValue);
+  const chosenPreset = chosenArray[0];
   console.log(chosenPreset);
   setPreset(chosenPreset.name);
-  // const chosenSet = chosenArray[0];
-  handleOptions({ cardSet: chosenPreset.cardset });
-  // handleOptions({cardSet: chosenPreset.cardset, typeOfSet: chosenSet.typeOfSet, size: chosenPrese.size ? chosenSet.size : options.size });
+ 
+  handleOptions({ cardSet: chosenPreset.cardSet, numberDealt: chosenPreset.numberDealt, delayTime: chosenPreset.delayTime });
+ 
 }
   
   return (
@@ -80,7 +81,6 @@ function handleSelectPreset(optionValue) {
             <SmallerButton onClick={() => handleOptions({ timerWanted: !timerWanted })} >{timerWanted ? "yes" : "no"}</SmallerButton>
           </FlexRowWrapper>
         </>}
-      
       </MinimalOptionsSection>
    
     )
