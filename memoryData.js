@@ -44,7 +44,6 @@ const abcDualSetlist = ABCSet.setList.map((letter) => {
 
 const abcDualSet = { setName: "abcDualSet", typeOfSet: "ASCIIDual", size: 6, setList: abcDualSetlist };
 
-//(not yet ready) has to be filled
 const htmlDualSetList = htmlSet.setList.map((tag) => {
     const pairObject = {
         half1: tag, half2: tag.replace("<", "</")

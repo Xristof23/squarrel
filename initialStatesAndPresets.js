@@ -1,8 +1,6 @@
 import {  allSets } from "@/memoryData";
 
-
-const euAnimals = allSets.filter((set) => set.setName === "euAnimals");
-const afrAnimals = allSets.filter((set) => set.setName === "afrAnimals");
+const [euAnimals, afrAnimals, ...rest] = allSets;
 
 //presets
 const beginner = { name: "beginner", numberOfPlayers: 1, numberdealt: 14, cardSet: euAnimals, delayTime: 2000 };
@@ -17,7 +15,6 @@ const initialOptions = {
     gameMode: "memory", numberOfPlayers: 1, nameOfPlayer1: "Simone", nameOfPlayer2: "Jean-Paul", numberDealt: 14, cardRows: 4, cardColumns: 4, delayTime: 2000, shuffle: true,
     cardSet: euAnimals, typeOfSet: "img", size: 6, timerWanted: true
 }
-console.log("inintialopt", initialOptions);
 
 export {
     initialCardState, 

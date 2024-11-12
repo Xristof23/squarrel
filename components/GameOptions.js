@@ -13,7 +13,6 @@ const OptionsSection = styled.section`
 
 export default function GameOptions({options, onUpdateOptions}) {
   const [optionsAreShown, setOptionsareShown] = useState(true);
-  console.log("GameoptionsV1", options);
   const { numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, numberDealt, cardColumns, delayTime, cardSet, typeOfSet, size, timerWanted} = options;
   const { setName, setList } = cardSet;
 

@@ -67,7 +67,7 @@ export default function HomePage() {
   const [devMode, setDevMode] = useState(false);
   const [options, setOptions] = useLocalStorageState("options", { defaultValue: initialOptions });
   const { gameMode, numberOfPlayers, nameOfPlayer1, nameOfPlayer2, nameOfPlayer3, cardRows, cardColumns, numberDealt, cardSet, shuffle, delayTime, typeOfSet, size, timerWanted } = options;
-  const [activePlayer, setActivePlayer] = useState(nameOfPlayer1);
+  const[activePlayer, setActivePlayer] = useState(nameOfPlayer1);
   const zeroPoints = [{ name: nameOfPlayer1, points: 0 }, { name: nameOfPlayer2, points: 0 }, { name: nameOfPlayer3, points: 0 }]
   const [scores, setScores] = useState(zeroPoints);
   const [squareState, setSquareState] = useState(initialCardState);
@@ -381,9 +381,7 @@ const arrayForEmpty = [...Array(numberDealt).keys()];
                 <BiggerButton onClick={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown, resultIsShown: false })} >
                   highscore
                 </BiggerButton>
-                  <TestButton onClick={() => setWhatIsShown({ ...whatIsShown, newDesign: !newDesign })}>
-                    {newDesign ? "new" : "old"}
-                  </TestButton>
+               
               </ButtonContainer>
               {setInfoIsShown &&
                 <SetInfo>
@@ -394,7 +392,10 @@ const arrayForEmpty = [...Array(numberDealt).keys()];
                   Type: {typeOfSet}</SetInfo>}
             </FlexColumnWrapper>
             </ControlsSection>
-          {timerWanted && <Timer timespan={timespan} minimalTimer={false} />}
+            {timerWanted && <Timer timespan={timespan} minimalTimer={false} />}
+            <TestButton onClick={() => setWhatIsShown({ ...whatIsShown, newDesign: !newDesign })}>
+                    {newDesign ? "switch to old" : "switch to new"}
+            </TestButton>
         </LeftSide>
         <SquareSection $height={cardSectionHeight} $addColumns={cardColumns - 4} $fraction="1fr " $shiftRight={shiftRight * (cardColumns - 4)} >
           {running === true ? (squareState.map((square, index) =>

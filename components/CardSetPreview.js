@@ -39,7 +39,7 @@ background-color: black;
 
 
 export default function CardSetPreview({ cardSet, previewHeight }) {
-  const { setName, setList, typeOfSet, size } = cardSet;
+  const { setName, setList, typeOfSet, size} = cardSet;
   const htmlDualPreview = ["<img>", "</head>", "<head>", "</img>",]
   const abcDualPreview = ["a", "Z", "b", "A"]
   const shownSetList = setName==="abcDualSet"? abcDualPreview : setName==="htmlDualSet"? htmlDualPreview : setList.slice(0, 4);
