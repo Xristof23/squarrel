@@ -42,7 +42,7 @@ margin-top: -172px;
 const StyledMain = styled.main`
  display: grid;
   grid-template-columns: 194px 800px;
-  grid-template-rows: 78px 194px 194px 194px 194px;
+  grid-template-rows: 36px 194px 194px 194px 194px;
   width: 99.5%;
   position: absolute;
   top: -1rem;
@@ -83,10 +83,10 @@ padding: .5rem;
 const HighScoreContainer = styled.div`
   position: absolute;
   padding: 0;
-  top: 92px;
-  left: 210px;
+  top: -10px;
+  left: 212px;
   margin: .5rem; 
-  width: ${({ $width }) => `${$width +2}px`};
+  width: ${({ $width }) => `${$width -18}px`};
   height: fit-content;
   border-radius: 4px;
   z-index: 2;
@@ -143,20 +143,18 @@ const MessageSlot = styled.div`
  color: black;
  flex-grow: 1;
  font-weight: 400;
- background-color: rgb(240 130 0 / 70%);
  min-width: 400px;
  width: 40%;
  height: 80%;
  margin: .5rem;
  padding: 0.3rem;
  border-radius: 4px;
- border: 1px solid rgb(240 130 0 / 100%);
 `;
 
 const Stats = styled.div`
   display: grid;
   grid-template-columns: 1fr 2fr 2fr;  
-text-align: left; 
+  text-align: left; 
  margin: .5rem;
 padding: 0.3rem;
 min-width: 385px;
@@ -170,9 +168,9 @@ text-align: left;
 `;
 
 const ControlsContainer = styled.div`
-display: flex;
-flex-direction: row; 
-padding: .5rem;
+  display: flex;
+  flex-direction: row; 
+  padding: .5rem;
   width: 100%;
   height: 3rem;
   background-color: lightgray;
@@ -195,16 +193,17 @@ const Placeholder= styled.div`
 
 //Form
 const StandardLabel = styled.label`
-  font-size: 0.95rem;
-  width: 98%;
-  margin: .5rem .5rem 1rem 0rem;
-  padding: 0rem;
+ text-align: left;   
+ font-size: 0.95rem;
+  width: 100%;
+  margin: .5rem .5rem 1rem 0;
+  padding: .5rem .5rem .5rem 0;
 `;
 
 const StyledSelect = styled.select`
  padding: .3rem;
  width: 98.5%;
-margin: 0.3rem .3rem .3rem 0; 
+margin: 0.5rem .5rem .5rem 0; 
 `;
 
 const StyledNrInput = styled.input`
@@ -216,8 +215,8 @@ const StyledNrInput = styled.input`
 `;
 
 const SmallerNrInput = styled(StyledNrInput)`
- min-height: .8rem;
- height: 1.2rem;
+  min-height: .8rem;
+  height: 1.2rem;
   width: 3.3rem;
   margin: .3rem;
   padding: .2rem;
@@ -225,12 +224,14 @@ const SmallerNrInput = styled(StyledNrInput)`
 `;
 
 const StyledInput = styled.input`
-flex-grow: 1;
+  flex-grow: 1;
   min-width: 3rem;
-  width: 65%;
+  width: ${({ $width }) => $width? `${$width}px` : "6rem"};
   height: 1.8rem;
-  margin: .2rem;
-  padding: .2rem;
+  margin: .2rem 0 .2rem .2rem;
+  padding: 0
+  border: 1px solid darkorange;
+  background-color: #fffffc;
   border-radius: 4px;
 `;
 
@@ -249,14 +250,14 @@ const ButtonContainer = styled.div`
 
 const StandardButton = styled.button`
 text-align: center;
-font-size: 1rem;
+font-size: .95rem;
 font-weight: 400; 
 flex-grow: 1;
 margin: .1rem 0 .1rem 0;
 padding: 0.3rem;
 width: ${({ $width }) => $width? `${$width}px` : "2.5rem"};
 min-width: fit-content;
-min-height: 1.8rem;
+height: 1.8rem;
 border-radius: 4px;
 border: 1px solid darkorange;
 background-color: #fffffc;

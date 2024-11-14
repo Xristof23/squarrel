@@ -21,7 +21,7 @@ const TimeDisplay = styled.div`
     line-height: .95rem;
     border-radius: 4px;
     border: 1px solid darkorange;
-    background-color: white;
+    background-color: #fffffc;
 `;
 export default function Timer({ timespan, minimalTimer }) {
     const [timerIsShown, setTimerIsShown] = useState(true);
