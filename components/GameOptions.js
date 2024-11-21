@@ -38,9 +38,31 @@ function handleSelect(optionValue) {
       
           <StandardLabel htmlFor="numberDealt">Size: <SmallerNrInput name="numberDealt" id="numberDealt" type="number" min={14} max={30} step={4}
             onChange={(event) => handleOptions({ numberDealt: Number(event.target.value), cardColumns: Math.ceil(event.target.value / 4) })} value={numberDealt} /></StandardLabel>
-          <FlexRowWrapper> Timer:
+           <StandardLabel htmlFor="numberOfPlayers">Players:
+              <SmallerNrInput name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={2}
+           onChange={(event) => handleOptions({ numberOfPlayers: event.target.value })} value={numberOfPlayers} />
+           </StandardLabel>   
+    
+      <StandardLabel htmlFor="selectSet">
+          <StyledSelect aria-label="Choose a set of cards" id="selectSet"
+        name="selectSet" value={`${cardSet.setName}`} onChange={(event) => handleSelect(event.target.value)}
+         >
+            <option value={""}>--Please choose a card set--</option>
+            <option value="euAnimals">European animals (b&w)</option>
+            <option value="wolfpack">Cult of wolves (b&w)</option>
+            <option value="afrAnimals">African animals (colour)</option>
+            <option value="happy">Being happy (colour)</option>
+            <option value="darkrpg">RPG characters (colour)</option>
+            <option value="ABCSet">Capital letters</option>
+            <option value="abcDualSet">Two kinds of letters</option>
+            <option value="smallNumbers">Small numbers</option>
+            <option value="htmlSet">HTML opening tags</option>
+            <option value="htmlDualSet">HTML tag pairs</option>
+          </StyledSelect>
+      </StandardLabel>
+      <FlexRowWrapper> Timer:
             <SmallerButton onClick={() => handleOptions({ timerWanted: !timerWanted })} >{timerWanted ? "yes" : "no"}</SmallerButton>
-          </FlexRowWrapper>
+      </FlexRowWrapper>
       </OptionsSection>
       // <OptionsSection>
       // <FlexRowWrapper>
@@ -49,10 +71,7 @@ function handleSelect(optionValue) {
        
       //   </FlexRowWrapper> 
       // {optionsAreShown && <>
-      //   <StandardLabel htmlFor="numberOfPlayers">Players:
-      //     <SmallerNrInput name="numberOfPlayers" id="numberOfPlayers" type="number" min={1} max={2}
-      //       onChange={(event) => handleOptions({ numberOfPlayers: event.target.value })} value={numberOfPlayers} />
-      //   </StandardLabel>
+   
       //   <br />
       //   <StandardLabel htmlFor="nameOfPlayer1">Player1: <StyledInput name="nameOfPlayer1" id="nameOfPlayer1"
       //     onChange={(event) => handleOptions({ nameOfPlayer1: event.target.value })} value={nameOfPlayer1} />

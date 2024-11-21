@@ -349,7 +349,8 @@ export default function HomePage() {
     setOptions({ ...options, ...updatedOptions });
   }
 
-  const arrayForEmpty = [...Array(numberDealt).keys()];
+  const numberOfEmptySquares = moreOptions ? numberDealt - 1 : numberDealt;
+  const arrayForEmpty = [...Array(numberOfEmptySquares).keys()];
 
 
   return (
@@ -396,7 +397,9 @@ export default function HomePage() {
             <Highscore cardSectionHeight={cardSectionHeight} highscore={highscore} devMode={devMode} clickedDelete={handleDelete} highscoreIsShown={highscoreIsShown}
             clickedChangeShow={() => setWhatIsShown({ ...whatIsShown, highscoreIsShown: !highscoreIsShown })} />}
         </HighScoreContainer> 
-          {moreOptions && <GameOptions options={options} onUpdateOptions={updateOptions}/>}
+          {moreOptions && <FirstSquare  $height={cardHeight}>
+            <GameOptions options={options} onUpdateOptions={updateOptions} />
+          </FirstSquare>}
 
         {running === true ? (squareState.map((square, index) =>
           <Card onTurn={cardClick} noTurn={noClick} key={square.id} id={square.id} isVisible={squareCount >= index ? true : false}

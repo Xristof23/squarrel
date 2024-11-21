@@ -209,7 +209,7 @@ margin: 0.5rem .5rem .5rem 0;
 const StyledNrInput = styled.input`
   font-size: 0.8rem;
   width: 4rem;
-  margin: 0.3rem;
+  margin: 0.2rem;
   padding: .2rem;
   border-radius: 4px;
 `;
