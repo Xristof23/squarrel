@@ -186,7 +186,6 @@ const Placeholder= styled.div`
   min-height: 40px;
   width: 14rem;
   height: 50%;
-  align-content: center;
   align-items: center;
   border-radius: 4px;
 `;
@@ -196,8 +195,8 @@ const StandardLabel = styled.label`
  text-align: left;   
  font-size: 0.95rem;
   width: 100%;
-  margin: .5rem .5rem 1rem 0;
-  padding: .5rem .5rem .5rem 0;
+  margin: 0;
+  padding: .3rem .3rem .3rem 0;
 `;
 
 const StyledSelect = styled.select`

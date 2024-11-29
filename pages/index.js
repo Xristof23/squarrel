@@ -386,7 +386,7 @@ export default function HomePage() {
             </FlexRowWrapper>
             <FlexRowWrapper>
             {timerWanted && <Timer timespan={timespan} minimalTimer={true} />}
-            <StandardButton onClick={()=>setWhatIsShown({...whatIsShown, moreOptions: !moreOptions})}>details</StandardButton>
+            <StandardButton onClick={()=>setWhatIsShown({...whatIsShown, moreOptions: !moreOptions, resultIsShown: false})}>details</StandardButton>
             </FlexRowWrapper>
           </FirstSquare>
         <HighScoreContainer $width={cardSectionHeight}>

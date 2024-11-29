@@ -28,8 +28,7 @@ export default function GameOptionsV2({ cardHeight, options, onUpdateOptions }) 
 
 function handleSelectPreset(optionValue) {
   const chosenArray = allPresets.filter((preset) => preset.name === optionValue);
-  const chosenPreset = chosenArray[0];
-  console.log(chosenPreset);
+  const chosenPreset = chosenArray[0];s
   setPreset(chosenPreset.name);
  
   handleOptions({ cardSet: chosenPreset.cardSet, numberDealt: chosenPreset.numberDealt, delayTime: chosenPreset.delayTime });
